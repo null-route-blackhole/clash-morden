@@ -1,0 +1,68 @@
+use std::num::ParseIntError;
+
+use serde::{Serialize, ser::Serializer};
+
+use crate::models::WebSocketConnectionId;
+
+pub type Result<T> = std::result::Result<T, Error>;
+
+#[derive(Debug, thiserror::Error)]
+pub enum Error {
+    #[error("Missing {0} parameter")]
+    MissingPathParameter(String),
+    #[error("I/O error: {0}")]
+    Io(#[from] std::io::Error),
+    #[error(transparent)]
+    Reqwest(#[from] reqwest::Error),
+    #[error(transparent)]
+    Json(#[from] serde_json::Error),
+    #[error("Websocket error: {0}")]
+    WebSocket(String),
+    #[error("Connection not found for the given id: {0}")]
+    WebSocketConnectionNotFound(WebSocketConnectionId),
+    #[error(transparent)]
+    InvalidHeaderValue(#[from] tokio_tungstenite::tungstenite::http::header::InvalidHeaderValue),
+    #[error(transparent)]
+    InvalidHeaderName(#[from] tokio_tungstenite::tungstenite::http::header::InvalidHeaderName),
+    #[error("IPC send timeout")]
+    Timeout(#[from] tokio::time::error::Elapsed),
+    #[error("The {0} method not supported")]
+    MethodNotSupported(String),
+    #[error("Failed Response, {0}")]
+    FailedResponse(String),
+    #[error(transparent)]
+    HttpError(#[from] http::Error),
+    #[error("Url parse error: {0}")]
+    UrlParseError(String),
+    #[error(transparent)]
+    ParseIntError(#[from] ParseIntError),
+}
+
+impl Serialize for Error {
+    fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        serializer.serialize_str(self.to_string().as_ref())
+    }
+}
+
+impl From<tokio_tungstenite::tungstenite::Error> for Error {
+    fn from(e: tokio_tungstenite::tungstenite::Error) -> Self {
+        crate::Error::WebSocket(e.to_string())
+    }
+}
+
+#[macro_export]
+macro_rules! failed_resp {
+    ($($arg: tt)*) => {
+        $crate::Error::FailedResponse(format!($($arg)*))
+    };
+}
+
+#[macro_export]
+macro_rules! ret_failed_resp {
+    ($($arg: tt)*) => {
+        return Err($crate::failed_resp!($($arg)*))
+    };
+}

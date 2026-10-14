@@ -1,0 +1,17 @@
+[package]
+name = "mihomo-rule-parser"
+version = "0.1.0"
+edition.workspace = true
+authors = ["Anonymous"]
+description = "Mihomo Rule Parser"
+
+[lib]
+name = "mihomo_rule_parser"
+
+[dependencies]
+serde.workspace = true
+serde_yaml.workspace = true
+thiserror.workspace = true
+
+byteorder = "1.5"
+zstd = "0.14"

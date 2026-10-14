@@ -1,0 +1,61 @@
+import js from "@eslint/js";
+import globals from "globals";
+import reactHooks from "eslint-plugin-react-hooks";
+import reactRefresh from "eslint-plugin-react-refresh";
+import tseslint from "typescript-eslint";
+import simpleImportSort from "eslint-plugin-simple-import-sort";
+import { defineConfig } from "eslint/config";
+
+export default defineConfig(
+  {
+    ignores: [
+      "node_modules",
+      "dist",
+      "src-tauri/frontend/dist",
+      "src/routeTree.gen.ts",
+      "src/public/zashboard",
+    ],
+  },
+  {
+    files: [
+      "scripts/*.ts",
+      "src/**/*.{js,mjs,ts,tsx}",
+      "crates/tauri-plugin-mihomo/guest-js/**/*.ts",
+      "vite.config.ts",
+    ],
+    extends: [js.configs.recommended, ...tseslint.configs.recommended],
+    languageOptions: {
+      ecmaVersion: "latest",
+      sourceType: "module",
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+        __OS_PLATFORM__: "readonly",
+      },
+    },
+    plugins: {
+      "react-hooks": reactHooks,
+      "react-refresh": reactRefresh,
+      "simple-import-sort": simpleImportSort,
+    },
+    rules: {
+      "react-hooks/rules-of-hooks": "error",
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          args: "all",
+          argsIgnorePattern: "^_",
+          caughtErrors: "all",
+          caughtErrorsIgnorePattern: "^_|ignore",
+          destructuredArrayIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          ignoreRestSiblings: true,
+        },
+      ],
+      "no-control-regex": "off",
+      "simple-import-sort/imports": "error",
+      "simple-import-sort/exports": "error",
+    },
+  },
+);

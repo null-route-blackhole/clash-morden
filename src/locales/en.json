@@ -1,0 +1,1354 @@
+{
+  "common": {
+    "actions": {
+      "back": "Back",
+      "close": "Close",
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "auto": "Auto",
+      "new": "New",
+      "edit": "Edit",
+      "save": "Save",
+      "delete": "Delete",
+      "enable": "Enable",
+      "disable": "Disable",
+      "add": "Add",
+      "apply": "Apply",
+      "browse": "Browse",
+      "clear": "Clear",
+      "pause": "Pause",
+      "refresh": "Refresh",
+      "import": "Import",
+      "update": "Update",
+      "updateAll": "Update All",
+      "upgrade": "Upgrade",
+      "restart": "Restart",
+      "versionManager": "Version Manager",
+      "install": "Install",
+      "uninstall": "Uninstall",
+      "use": "Use",
+      "grant": "Grant",
+      "reGrant": "Re-Grant",
+      "select": "Select",
+      "openUrl": "Open URL",
+      "chooseFile": "Choose File",
+      "resetToDefault": "Reset to Default",
+      "expandAll": "Expand All",
+      "collapseAll": "Collapse All",
+      "scrollToTop": "Scroll to Top",
+      "exit": "Exit",
+      "retry": "Retry"
+    },
+    "status": {
+      "active": "Active",
+      "closed": "Closed",
+      "default": "Default",
+      "service": {
+        "pending": "pending",
+        "installed": "installed",
+        "uninstall": "uninstalled",
+        "active": "active",
+        "unknown": "unknown"
+      },
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "granted": "Granted",
+      "notGranted": "Not Granted",
+      "readOnly": "ReadOnly",
+      "notAvailable": "Not available",
+      "recommended": "Recommended",
+      "required": "Required"
+    },
+    "fields": {
+      "name": "Name",
+      "type": "Type",
+      "description": "Descriptions",
+      "icon": "Icon",
+      "location": "Location",
+      "host": "Host",
+      "process": "Process",
+      "time": "Time",
+      "source": "Source",
+      "destination": "Destination",
+      "from": "From",
+      "updatedTime": "Updated Time",
+      "expireTime": "Expire Time",
+      "usedTotal": "Used / Total",
+      "device": "Device Name",
+      "stack": "Tun Stack",
+      "language": "Language",
+      "startPage": "Start Page",
+      "startupScript": "Startup Script"
+    },
+    "search": {
+      "filter": "Filter",
+      "filterConditions": "Filter conditions",
+      "content": "Content",
+      "contentPlaceholder": "Search rule content",
+      "domain": "Domain",
+      "domainPlaceholder": "Search domain, e.g. google.com",
+      "cidr": "CIDR",
+      "cidrPlaceholder": "Search IP or CIDR, e.g. 8.8.8.8 or 8.8.8.0/24",
+      "rulesTotal": "{{count}} rules",
+      "rulesMatched": "{{mode}}: {{text}} · {{groups}} groups / {{items}} entries",
+      "searching": "Searching...",
+      "matchCase": "Match Case",
+      "matchWholeWord": "Match Whole Word",
+      "useRegularExpression": "Use Regular Expression"
+    },
+    "empty": {
+      "noConnections": "No Connections",
+      "noLogs": "No Logs",
+      "noRules": "No Rules",
+      "noProxies": "No Proxies",
+      "directMode": "Direct Mode",
+      "empty": "Empty"
+    }
+  },
+  "navigation": {
+    "sidebar": {
+      "styleTest": "Test",
+      "proxies": "Proxies",
+      "profiles": "Configurations",
+      "connections": "Connections",
+      "rules": "Rules",
+      "logs": "Logs",
+      "test": "Test",
+      "settings": "Settings",
+      "home": "Overview",
+      "actions": {
+        "expanded": "Collapse sidebar",
+        "collapsed": "Hide sidebar",
+        "hidden": "Expand sidebar"
+      },
+      "kernel": "Core"
+    }
+  },
+  "pages": {
+    "overview": {
+      "title": "Overview",
+      "runtime": {
+        "title": "Runtime",
+        "status": "Status",
+        "online": "Running",
+        "offline": "Stopped",
+        "unavailable": "Unavailable",
+        "mode": "Mode",
+        "controller": "Controller",
+        "connections": "Connections",
+        "closed": "Closed"
+      },
+      "delay": {
+        "title": "Latency",
+        "ms": "ms",
+        "test": "Test latency"
+      },
+      "network": {
+        "title": "Network info",
+        "interfaces": "{{count}} interfaces",
+        "noInterfaces": "No network interfaces",
+        "refresh": "Refresh"
+      },
+      "globalConnections": {
+        "title": "Link map",
+        "active": "Active connections",
+        "empty": "No active connections"
+      },
+      "topology": {
+        "title": "Link topology",
+        "empty": "No active topology"
+      },
+      "statistics": {
+        "title": "Connection statistics",
+        "details": "Detailed statistics",
+        "active": "Active",
+        "closed": "Closed",
+        "protocols": "Protocols",
+        "network": "Network",
+        "rules": "Rules",
+        "processes": "Processes"
+      }
+    },
+    "proxies": {
+      "title": "Proxies",
+      "groups": "Proxy Groups",
+      "groupBadge": "Group",
+      "provider": "Proxy Provider",
+      "updateAt": "Update At",
+      "modes": {
+        "rule": "rule",
+        "global": "global",
+        "direct": "direct",
+        "script": "script",
+        "merge": "merge",
+        "remote": "remote",
+        "local": "local"
+      },
+      "actions": {
+        "delayCheck": "Delay check",
+        "delayCheckUrl": "Delay check URL",
+        "delayCheckToCancelFixed": "Delay check to cancel fixed",
+        "jumpToGroup": "Jump to this proxy group",
+        "groupJump": "Proxy Group Jump",
+        "showHiddenGroups": "Show hidden groups"
+      },
+      "sort": {
+        "default": "Sort by default",
+        "delay": "Sort by delay",
+        "name": "Sort by name"
+      },
+      "view": {
+        "basic": "Proxy basic",
+        "detail": "Proxy detail"
+      }
+    },
+    "profiles": {
+      "title": "Configurations",
+      "actions": {
+        "enhanceScripts": "Enhance Scripts",
+        "updateProfile": "Update Profile",
+        "updateAllProfiles": "Update All Profiles",
+        "viewRuntimeConfig": "View Runtime Config",
+        "reactivateProfiles": "Reactivate Profiles",
+        "paste": "Paste",
+        "home": "Home",
+        "editInfo": "Edit Info",
+        "editFile": "Edit File",
+        "openFile": "Open File",
+        "updateProxy": "Update(Proxy)",
+        "toTop": "To Top",
+        "toEnd": "To End",
+        "selectMode": "Select",
+        "deleteSelected": "Delete Selected ({{count}})",
+        "enableSelected": "Enable Selected ({{count}})",
+        "disableSelected": "Disable Selected ({{count}})"
+      },
+      "inputs": {
+        "profileUrl": "Profile URL"
+      },
+      "dialog": {
+        "createTitle": "Create Profile",
+        "editTitle": "Edit Profile",
+        "scriptConsole": "Script Console",
+        "confirmDeletion": "Confirm deletion",
+        "confirmDeletionMessage": "This operation is not reversible",
+        "confirmBatchDeletion": "Delete {{count}} items?",
+        "confirmBatchDeletionMessage": "This operation is not reversible"
+      },
+      "fields": {
+        "subscriptionUrl": "Subscription URL",
+        "updateInterval": "Update Interval",
+        "requestTimeout": "HTTP Request Timeout",
+        "requestTimeoutHint": "Leave empty to use 10 seconds.",
+        "useSystemProxy": "Use System Proxy",
+        "useClashProxy": "Use Clash Proxy",
+        "acceptInvalidCertsDanger": "Allows Invalid Certificates (Danger)"
+      },
+      "runtime": {
+        "scriptConsole": "Script Console",
+        "console": "Console (Runtime)"
+      },
+      "editor": {
+        "console": "Console",
+        "restoreChanges": "Restore Changes",
+        "runCheck": "Run Check{{keymap}}"
+      },
+      "dragImport": {
+        "title": "Drag and Drop to Import Profiles",
+        "description": "Drop local profile files anywhere in this window to import them immediately.",
+        "ready": "Release to import {{count}} profile files",
+        "waiting": "Waiting for importable profile files",
+        "importable": "Importable",
+        "notImportable": "Unsupported",
+        "hint": "Supports `.yaml` / `.yml`, and the entire window can be used as the drop zone",
+        "hintWithInvalid": "Supports `.yaml` / `.yml`, non-YAML files will be ignored"
+      },
+      "sections": {
+        "subscriptionConfigs": "Subscription configurations"
+      },
+      "globalScripts": {
+        "title": "Plugin scripts",
+        "description": "Run JavaScript across the application web interface.",
+        "defaultName": "My plugin script",
+        "import": "Import JS",
+        "empty": "No plugin scripts. Create one or import a JS file.",
+        "edit": "Edit plugin script",
+        "help": "Available: document, window, console, GM_addStyle, GM_getValue, GM_setValue, onRouteChange, onCleanup and signal.",
+        "logs": "Runtime logs",
+        "running": "Running",
+        "error": "Execution failed",
+        "stopped": "Stopped",
+        "confirmDelete": "Delete plugin script “{{name}}”?"
+      },
+      "remoteScript": {
+        "enabled": "Remote script",
+        "subscribe": "Subscribe",
+        "url": "Update URL (leave empty for local scripts)",
+        "updated": "Script updated",
+        "systemProxy": "Download using system proxy",
+        "appProxy": "Download using app proxy"
+      }
+    },
+    "connections": {
+      "title": "Connections",
+      "view": {
+        "table": "Table View",
+        "list": "List View"
+      },
+      "actions": {
+        "closeAll": "Close All",
+        "pauseRefresh": "Pause list refresh",
+        "resumeRefresh": "Resume list refresh",
+        "closeConnection": "Close Connection"
+      },
+      "columns": {
+        "actions": "Actions",
+        "closedTime": "ClosedTime",
+        "downloadSpeed": "Download Speed",
+        "uploadSpeed": "Upload Speed",
+        "totalDownloaded": "Total Download",
+        "totalUploaded": "Total Upload",
+        "downloaded": "Downloaded",
+        "uploaded": "Uploaded",
+        "dlSpeed": "DL Speed",
+        "ulSpeed": "UL Speed",
+        "chains": "Chains",
+        "rule": "Rule",
+        "dragToReorder": "Drag to reorder columns",
+        "startAt": "Start at {{time}}"
+      },
+      "filters": {
+        "placeholder": "Filter by connection fields",
+        "hostPlaceholder": "Search host",
+        "noOptions": "No filter values",
+        "destinationIP": "Destination IP",
+        "destinationPort": "Destination Port",
+        "sourceIP": "Source IP",
+        "sourcePort": "Source Port",
+        "network": "Network",
+        "inbound": "Inbound"
+      }
+    },
+    "rules": {
+      "title": "Rules",
+      "provider": "Rule Provider",
+      "actions": {
+        "toggleDisable": "Enable/Disable Rule",
+        "enable": "Enable Rule",
+        "disable": "Disable Rule"
+      }
+    },
+    "logs": {
+      "title": "Logs"
+    },
+    "test": {
+      "title": "Test",
+      "actions": {
+        "testAll": "Test All"
+      },
+      "dialog": {
+        "createTitle": "Create Test",
+        "editTitle": "Edit Test"
+      },
+      "fields": {
+        "url": "Test URL"
+      }
+    },
+    "settings": {
+      "title": "Settings",
+      "system": {
+        "title": "System Setting",
+        "proxy": {
+          "label": "System Proxy",
+          "info": "Enable to modify the operating system's proxy settings. If enabling fails, modify the operating system's proxy settings manually",
+          "dialogTitle": "System Proxy Setting",
+          "current": "Current System Proxy",
+          "enableStatus": "Enable Status:",
+          "serverAddr": "Server Addr: ",
+          "bypassValue": "Bypass: ",
+          "guard": {
+            "label": "Proxy Guard",
+            "info": "Enable to prevent other software from modifying the operating system's proxy settings",
+            "duration": "Guard Duration"
+          },
+          "bypass": {
+            "label": "Proxy Bypass Settings: ",
+            "duplicate": "Duplicate Bypass",
+            "resetDefault": "Reset Default Bypass"
+          },
+          "pac": {
+            "useMode": "Use PAC Mode",
+            "content": "PAC Script Content",
+            "url": "PAC URL: "
+          }
+        },
+        "autoLaunch": "Auto Launch",
+        "silentStart": {
+          "label": "Silent Start",
+          "options": {
+            "bootup": "Boot-up Only",
+            "global": "Global",
+            "off": "OFF"
+          }
+        }
+      },
+      "clash": {
+        "title": "Clash Setting",
+        "tun": {
+          "label": "Tun Mode",
+          "info": "The Tun mode requires granting core-related permissions. Please enable service mode before using it or manual grant core permissions",
+          "serviceModeOnly": "System and Mixed Can Only be Used in Service Mode",
+          "autoRoute": "Auto Route",
+          "strictRoute": "Strict Route",
+          "autoDetectInterface": "Auto Detect Interface",
+          "dnsHijack": "DNS Hijack",
+          "mtu": "Max Transmission Unit"
+        },
+        "serviceMode": {
+          "label": "Service Mode",
+          "currentState": "Current State",
+          "info": "Information: Please make sure that the ClashMorden Service is installed and enabled",
+          "disable": "Disable Service Mode"
+        },
+        "allowLan": "Allow Lan",
+        "networkInterfaceInfo": "Network Interface Info",
+        "ipv6": "IPv6",
+        "findProcessMode": {
+          "label": "Find Process Mode",
+          "options": {
+            "always": "force matching all processes",
+            "strict": "Clash determines whether to enable it",
+            "off": "Does not match the process"
+          }
+        },
+        "logLevel": "Log Level",
+        "portConfig": {
+          "label": "Port Config",
+          "randomPort": "Random Port",
+          "dialogTitle": "Clash Port"
+        },
+        "externalController": {
+          "label": "External Controller",
+          "host": "Host",
+          "secret": "Secret",
+          "enabled": "External Controller Enabled",
+          "disabled": "External Controller Disabled",
+          "allowPrivateNetwork": "Allow Private Network",
+          "allowOrigins": "Allow Origins",
+          "duplicateAllowOrigins": "Duplicate Allow Origins",
+          "resetDefaultAllowOrigins": "Reset Default Allow Origins"
+        },
+        "webUi": {
+          "label": "Web UI",
+          "replaceTemplateHint": "Replace host, port, secret with %host, %port, %secret",
+          "supportPlaceholders": "Support %host, %port, %secret"
+        },
+        "core": {
+          "label": "Clash Core",
+          "updateRequires": "Update core requires",
+          "inUse": "In use"
+        },
+        "versionManager": {
+          "title": "Mihomo Version Manager",
+          "channel": {
+            "all": "All",
+            "stable": "Stable",
+            "alpha": "Alpha",
+            "smart": "Smart",
+            "nightly": "Nightly"
+          },
+          "prerelease": "Pre-release",
+          "currentVersion": "Current",
+          "downloaded": "Downloaded",
+          "variants": "files",
+          "unknownDate": "unknown date",
+          "publishDate": "Published {{date}}",
+          "updatedDate": "Updated {{date}}",
+          "activeCore": "In use: {{slot}} core · {{version}}",
+          "behindLatest": "Installed version ({{version}}) does not match the latest; it may be behind. Select the latest to update.",
+          "replacesCurrent": "This will replace the {{slot}} core that is currently running.",
+          "switchSlot": "Installs to the {{slot}} slot (currently running: {{current}}). It will not overwrite the current core and switches to it after install.",
+          "empty": "No versions available",
+          "loadFailed": "Failed to load: {{error}}",
+          "selectHint": "Select a version and variant to download and install",
+          "selected": "Selected {{tag}} · {{variant}}",
+          "downloadAndInstall": "Download & Install",
+          "installing": "Installing…",
+          "cannotDeleteCurrent": "The running version cannot be deleted",
+          "deleteConfirmTitle": "Delete downloaded file",
+          "deleteConfirmMessage": "Delete the downloaded file {{name}}?",
+          "downloadCancelled": "Download cancelled"
+        },
+        "openUwpTool": "Open UWP tool",
+        "updateGeoData": "Update GeoData",
+        "unifiedDelay": {
+          "label": "Unified Delay",
+          "info": "When unified delay is turned on, two delay tests will be performed to eliminate the delay differences between different types of nodes caused by connection handshakes, etc"
+        },
+        "flushCache": "Flush {{cache}} Cache",
+        "cacheFlushed": "{{cache}} Cache Flushed",
+        "dns": {
+          "title": "DNS Configuration",
+          "configure": "Configure",
+          "scope": "Applies to all subscriptions. Only explicitly set fields override subscription and script DNS values. Saving validates the configuration and restarts the core.",
+          "enable": "Enable DNS",
+          "ipv6": "DNS IPv6",
+          "listen": "Listen address",
+          "mode": "Enhanced mode",
+          "inherit": "Inherit subscription / scripts",
+          "enabled": "Enabled",
+          "disabled": "Disabled",
+          "emptyInherits": "Leave empty to inherit the subscription or scripts.",
+          "tunNote": "TUN requires DNS and will keep DNS enabled while TUN is active.",
+          "range": "Fake-IP IPv4 range",
+          "range6": "Fake-IP IPv6 range",
+          "filterMode": "Fake-IP filter mode",
+          "blacklist": "Blacklist",
+          "whitelist": "Whitelist",
+          "filter": "Fake-IP filter",
+          "overrideFilter": "Override filter list",
+          "filterHint": "One entry per line. An empty override clears the filter list.",
+          "default-nameserver": "Default nameservers",
+          "nameserver": "Primary nameservers",
+          "fallback": "Fallback nameservers",
+          "proxy-server-nameserver": "Proxy node nameservers",
+          "direct-nameserver": "Direct nameservers",
+          "overrideServers": "Override server list",
+          "serverHint": "One server per line. Empty override clears this list. Mihomo validates server formats before saving.",
+          "respect-rules": "Respect routing rules",
+          "prefer-h3": "Prefer HTTP/3",
+          "direct-nameserver-follow-policy": "Direct DNS follows policy",
+          "policy": "Nameserver policy (YAML)",
+          "overridePolicy": "Override policy",
+          "policyHint": "YAML mapping: domain rule to a server or server list. Empty clears the policy.",
+          "invalidPolicy": "Policy must be a YAML mapping.",
+          "fallbackFilter": "Fallback filter (YAML)",
+          "fallbackHint": "Supports geoip, geoip-code, ipcidr, domain and geosite. Empty replaces the filter with an empty mapping.",
+          "use-hosts": "Use custom Hosts",
+          "use-system-hosts": "Use system Hosts",
+          "hosts": "Hosts (YAML)",
+          "hostsHint": "Top-level Hosts mapping. Values may be an IP address, alias or list. Empty clears the override.",
+          "advancedMode": "Advanced YAML",
+          "formMode": "Form editor",
+          "advancedHint": "Edit supported DNS fields under dns and Hosts under hosts. Missing fields or null inherit; false, [] and {} override. Other saved DNS fields remain unchanged.",
+          "invalidAdvanced": "Invalid or unsupported DNS YAML"
+        }
+      },
+      "verge": {
+        "title": "Verge Setting",
+        "updateChannel": {
+          "label": "Update Channel",
+          "options": {
+            "stable": "Stable",
+            "preview": "Preview"
+          }
+        },
+        "themeMode": {
+          "label": "Theme Mode",
+          "options": {
+            "light": "Light",
+            "dark": "Dark",
+            "system": "System"
+          }
+        },
+        "tray": {
+          "clickEvent": "Tray Click Event",
+          "showMainWindow": "Show Main Window"
+        },
+        "env": {
+          "copyType": "Copy Env Type",
+          "copySuccess": "Copy Env Successfully"
+        },
+        "theme": {
+          "interfaceStyle": "Interface style",
+          "compactMode": "Compact mode",
+          "interfaceStyles": {
+            "clash": "Original Clash",
+            "outline": "Minimal outline",
+            "soft": "Soft layers",
+            "glass": "Glass",
+            "bold": "Defined structure"
+          },
+          "title": "Theme Setting",
+          "default": "Default Setting",
+          "currentTheme": "Current Theme",
+          "presets": {
+            "custom": "Custom",
+            "default": "Default (Lavender Purple)",
+            "ocean": "Ocean Teal",
+            "indigo": "Deep Indigo",
+            "sunset": "Rose Pink",
+            "lavender": "Lavender Purple",
+            "monochrome": "Stone Gray"
+          },
+          "colors": {
+            "primary": "Primary Color",
+            "secondary": "Secondary Color",
+            "primaryText": "Primary Text",
+            "secondaryText": "Secondary Text",
+            "info": "Info Color",
+            "warning": "Warning Color",
+            "error": "Error Color",
+            "success": "Success Color",
+            "background": "Background Color",
+            "paperBackground": "Card Background Color"
+          },
+          "fontFamily": "Font Family",
+          "cssInjection": "CSS Injection",
+          "colorIntensity": "Color intensity",
+          "colorOpacity": "Color opacity"
+        },
+        "layout": {
+          "title": "Layout Setting",
+          "trafficGraph": "Traffic Graph",
+          "memoryUsage": "Memory Usage",
+          "proxyGroupIcon": "Proxy Group Icon",
+          "menuIcon": "Menu Icon",
+          "sidebarLeftAligned": "Left-align sidebar",
+          "icon": {
+            "monochrome": "Monochrome",
+            "colorful": "Colorful"
+          },
+          "tray": {
+            "label": "Tray",
+            "icon": "Tray Icon",
+            "common": "Common Tray Icon",
+            "systemProxy": "System Proxy Tray Icon",
+            "tun": "Tun Tray Icon"
+          },
+          "splashscreen": "Splash Screen",
+          "systemTitleBar": "System Title Bar",
+          "keepInDock": {
+            "label": "Keep in Dock",
+            "info": "The application icon remains in the dock after the application window is closed"
+          },
+          "keepUiActive": {
+            "label": "Keep UI Active",
+            "info": "Keep the UI active and open it again without re-rendering the interface"
+          }
+        },
+        "misc": {
+          "title": "Miscellaneous",
+          "appLogLevel": "App Log Level",
+          "autoCloseConnections": "Auto Close Connections",
+          "autoCheckUpdate": "Auto Check Update",
+          "enableBuiltinEnhanced": "Enable Builtin Enhanced",
+          "proxyLayoutColumn": "Proxy Layout Column",
+          "autoLogClean": {
+            "label": "Auto Log Clean",
+            "options": {
+              "never": "Never Clean",
+              "sevenDays": "Retain 7 Days",
+              "thirtyDays": "Retain 30 Days",
+              "ninetyDays": "Retain 90 Days"
+            }
+          },
+          "defaultLatencyTest": "Default Latency Test",
+          "defaultLatencyTimeout": "Default Latency Timeout",
+          "logRollSizeMb": "Log Roll Size (MB)",
+          "logRollSizeMbInfo": "Max size of a single log file before it is rotated. Applies to the core log on the next core start, and to the app log on the next app restart.",
+          "logMaxKeepFiles": "Max Keep Log Files",
+          "logMaxKeepFilesInfo": "Max number of rotated log files to keep on disk. Applies to the core log on the next core start, and to the app log on the next app restart."
+        },
+        "hotkeys": {
+          "title": "Hotkey Setting",
+          "global": "Global",
+          "app": "In-app",
+          "restore": "Restore Settings",
+          "clear": "Clear All",
+          "conflict": "This hotkey already exists",
+          "invalid": "Hotkeys cannot contain only modifier keys",
+          "notAvailable": "Not available",
+          "actions": {
+            "openOrCloseDashboard": "Open/Close Dashboard",
+            "closeDashboard": "Close Dashboard",
+            "ruleMode": "Rule Mode",
+            "globalMode": "Global Mode",
+            "directMode": "Direct Mode",
+            "toggleSystemProxy": "Enable/Disable System Proxy",
+            "toggleTunMode": "Enable/Disable Tun Mode",
+            "exitApp": "Exit App"
+          }
+        },
+        "runtimeConfig": "Runtime Config",
+        "actions": {
+          "openAppDir": "Open App Dir",
+          "openCoreDir": "Open Core Dir",
+          "openLogsDir": "Open Logs Dir",
+          "checkForUpdates": "Check for Updates",
+          "goToReleasePage": "Go to Release Page",
+          "openDevTools": "Open Dev Tools"
+        },
+        "version": "Verge Version",
+        "backup": {
+          "title": "Backup Setting",
+          "types": {
+            "local": "Local",
+            "webdav": "WebDAV"
+          },
+          "invalidFileFormat": "Invalid file format",
+          "webdavTitle": "WebDav Backup",
+          "actions": {
+            "recovery": "Recovery",
+            "viewFiles": "View Backups",
+            "backup": "Backup"
+          },
+          "onlyProfiles": "Only Backup Profiles",
+          "local": {
+            "dir": "Local Backup Folder",
+            "defaultDir": "Default backup folder"
+          },
+          "webdav": {
+            "url": "WebDav URL",
+            "username": "WebDav Username",
+            "password": "WebDav Password"
+          },
+          "files": "Backup Files",
+          "scopes": {
+            "all": "Config + Profiles",
+            "profiles": "Profiles"
+          }
+        },
+        "updateViewer": {
+          "title": "New Version Available",
+          "released": "Released on {{date}}",
+          "preview": "Preview",
+          "whatsNew": "What's New",
+          "downloading": "Downloading update",
+          "preparing": "Preparing update…",
+          "noNotes": "No release notes available",
+          "installed": "Update installed. Restart the app to apply it",
+          "restart": "Restart & Apply",
+          "later": "Later"
+        }
+      },
+      "appearance": {
+        "title": "Theme Settings"
+      },
+      "directoriesTitle": "Directory navigation"
+    },
+    "home": {
+      "cards": {
+        "trafficStats": "Traffic Stats"
+      },
+      "settings": {
+        "cards": {
+          "profile": "Configuration & runtime",
+          "currentProxy": "Current Proxy Card",
+          "traffic": "Traffic Stats Card",
+          "tests": "Website Tests Card",
+          "ip": "IP Information Card",
+          "clashInfo": "Clash Info Cards",
+          "systemInfo": "System Info Cards",
+          "globe": "Link map",
+          "legacyTopology": "Connection topology",
+          "topology": "Link topology",
+          "countryStats": "Country / region",
+          "connectionStats": "Connection stats",
+          "aggregateStats": "Aggregated connection stats",
+          "rulesStats": "Rule hit stats",
+          "domainStats": "Domain hits",
+          "nodeStats": "Node stats",
+          "destIpStats": "Destination IP",
+          "clientStats": "Clients",
+          "processStats": "Processes"
+        }
+      },
+      "components": {
+        "profile": {
+          "clickToImport": "Click to import subscription",
+          "title": "Configuration & runtime",
+          "current": "Current configuration",
+          "memory": "Memory usage",
+          "copyEnvironment": "Copy environment info",
+          "viewConfig": "View configuration",
+          "updating": "Updating",
+          "disconnect": "Disconnect"
+        },
+        "clashInfo": {
+          "title": "Clash Info",
+          "fields": {
+            "coreVersion": "Core Version",
+            "systemProxyAddress": "System Proxy Address",
+            "mixedPort": "Mixed Port",
+            "uptime": "Uptime",
+            "rulesCount": "Rules Count"
+          }
+        },
+        "systemInfo": {
+          "title": "System Info",
+          "fields": {
+            "osInfo": "OS Info",
+            "autoLaunch": "Auto Launch",
+            "runningMode": "Running Mode",
+            "lastCheckUpdate": "Last Check Update",
+            "vergeVersion": "Verge Version"
+          },
+          "actions": {
+            "settings": "Settings"
+          },
+          "badges": {
+            "serviceMode": "Service Mode",
+            "sidecarMode": "User Mode",
+            "adminServiceMode": "Admin + Service Mode"
+          },
+          "notifications": {
+            "upToDate": "Already up to date",
+            "updateAvailable": "A new version is available"
+          }
+        },
+        "ipInfo": {
+          "title": "IP Information",
+          "labels": {
+            "ip": "IP",
+            "asn": "ASN",
+            "isp": "ISP",
+            "org": "ORG",
+            "location": "Location",
+            "timezone": "Timezone",
+            "autoRefresh": "Auto refresh",
+            "unknown": "Unknown"
+          },
+          "errors": {
+            "load": "Failed to get IP info",
+            "loadWithDetails": "Failed to get IP info: {{message}}"
+          }
+        },
+        "currentProxy": {
+          "title": "Current Node",
+          "actions": {
+            "refreshDelay": "Delay check"
+          },
+          "labels": {
+            "globalMode": "Global Mode",
+            "directMode": "Direct Mode",
+            "group": "Group",
+            "proxy": "Proxy",
+            "noActiveNode": "No active proxy node"
+          },
+          "status": {
+            "testing": "Testing",
+            "untested": "Not tested",
+            "error": "Error",
+            "timeout": "Timeout",
+            "latencyHigh": "High latency",
+            "latencyMedium": "Moderate latency",
+            "latencyGood": "Good latency",
+            "latencyExcellent": "Excellent latency",
+            "uninitialized": "Not initialized",
+            "noProxyNode": "No proxy node"
+          }
+        },
+        "tests": {
+          "current": "Current",
+          "max": "Maximum",
+          "min": "Minimum",
+          "average": "Average",
+          "title": "Latency Test",
+          "view": "Display style",
+          "history": "History bars",
+          "window": "Last 100 tests",
+          "legacy": "Legacy progress"
+        },
+        "traffic": {
+          "metrics": {
+            "activeConnections": "Active Connections",
+            "closedConnections": "Closed connections"
+          }
+        },
+        "ipCheck": {
+          "title": "Network info",
+          "status": {
+            "getting": "Getting...",
+            "failed": "Test failed"
+          },
+          "labels": {
+            "showIp": "Show IP",
+            "hideIp": "Hide IP"
+          },
+          "serviceLabel": "IP info service"
+        },
+        "earth": {
+          "title": "Link map",
+          "styleSpace": "Space",
+          "styleFlat": "Flat",
+          "pauseRotation": "Pause globe rotation",
+          "resumeRotation": "Resume globe rotation",
+          "localIP": "Local IP",
+          "roleOrigin": "Local device",
+          "legendProxied": "Via proxy",
+          "directLabel": "Direct",
+          "role": "Role",
+          "roleDestination": "Destination",
+          "connectionCount": "Connection count",
+          "rendererError": "3D rendering is unavailable in this browser.",
+          "originError": "The local public IP could not be detected. Retry to locate connections.",
+          "noConnections": "No active connections",
+          "noLocated": "No active connection endpoints could be located",
+          "database": {
+            "checking": "Checking the local city database…",
+            "loading": "Loading the cached city database…",
+            "consentTitle": "Download the local city database?",
+            "consent": "Connection endpoints stay in this browser. DB-IP City Lite requires about {download} to download and {stored} of local storage after extraction.",
+            "cacheRecovered": "A damaged cached database was removed. Download a clean copy to restore location lookup.",
+            "download": "Download database",
+            "learnMore": "About DB-IP City Lite",
+            "downloading": "Downloading city database",
+            "errors": {
+              "space": "There is not enough browser storage for the city database.",
+              "network": "The city database could not be downloaded.",
+              "decompress": "The city database could not be decompressed.",
+              "invalid": "The downloaded city database is invalid.",
+              "storage": "The city database could not be saved in browser storage.",
+              "unsupported": "This browser cannot decompress the city database.",
+              "unknown": "The city database could not be loaded."
+            }
+          },
+          "hideCityLabels": "Hide city labels",
+          "showCityLabels": "Show city labels",
+          "mapStyle": "Map style"
+        },
+        "topology": {
+          "collapseGroups": "Collapse proxy groups",
+          "view": "Topology view",
+          "flow": "Connection flow",
+          "legacy": "Connection topology",
+          "source": "Source",
+          "matchedRule": "Matched rule / rule set",
+          "group": "Proxy group",
+          "exit": "Exit proxy",
+          "destination": "Destination : port",
+          "process": "Process",
+          "targetToggle": "Target",
+          "connections": "connections",
+          "stats": {
+            "clients": "Clients",
+            "rules": "Rules",
+            "groups": "Groups",
+            "nodes": "Nodes"
+          },
+          "legend": {
+            "proxyGroups": "Proxy Groups",
+            "proxyNodes": "Proxy Nodes",
+            "rules": "Rules",
+            "sourceIP": "Source IP",
+            "sourcePort": "Source Port"
+          },
+          "pause": "Pause",
+          "resume": "Resume",
+          "waiting": "Waiting for connections…",
+          "tooManyNodes": "Too many nodes, collapse levels to continue",
+          "zoomIn": "Zoom in",
+          "zoomOut": "Zoom out",
+          "fit": "Fit width",
+          "expandHeight": "Expand full height",
+          "settings": "Topology settings",
+          "processMode": "Process mode"
+        },
+        "countryStats": {
+          "title": "Country / region",
+          "connections": "Connections",
+          "traffic": "Traffic",
+          "empty": "No located connections"
+        },
+        "connectionStats": {
+          "ipUnavailable": "Destination IP not reported",
+          "regionUnavailable": "Region unavailable",
+          "title": "Connection stats",
+          "scope": "Connections captured since {{since}}. History is retained by day; rules use core hit counters.",
+          "retention": "History retention",
+          "days": "Keep {{count}} days",
+          "forever": "Keep forever",
+          "clear": "Clear statistics history",
+          "confirmClear": "Clear accumulated connection statistics? Active connections and core rule counters remain unchanged. Subsequent traffic is counted from the reset.",
+          "totalTraffic": "Total traffic",
+          "noData": "No data",
+          "dimensions": {
+            "nodes": "Node",
+            "clients": "Client",
+            "destIp": "Destination IP",
+            "process": "Process",
+            "rules": "Rule",
+            "countries": "Targets",
+            "exitCountries": "Exit countries/regions",
+            "hosts": "Destination host",
+            "groups": "Proxy group"
+          },
+          "sort": {
+            "count": "Sort by connections",
+            "traffic": "Sort by traffic"
+          },
+          "columns": {
+            "name": "Name",
+            "count": "Count",
+            "traffic": "Traffic",
+            "download": "Download",
+            "upload": "Upload"
+          },
+          "view": {
+            "table": "Table view",
+            "chart": "Chart view"
+          }
+        },
+        "ruleStats": {
+          "title": "Rule hit stats",
+          "noHitData": "No rule hit data",
+          "disabledHint": "Rule hit counting is not enabled in the core config."
+        },
+        "domainStats": {
+          "title": "Domain hits",
+          "noHitData": "No domain hit data"
+        },
+        "nodeStats": {
+          "title": "Node stats",
+          "empty": "No active connections"
+        },
+        "destIpStats": {
+          "title": "Destination IP",
+          "empty": "No active connections"
+        },
+        "clientStats": {
+          "title": "Clients",
+          "targets": "targets",
+          "empty": "No active connections"
+        },
+        "processStats": {
+          "title": "Processes",
+          "empty": "No process data"
+        },
+        "aggregateStats": {
+          "rules": "Frequent rules",
+          "hosts": "Popular domains",
+          "nodes": "Popular nodes",
+        "targetCountries": "Targets",
+          "exitCountries": "Exit countries/regions",
+          "processes": "Frequent processes (traffic)",
+          "hits": "hits"
+        }
+      },
+      "topbar": {
+        "coreRunning": "Core Running",
+        "coreStopped": "Core Stopped",
+        "coreMissing": "No core installed. Install one in Core Settings before starting.",
+        "coreChecking": "Checking core…",
+        "coreSwitching": "Working…",
+        "tunRequiresService": "Tun mode requires service mode. Please install and start the service from the Core General page first."
+      },
+      "edit": {
+        "hint": "Edit overview: drag to reorder, ✕ to remove",
+        "addCard": "Add cards",
+        "done": "Done",
+        "allVisible": "All cards are visible",
+        "dragHint": "Long press to drag",
+        "remove": "Remove"
+      }
+    },
+    "kernel": {
+      "title": "Core",
+      "inherit": "Restore inheritance",
+      "inherited": "Inherited / unset (suggested value shown)",
+      "automatic": "Automatic",
+      "empty": "(Empty)",
+      "username": "Username",
+      "password": "Password",
+      "mapHint": "Value accepts a string or a YAML list, for example [223.5.5.5, 119.29.29.29].",
+      "scope": "Only edited fields are saved. Configuration is validated before reloading the core. Save restored inheritance to refresh effective values. Enabling DNS, TUN or sniffing fills suggested settings absent from the profile.",
+      "smart": "Smart model",
+      "model": "Model.bin",
+      "custom": "Custom",
+      "sync": "Sync",
+      "modelSynced": "Model synced; restart the Smart core to load it",
+      "smartHint": "Only Smart-capable cores use this model. Sync writes Model.bin in the data directory. Save URL edits; restart the core to load the model.",
+          "coreManagement": "Clash core version management",
+      "networkTools": "Network tools and controller",
+      "refreshInterfaces": "Current interfaces",
+      "tabs": {
+        "general": "General",
+        "network": "Network",
+        "dns": "DNS",
+        "tun": "TUN",
+        "sniffer": "Sniffer"
+      },
+      "sections": {
+        "routing": "Routing and connections",
+        "cache": "Cache and fingerprint",
+        "ports": "Clash ports",
+        "globalNetwork": "Global network",
+        "access": "Access control",
+        "dnsStatus": "Runtime status",
+        "dnsBehavior": "Mode and behavior",
+        "dnsInbound": "Inbound and redirection",
+        "fakeip": "Fake-IP settings",
+        "nameservers": "Upstream DNS servers",
+        "specialDns": "Dedicated DNS servers",
+        "policies": "Custom policies and Hosts",
+        "fallback": "Fallback filter",
+        "dnsTuning": "Advanced tuning",
+        "tunStatus": "Runtime status",
+        "tunRouting": "Stack and routing",
+        "darwin": "Darwin performance (macOS)",
+        "tunGeneral": "General settings",
+        "hijack": "DNS hijack",
+        "excludeRoute": "Excluded routes",
+        "interfaceFilter": "Interface filters",
+        "portFilter": "Port filters",
+        "includeRoute": "Included routes (Fake-IP bypass)",
+        "sniffStatus": "Runtime status",
+        "sniffBehavior": "Sniff behavior",
+        "sniffPorts": "Sniff ports",
+        "forceSniff": "Forced sniffing",
+        "skipSniff": "Skip sniffing"
+      },
+      "hints": {
+        "cache": "Persist Fake-IP mappings to preserve applications using cached addresses after restart. Global UA identifies the core when downloading databases and subscriptions; leave blank to inherit the profile.",
+        "ports": "0 disables a port. Redir is unavailable on Windows; TProxy is Linux only. Disable random ports before editing fixed ports.",
+        "quic": "QUIC blocking targets UDP 443. Foreign mode excludes CN and LAN addresses and requires GeoIP data. It applies in rule mode.",
+        "nameservers": "Default resolves DoH/DoT server hostnames. Primary servers handle ordinary queries; fallback servers are used when results match fallback filters.",
+        "specialDns": "Resolve proxy server hostnames and direct endpoints separately.",
+        "fallback": "Control when fallback DNS is used. With GeoIP enabled, results outside the configured country trigger fallback.",
+        "tunRouting": "Auto route configures system routes. Strict route prevents leaks but may affect inbound LAN services. Endpoint independent NAT helps some P2P games.",
+        "darwin": "RecvMsgX can reduce CPU usage during fast receives. SendMsgX is disabled by default to avoid stalls in some core versions during multithreaded downloads.",
+        "hijack": "Intercept DNS requests matching these targets and send them to the core DNS engine. Existing TUN behavior also enables DNS.",
+        "excludeRoute": "Traffic matching these CIDRs bypasses TUN and routes through physical interfaces.",
+        "interfaceFilter": "Limit the physical interfaces handled by TUN or exclude specific interfaces.",
+        "portFilter": "Bypass TUN for these source or destination ports, useful for discovery and some games.",
+        "includeRoute": "Restrict TUN routes to these ranges. Actual routing also depends on auto route, exclusions and the core version.",
+        "sniffStatus": "Extract hostnames from IP traffic so domain routing rules can apply.",
+        "sniffBehavior": "Override destinations with sniffed hostnames. Force DNS mapping and parse pure IP control which traffic is sniffed.",
+        "sniffPorts": "Set sniffing ports and destination overrides per protocol. Individual ports and ranges such as 8080-8880 are supported.",
+        "forceSniff": "Force sniffing and destination overrides for these domains.",
+        "skipSniff": "Skip these domains or addresses. Apple push and some IoT services validate destination hostnames; overrides may break connections."
+      },
+      "options": {
+        "always": "Always",
+        "strict": "Strict",
+        "off": "Off",
+        "fake-ip": "Fake IP",
+        "redir-host": "Redir Host",
+        "blacklist": "Blacklist (exclude)",
+        "whitelist": "Whitelist",
+        "arc": "ARC (adaptive replacement)",
+        "lru": "LRU",
+        "mixed": "Mixed",
+        "system": "System",
+        "gvisor": "gVisor",
+        "foreign": "Block foreign QUIC (recommended)",
+        "all": "Block all",
+        "mips": "MIPS"
+      },
+      "models": {
+        "0": "Standard (recommended)",
+        "1": "Medium (balanced)",
+        "2": "Large (precise)"
+      },
+      "fields": {
+        "tcp-concurrent": "TCP concurrent connections",
+        "unified-delay": "Unified delay",
+        "interface-name": "Bind network interface",
+        "find-process-mode": "Process matching",
+        "disable-keep-alive": "Disable Keep-Alive",
+        "keep-alive-interval": "Keep-Alive interval (seconds)",
+        "keep-alive-idle": "Keep-Alive idle (seconds)",
+        "profile": {
+          "store-selected": "Remember node selections",
+          "store-fake-ip": "Persist Fake-IP"
+        },
+        "global-ua": "Global User-Agent",
+        "etag-support": "ETag support",
+        "port": "HTTP port",
+        "socks-port": "SOCKS port",
+        "redir-port": "Redir port",
+        "tproxy-port": "TProxy port",
+        "mixed-port": "Mixed port",
+        "ipv6": "IPv6 support",
+        "tcp-fast-open": "TCP Fast Open (TFO)",
+        "mptcp": "Multipath TCP (MPTCP)",
+        "app-quic-block": "QUIC blocking",
+        "allow-lan": "Allow LAN connections",
+        "lan-allowed-ips": "Allowed addresses",
+        "lan-disallowed-ips": "Disallowed addresses",
+        "authentication": "Proxy authentication",
+        "skip-auth-prefixes": "Authentication bypass CIDRs",
+        "dns": {
+          "enable": "Enable DNS engine",
+          "enhanced-mode": "DNS resolution mode",
+          "ipv6": "IPv6 resolution",
+          "respect-rules": "Respect rules",
+          "prefer-h3": "Prefer HTTP/3 (DoH/3)",
+          "ipv6-timeout": "IPv6 timeout (ms)",
+          "listen": "DNS listen address",
+          "use-system-hosts": "Use system Hosts",
+          "use-hosts": "Use configured Hosts",
+          "fake-ip-range": "IPv4 Fake-IP range",
+          "fake-ip-range6": "IPv6 Fake-IP range",
+          "fake-ip-filter-mode": "Filter mode",
+          "fake-ip-ttl": "Fake-IP TTL (seconds)",
+          "fake-ip-filter": "Fake-IP filter list",
+          "default-nameserver": "Default DNS servers",
+          "nameserver": "Primary DNS servers",
+          "fallback": "Fallback DNS servers",
+          "proxy-server-nameserver": "Proxy server DNS",
+          "direct-nameserver": "Direct connection DNS",
+          "direct-nameserver-follow-policy": "Direct DNS follows nameserver policy",
+          "nameserver-policy": "Domain nameserver policy",
+          "proxy-server-nameserver-policy": "Proxy nameserver policy",
+          "fallback-filter": {
+            "geoip": "Enable GeoIP filter",
+            "geoip-code": "GeoIP country code",
+            "ipcidr": "IP CIDR filter",
+            "geosite": "GeoSite filter",
+            "domain": "Domain filter"
+          },
+          "cache-algorithm": "Cache algorithm",
+          "cache-max-size": "Maximum cache size"
+        },
+        "hosts": "Hosts overrides",
+        "tun": {
+          "enable": "Enable TUN",
+          "stack": "TUN network stack",
+          "auto-route": "Auto route",
+          "auto-detect-interface": "Auto detect outbound interface",
+          "strict-route": "Strict route",
+          "endpoint-independent-nat": "Endpoint independent NAT",
+          "disable-icmp-forwarding": "Disable ICMP forwarding",
+          "recvmsgx": "Enable RecvMsgX receive acceleration",
+          "sendmsgx": "Enable SendMsgX send acceleration",
+          "mtu": "MTU",
+          "device": "Device name",
+          "udp-timeout": "UDP timeout (seconds)",
+          "dns-hijack": "DNS hijack targets",
+          "route-exclude-address": "Excluded route CIDRs",
+          "include-interface": "Included interfaces",
+          "exclude-interface": "Excluded interfaces",
+          "exclude-src-port": "Excluded source ports",
+          "exclude-dst-port": "Excluded destination ports",
+          "route-address": "Included route addresses"
+        },
+        "sniffer": {
+          "enable": "Enable sniffer",
+          "override-destination": "Override destination",
+          "force-dns-mapping": "Force DNS mapping",
+          "parse-pure-ip": "Parse pure IP",
+          "sniff": {
+            "HTTP": {
+              "ports": "HTTP ports",
+              "override-destination": "Override HTTP destination"
+            },
+            "TLS": {
+              "ports": "TLS ports",
+              "override-destination": "Override TLS destination"
+            },
+            "QUIC": {
+              "ports": "QUIC ports",
+              "override-destination": "Override QUIC destination"
+            }
+          },
+          "force-domain": "Forced sniff domains",
+          "skip-domain": "Skip domains",
+          "skip-src-address": "Skip source addresses",
+          "skip-dst-address": "Skip destination addresses"
+        }
+      },
+      "effectiveState": "Current generated runtime configuration",
+      "quic": {
+        "foreign": "Block foreign QUIC (recommended)",
+        "all": "Block all",
+        "off": "Do not block"
+      },
+      "warningTitle": "Before changing core settings",
+      "warningBody": "Please make sure you understand these settings. Incorrect configuration can interrupt connectivity, DNS resolution or proxy routing. If unsure, keep the current configuration. Confirming will show this reminder next time.",
+      "warningDismiss": "Don't show again",
+      "sources": {
+        "config": "Current configuration",
+        "override": "Saved override",
+        "edited": "Edited · unsaved",
+        "suggested": "Not configured · suggested value",
+        "reset": "Restore inheritance · actual value after saving"
+      },
+      "footerDismissTitle": "Hide the footer warning permanently?",
+      "footerDismissBody": "The footer warning will stay hidden. Changing kernel settings can disrupt connectivity, DNS resolution or proxy routing. Keep your current configuration if you are unsure. Confirm hiding this warning?"
+    }
+  },
+  "messages": {
+    "editor": {
+      "readOnly": "Cannot edit in read-only editor",
+      "regenerateTemplateContent": "Regenerate Template Content",
+      "readMonacoContentFailed": "Can't read monaco content"
+    },
+    "profiles": {
+      "imported": "Profile Imported Successfully",
+      "switched": "Profile Switched",
+      "reactivated": "Profile Reactivated",
+      "batchDeleteSuccess": "Successfully deleted {{count}} items",
+      "batchToggleSuccess": "Updated {{count}} items",
+      "onlyYamlSupported": "Only YAML Files Supported",
+      "unsupportedFiles": "Unsupported files: {{files}}",
+      "importFileFailed": "Failed to import file: {{file}}",
+      "scriptRunCheckFailed": "Script run check failed, Please check the script content is correct",
+      "scriptRunCheckSuccessful": "Script run check successful, This script can be run normally",
+      "contentSaved": "Save Content Successfully",
+      "contentUnchanged": "Profile Content No Change",
+      "configUnchanged": "Profile Config No Change",
+      "configUpdated": "Profile Config Updated",
+      "contentSaveFailed": "Save Content Failed",
+      "invalidRequestTimeout": "Enter a whole number from 1 to 3600 seconds.",
+      "saveContent": "Save Content{{keymap}}",
+      "askSaveContentNow": "Content has changed, save it now?"
+    },
+    "clash": {
+      "configUpdated": "Clash Config Updated",
+      "portModified": "Clash Port Modified",
+      "portConflict": "{{portName}} Port Conflict",
+      "invalidPort": "Use 0 to disable, or an integer from 1000 to 65535.",
+      "portFallback": "Default port `7890` is already in use, using unused port `{{port}}`",
+      "externalControllerAddressModified": "External Controller Address Modified",
+      "core": {
+        "permissionsGranted": "Permissions Granted Successfully for {{core}} Core",
+        "requireGrant": "Tun mode is currently enabled, please grant permission to {{core}} before switching",
+        "versionUpdated": "Core Version Updated",
+        "noVersionInfo": "Unable to fetch mihomo release information",
+        "versionInstalled": "{{tag}} installed and switched",
+        "versionDeleted": "Downloaded file deleted",
+        "restarted": "Clash Core Restarted",
+        "runFailed": "Failed to run mihomo core, please check mihomo log to find problem",
+        "switched": "Switched to {{core}} Core"
+      },
+      "geoDataUpdated": "GeoData Updated",
+      "tun": {
+        "macosDeviceNameError": "Tun device names on Macos must follow the combination `utun` + number, for example, `utun1234`",
+        "deviceBusy": "Tun device or resource busy, will tun off Tun mode, please try to enable Tun mode again later",
+        "updateConfigFailed": "Update Tun Config Failed, please try again later"
+      }
+    },
+    "settings": {
+      "applied": "Settings Applied",
+      "serviceInstalled": "Service Installed Successfully",
+      "serviceUninstalled": "Service Uninstalled Successfully",
+      "proxyGuardDurationTooShort": "Proxy Daemon Duration Cannot be Less than 1 Second",
+      "invalidBypassFormat": "Invalid Bypass Format"
+    },
+    "app": {
+      "restartToApply": "Restart Application to Apply Modifications",
+      "latestVersion": "Currently on the Latest Version",
+      "restartSoon": "App Will Be Restarted Soon"
+    },
+    "rules": {
+      "updateProviderError": "[ {{name}} ] Update Failed: {{errorMsg}}",
+      "readProvidersError": "Failed to read rule providers, please check if the rule providers has been updated and synchronized"
+    },
+    "updater": {
+      "portableError": "The portable version does not support in-app updates. Please manually download and replace it",
+      "breakingChangeError": "This version is a major update and does not support in-app updates. Please uninstall it and manually download and install the new version"
+    },
+    "backup": {
+      "webdavConnectionFailed": "WebDav Connection Failed, {{error}}",
+      "success": "Backup Successful",
+      "failed": "Backup Failed, {{error}}",
+      "deleteSuccess": "Delete Backup Successful",
+      "deleteFailed": "Delete Backup Failed, {{error}}",
+      "applySuccess": "Apply Backup Successful, Will Restart App Soon",
+      "applyFailed": "Apply Backup Failed, {{error}}",
+      "platformNoMatch": "Platform No Match"
+    }
+  }
+}

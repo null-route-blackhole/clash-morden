@@ -1,0 +1,142 @@
+import { TextField } from "@mui/material";
+import { nanoid } from "nanoid";
+import { forwardRef, useImperativeHandle, useState } from "react";
+import { useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
+import { useShallow } from "zustand/react/shallow";
+
+import { BaseDialog } from "@/components/base";
+import { useVergeStore } from "@/stores";
+import { getErrorMessage } from "@/utils";
+
+import { useNotice } from "../base/notifies";
+
+interface Props {
+  onChange: (uid: string, patch?: Partial<IVergeTestItem>) => void;
+}
+
+export interface TestViewerRef {
+  create: () => void;
+  edit: (item: IVergeTestItem) => void;
+}
+
+// create or edit the test item
+export const TestViewer = forwardRef<TestViewerRef, Props>((props, ref) => {
+  const { t } = useTranslation();
+  const { notice } = useNotice();
+  const [open, setOpen] = useState(false);
+  const [openType, setOpenType] = useState<"new" | "edit">("new");
+  const [loading, setLoading] = useState(false);
+  const testList = useVergeStore(useShallow((s) => s.verge.test_list ?? []));
+  const patchVerge = useVergeStore((s) => s.patchVerge);
+  const { setValue, register, handleSubmit, reset } = useForm<IVergeTestItem>({
+    defaultValues: {
+      name: "",
+      icon: "",
+      url: "",
+    },
+  });
+
+  const patchTestList = async (uid: string, patch: Partial<IVergeTestItem>) => {
+    const newList = testList.map((x) => {
+      if (x.uid === uid) {
+        return { ...x, ...patch };
+      }
+      return x;
+    });
+    await patchVerge({ test_list: newList });
+  };
+
+  useImperativeHandle(ref, () => ({
+    create: () => {
+      setOpenType("new");
+      setOpen(true);
+    },
+    edit: (item) => {
+      if (item) {
+        Object.entries(item).forEach(([key, value]) => {
+          setValue(key as keyof IVergeTestItem, value);
+        });
+      }
+      setOpenType("edit");
+      setOpen(true);
+    },
+  }));
+
+  const onSubmit = async (data: IVergeTestItem) => {
+    setLoading(true);
+    try {
+      if (!data.name) throw new Error("`Name` should not be null");
+      if (!data.url) throw new Error("`Url` should not be null");
+
+      if (openType === "new") {
+        const uid = nanoid();
+        const item = { ...data, uid };
+        const newList = [...testList, item];
+        await patchVerge({ test_list: newList });
+        props.onChange(uid);
+      } else {
+        if (!data.uid) throw new Error("UID not found");
+        const uid = data.uid;
+
+        await patchTestList(uid, data);
+        props.onChange(uid, data);
+      }
+      setOpen(false);
+      setLoading(false);
+      setTimeout(() => reset(), 500);
+    } catch (err: unknown) {
+      notice("error", getErrorMessage(err));
+      setLoading(false);
+    }
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setTimeout(() => reset(), 500);
+  };
+
+  const text = {
+    fullWidth: true,
+    size: "small",
+    margin: "normal",
+    variant: "outlined",
+    autoComplete: "off",
+    autoCorrect: "off",
+  } as const;
+
+  return (
+    <BaseDialog
+      open={open}
+      title={
+        openType === "new"
+          ? t("pages.test.dialog.createTitle")
+          : t("pages.test.dialog.editTitle")
+      }
+      contentStyle={{ width: 375 }}
+      okBtn={t("common.actions.save")}
+      cancelBtn={t("common.actions.cancel")}
+      onClose={handleClose}
+      onCancel={handleClose}
+      onOk={handleSubmit(onSubmit)}
+      loading={loading}>
+      <form>
+        <TextField
+          {...text}
+          {...register("name")}
+          label={t("common.fields.name")}
+        />
+        <TextField
+          {...text}
+          {...register("icon")}
+          label={t("common.fields.icon")}
+        />
+        <TextField
+          {...text}
+          {...register("url")}
+          label={t("pages.test.fields.url")}
+        />
+      </form>
+    </BaseDialog>
+  );
+});

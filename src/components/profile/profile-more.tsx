@@ -1,0 +1,415 @@
+import Block from "@mui/icons-material/Block";
+import CheckCircle from "@mui/icons-material/CheckCircle";
+import Delete from "@mui/icons-material/Delete";
+import Edit from "@mui/icons-material/Edit";
+import FileOpen from "@mui/icons-material/FileOpen";
+import Refresh from "@mui/icons-material/Refresh";
+import Terminal from "@mui/icons-material/Terminal";
+import {
+  alpha,
+  Badge,
+  type BadgeProps,
+  Box,
+  CircularProgress,
+  IconButton,
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  MenuItem,
+  styled,
+  type SxProps,
+  Typography,
+} from "@mui/material";
+import { useLockFn } from "ahooks";
+import { memo, useState } from "react";
+import { useTranslation } from "react-i18next";
+
+import { Marquee } from "@/components/base";
+import { LogViewer } from "@/components/profile/log-viewer";
+import { ProfileEditorViewer } from "@/components/profile/profile-editor-viewer";
+import { ProfileTypeChip } from "@/components/profile/profile-type-chip";
+import { viewProfile } from "@/services/cmds";
+import { useProfilesStore } from "@/stores";
+import { cn, getErrorMessage } from "@/utils";
+
+import { useNotice } from "../base/notifies";
+import { ConfirmViewer } from "./confirm-viewer";
+import { ProfileDiv } from "./profile-box";
+
+export interface LogMessage {
+  method: string;
+  data: string[];
+  exception?: string | null;
+}
+
+interface Props {
+  sx?: SxProps;
+  selected: boolean;
+  itemData: IProfileItem;
+  logs?: LogMessage[];
+  reactivating: boolean;
+  onToggleEnable: (uid: string, enable: boolean) => void;
+  onDelete?: (item: IProfileItem) => Promise<void>;
+  onActivatedSave: () => void;
+  onClick?: (uid: string) => void;
+  selectMode?: boolean;
+  multiSelected?: boolean;
+}
+
+const StyledBadge = styled(Badge)<BadgeProps>(({ theme }) => ({
+  "& .MuiBadge-badge": {
+    right: 1,
+    top: 3,
+    border: `2px solid ${theme.palette.background.paper}`,
+    padding: "0 4px",
+  },
+  "&[aria-disabled=true] .MuiBadge-badge": {
+    opacity: 0.2,
+  },
+}));
+
+// profile enhanced item
+export const ProfileMore = memo(function ProfileMore(props: Props) {
+  const {
+    sx,
+    selected,
+    itemData,
+    logs = [],
+    reactivating,
+    onToggleEnable,
+    onDelete,
+    onActivatedSave,
+    onClick,
+    selectMode,
+    multiSelected,
+  } = props;
+
+  const updateProfile = useProfilesStore((s) => s.updateProfile);
+  const { uid, type } = itemData;
+  const { t } = useTranslation();
+  const { notice } = useNotice();
+  const [anchorEl, setAnchorEl] = useState<any>(null);
+  const [position, setPosition] = useState({ left: 0, top: 0 });
+  const [fileOpen, setFileOpen] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [logOpen, setLogOpen] = useState(false);
+  const [toggling, setToggling] = useState(false);
+
+  const onEditFile = () => {
+    setAnchorEl(null);
+    setFileOpen(true);
+  };
+
+  const onOpenFile = useLockFn(async () => {
+    setAnchorEl(null);
+    try {
+      await viewProfile(uid);
+    } catch (err: unknown) {
+      notice("error", getErrorMessage(err));
+    }
+  });
+
+  const fnWrapper = (fn: () => void) => () => {
+    setAnchorEl(null);
+    return fn();
+  };
+  const hasError = !!logs.find((e) => e.exception);
+  const isScript = type === "script";
+  const showConsole = isScript && selected;
+  const profileName = itemData.name || (isScript ? "JS" : "Merge");
+  const description = itemData.desc || "-";
+
+  const menus = [
+    {
+      label: "common.actions.enable",
+      icon: <CheckCircle fontSize="small" />,
+      handler: fnWrapper(async () => {
+        setToggling(true);
+        onToggleEnable(uid, true);
+        setToggling(false);
+      }),
+    },
+    {
+      label: "common.actions.edit",
+      icon: <Edit fontSize="small" />,
+      handler: onEditFile,
+    },
+    {
+      label: "pages.profiles.actions.openFile",
+      icon: <FileOpen fontSize="small" />,
+      handler: onOpenFile,
+    },
+    {
+      label: "common.actions.delete",
+      icon: <Delete fontSize="small" color="error" />,
+      handler: () => {
+        setAnchorEl(null);
+        setConfirmOpen(true);
+      },
+    },
+  ];
+
+  if (itemData.url)
+    menus.push({
+      label: "common.actions.refresh",
+      icon: <Refresh fontSize="small" />,
+      handler: fnWrapper(async () => {
+        try {
+          await updateProfile(uid);
+          onActivatedSave();
+        } catch (error) {
+          notice("error", getErrorMessage(error));
+        }
+      }),
+    });
+  if (selected) {
+    menus.splice(0, 1, {
+      label: "common.actions.disable",
+      icon: <Block fontSize="small" />,
+      handler: fnWrapper(async () => {
+        setToggling(true);
+        onToggleEnable(uid, false);
+        setToggling(false);
+      }),
+    });
+  }
+
+  const boxStyle = {
+    height: 26,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    lineHeight: 1,
+  };
+
+  return (
+    <Box
+      className={cn(selectMode ? "animate-shake" : undefined)}
+      sx={(theme) => {
+        const isLight = theme.palette.mode === "light";
+        return {
+          width: "100%",
+          bgcolor: theme.palette.background.default,
+          borderRadius: "12px",
+          boxShadow: isLight
+            ? "0 1px 3px rgba(0,0,0,0.08)"
+            : "0 1px 4px rgba(0,0,0,0.24)",
+          ...(selectMode && {
+            filter: "saturate(0.75)",
+            opacity: 0.85,
+          }),
+          ...(multiSelected && {
+            filter: "saturate(1)",
+            opacity: 1,
+            boxShadow: `0 0 0 2px ${theme.palette.primary.main}, 0 2px 6px ${alpha(theme.palette.primary.main, 0.2)}`,
+          }),
+          ...{ sx },
+        };
+      }}>
+      <ProfileDiv
+        className="interface-profile-card"
+        aria-label="script"
+        aria-selected={selected || itemData.enable}
+        onClick={onClick ? () => onClick(uid) : undefined}
+        onDoubleClick={() => {
+          if (!selectMode) onEditFile();
+        }}
+        onContextMenu={(event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          if (selectMode) return;
+          const { clientX, clientY } = event;
+          setPosition({ top: clientY, left: clientX });
+          setAnchorEl(event.currentTarget);
+        }}>
+        {(reactivating || toggling) && (
+          <Box
+            sx={{
+              position: "absolute",
+              top: 0,
+              bottom: 0,
+              left: 0,
+              right: 0,
+              zIndex: 10,
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              backdropFilter: "blur(2px)",
+              borderRadius: "12px",
+            }}>
+            <CircularProgress size={20} />
+          </Box>
+        )}
+        {multiSelected && (
+          <CheckCircle
+            sx={{
+              position: "absolute",
+              top: 8,
+              right: 8,
+              zIndex: 10,
+              fontSize: 22,
+              color: "primary.main",
+            }}
+          />
+        )}
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 0.75,
+            height: 30,
+            mb: 0.5,
+          }}>
+          <ProfileTypeChip type={type} variant="enhance" />
+          <Box sx={{ minWidth: 0, flex: 1 }}>
+            <Marquee pauseOnHover>
+              <Typography
+                title={profileName}
+                variant="h6"
+                component="h2"
+                noWrap
+                sx={{
+                  fontSize: "17px",
+                  fontWeight: 650,
+                  lineHeight: "24px",
+                }}>
+                {profileName}
+              </Typography>
+            </Marquee>
+          </Box>
+          <Box
+            component="span"
+            sx={{
+              flexShrink: 0,
+              fontSize: 11,
+              fontWeight: itemData.enable ? 600 : 400,
+              color: itemData.enable ? "success.main" : "text.secondary",
+            }}>
+            {t(
+              itemData.enable
+                ? "common.status.enabled"
+                : "common.status.disabled",
+            )}
+          </Box>
+          <Box sx={{ flex: "0 0 auto", width: 30, height: 30 }}>
+            {showConsole ? (
+              <IconButton
+                disabled={selectMode}
+                size="small"
+                edge="end"
+                color={hasError ? "error" : "primary"}
+                title={t("pages.profiles.runtime.scriptConsole")}
+                sx={(theme) => {
+                  const isLight = theme.palette.mode === "light";
+                  const color = hasError
+                    ? theme.palette.error.main
+                    : theme.palette.primary.main;
+                  return {
+                    width: 30,
+                    height: 30,
+                    mr: -0.25,
+                    borderRadius: "8px",
+                    bgcolor: alpha(color, isLight ? 0.12 : 0.22),
+                    "&:hover": {
+                      bgcolor: alpha(color, isLight ? 0.12 : 0.22),
+                    },
+                  };
+                }}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  setLogOpen(true);
+                }}>
+                {hasError ? (
+                  <Badge color="error" variant="dot">
+                    <Terminal fontSize="small" />
+                  </Badge>
+                ) : (
+                  <StyledBadge
+                    aria-disabled={selectMode}
+                    badgeContent={logs.length}
+                    color="primary">
+                    <Terminal fontSize="small" />
+                  </StyledBadge>
+                )}
+              </IconButton>
+            ) : null}
+          </Box>
+        </Box>
+
+        <Box sx={{ ...boxStyle, gap: 1 }}>
+          <Typography
+            noWrap
+            title={description}
+            sx={{
+              minWidth: 0,
+              flex: 1,
+              fontSize: 13,
+              opacity: itemData.desc ? 1 : 0.72,
+            }}>
+            {description}
+          </Typography>
+        </Box>
+      </ProfileDiv>
+      <Menu
+        open={!!anchorEl}
+        anchorEl={anchorEl}
+        onClose={() => setAnchorEl(null)}
+        anchorPosition={position}
+        anchorReference="anchorPosition"
+        transitionDuration={225}
+        slotProps={{ list: { sx: { py: 0.5 } } }}
+        onContextMenu={(e) => {
+          e.preventDefault();
+          setAnchorEl(null);
+        }}>
+        {menus
+          .filter((item: any) => item.show !== false)
+          .map((item) => (
+            <MenuItem
+              key={item.label}
+              onClick={() => item.handler()}
+              sx={{ minWidth: 120 }}
+              dense>
+              <ListItemIcon className="text-primary!">{item.icon}</ListItemIcon>
+              <ListItemText
+                className={cn("text-primary", {
+                  "text-error": item.label === "common.actions.delete",
+                })}>
+                {t(item.label)}
+              </ListItemText>
+            </MenuItem>
+          ))}
+      </Menu>
+      <ProfileEditorViewer
+        open={fileOpen}
+        profileItem={itemData}
+        type={type === "merge" ? "merge" : "script"}
+        onChange={() => {
+          if (selected) {
+            onActivatedSave();
+          }
+        }}
+        onClose={() => setFileOpen(false)}
+      />
+      <ConfirmViewer
+        title={t("pages.profiles.dialog.confirmDeletion")}
+        message={t("pages.profiles.dialog.confirmDeletionMessage")}
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        onConfirm={async () => {
+          setConfirmOpen(false);
+          setToggling(true);
+          await onDelete?.(itemData);
+          setToggling(false);
+        }}
+      />
+      {selected && (
+        <LogViewer
+          open={logOpen}
+          logInfo={logs}
+          onClose={() => setLogOpen(false)}
+        />
+      )}
+    </Box>
+  );
+});

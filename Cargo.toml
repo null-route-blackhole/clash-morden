@@ -1,0 +1,53 @@
+[workspace]
+members = [
+  "src-tauri",
+  "crates/mihomo-rule-parser",
+  "crates/mihomo-config",
+  "crates/tauri-plugin-mihomo",
+  "crates/process_supervisor",
+  "crates/clash-verge-self-utils",
+  "crates/clash-verge-self-service"
+]
+default-members = ["src-tauri"]
+resolver = "2"
+
+[workspace.package]
+publish = false
+edition = "2024"
+
+[workspace.dependencies]
+mihomo-rule-parser = { path = "crates/mihomo-rule-parser" }
+tauri-plugin-mihomo = { path = "crates/tauri-plugin-mihomo" }
+process_supervisor = { path = "crates/process_supervisor" }
+clash-verge-self-utils = { path = "crates/clash-verge-self-utils" }
+clash-verge-self-service = { path = "crates/clash-verge-self-service" }
+
+anyhow = "1"
+thiserror = "2"
+reqwest = { version = "0.13", features = ["query", "json"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1"
+serde_yaml = "0.9"
+dirs = "7.0"
+tokio = { version = "1.40", features = ["full"] }
+once_cell = "1.19"
+parking_lot = "0.12"
+log = "0.4"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "local-time"] }
+tracing-appender = "0.2"
+logroller = "0.1"
+uuid = { version = "1.24.0", features = ["v4", "serde"] }
+
+[profile.dev]
+incremental = true
+
+[profile.release]
+panic = "abort"
+codegen-units = 1
+lto = true
+opt-level = "s"
+strip = true
+
+[workspace.lints.clippy]
+redundant_clone = "warn"

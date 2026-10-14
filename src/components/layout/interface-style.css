@@ -1,0 +1,918 @@
+/* Shared application controls, matching the approved Test page. Clash is opt-out. */
+html[data-interface-style] {
+  --ui-accent: var(--mui-palette-primary-main);
+  --ui-paper: var(--mui-palette-background-paper);
+  --ui-text: var(--mui-palette-text-primary);
+  --ui-muted: var(--mui-palette-text-secondary);
+  --ui-edge: color-mix(in srgb, var(--ui-text) 10%, var(--ui-paper));
+  --ui-fill: color-mix(in srgb, var(--ui-text) 4%, var(--ui-paper));
+  --ui-radius: 8px;
+  --ui-card-radius: 14px;
+  --ui-control-height: 30px;
+}
+html[data-interface-style="soft"] {
+  --ui-radius: 10px;
+  --ui-card-radius: 18px;
+}
+html[data-interface-style="glass"] {
+  --ui-radius: 9px;
+  --ui-card-radius: 16px;
+}
+html[data-interface-style="bold"] {
+  --ui-radius: 4px;
+  --ui-card-radius: 8px;
+  --ui-edge: color-mix(in srgb, var(--ui-text) 23%, var(--ui-paper));
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .overview-topbar
+  .lucide {
+  width: 16px;
+  height: 16px;
+  stroke-width: 1.65;
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiIconButton-root {
+  border: 0;
+  box-shadow: none;
+}
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .interface-card-header
+  .lucide {
+  width: 16px;
+  height: 16px;
+  stroke-width: 1.65;
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiButton-root,
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiToggleButton-root {
+  border-radius: var(--ui-radius);
+  text-transform: none;
+  font-weight: 500;
+  font-size: 12px;
+  min-height: var(--ui-control-height);
+  box-shadow: none;
+  transition:
+    background-color 0.15s,
+    border-color 0.15s;
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiButton-root:where(
+    :not(.Mui-disabled):not(.MuiButton-colorError):not(
+        .MuiButton-colorWarning
+      ):not(.MuiButton-colorSuccess)
+  ) {
+  color: var(--ui-text);
+  border-color: var(--ui-edge);
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiButton-contained:where(
+    :not(.Mui-disabled):not(.MuiButton-colorError):not(
+        .MuiButton-colorWarning
+      ):not(.MuiButton-colorSuccess)
+  ) {
+  background: var(--ui-text);
+  color: var(--ui-paper);
+  border-color: transparent;
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiButton-outlined,
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiButton-text {
+  background: transparent;
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiButton-root:not(.Mui-disabled):hover {
+  box-shadow: none;
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiButton-outlined:not(.Mui-disabled):hover,
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiButton-text:not(.Mui-disabled):hover {
+  background: var(--ui-fill);
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiButton-contained:not(.Mui-disabled):hover {
+  filter: brightness(0.92);
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiButton-root.Mui-disabled {
+  opacity: 0.45;
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiIconButton-root:where(
+    :not(.MuiIconButton-colorError):not(.MuiIconButton-colorWarning)
+  ) {
+  color: var(--ui-muted);
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  border-radius: var(--ui-radius);
+  padding: 6px;
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiIconButton-root:not(.Mui-disabled):hover {
+  color: var(--ui-text);
+  background: var(--ui-fill);
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiIconButton-root[aria-pressed="true"],
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiIconButton-root.MuiIconButton-colorPrimary,
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiIconButton-root.MuiIconButton-colorSecondary {
+  color: var(--ui-text);
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiIconButton-root.Mui-disabled {
+  color: var(--ui-muted);
+  opacity: 0.4;
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiIconButton-root
+  .MuiSvgIcon-root {
+  font-size: 18px;
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .overview-topbar
+  .MuiIconButton-root
+  svg {
+  color: inherit;
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiButtonBase-root:focus-visible,
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiInputBase-root:focus-within,
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiButtonBase-root[role="combobox"]:focus-visible {
+  outline: 2px solid var(--ui-accent);
+  outline-offset: 2px;
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiInputBase-root,
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiOutlinedInput-root,
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiButtonBase-root[role="combobox"] {
+  border-radius: var(--ui-radius);
+  font-size: 12px;
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiOutlinedInput-notchedOutline {
+  border-color: var(--ui-edge);
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiOutlinedInput-input:not(textarea),
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiSelect-select {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiSelect-icon {
+  color: var(--ui-muted);
+  font-size: 18px;
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiInputLabel-root,
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiFormLabel-root {
+  font-size: 12px;
+  color: var(--ui-muted);
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiButtonGroup-root,
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiToggleButtonGroup-root {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--ui-edge);
+  border-radius: var(--ui-radius);
+  background: var(--ui-fill);
+  box-shadow: none;
+}
+
+html[data-interface-compact="true"] .MuiButton-root,
+html[data-interface-compact="true"] .MuiToggleButton-root {
+  min-height: 26px;
+  padding: 4px 9px;
+  font-size: 11px;
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiButtonGroup-root
+  .MuiButton-root,
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiToggleButtonGroup-root
+  .MuiToggleButton-root {
+  margin: 0;
+  border: 0;
+  border-radius: calc(var(--ui-radius) - 3px);
+  min-width: 0;
+  min-height: 24px;
+  padding: 4px 12px;
+  font-size: 11px;
+  color: var(--ui-muted);
+  background: transparent;
+  box-shadow: none;
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiButtonGroup-root
+  .MuiButton-contained,
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiButtonGroup-root
+  .MuiButton-root[aria-pressed="true"],
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiToggleButtonGroup-root
+  .MuiToggleButton-root.Mui-selected {
+  color: var(--ui-text);
+  background: var(--ui-paper);
+  font-weight: 600;
+  box-shadow: 0 1px 3px #0000000b;
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiSwitch-root {
+  width: 34px;
+  height: 20px;
+  padding: 0;
+  margin: 4px 6px;
+  overflow: visible;
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiSwitch-root
+  .MuiSwitch-switchBase {
+  padding: 2px;
+  margin: 0;
+  color: white;
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiSwitch-root
+  .MuiSwitch-switchBase.Mui-checked {
+  transform: translateX(14px);
+  color: white;
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiSwitch-root
+  .MuiSwitch-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 1px 2px #0002;
+  box-sizing: border-box;
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiSwitch-root
+  .MuiSwitch-track {
+  border: 0;
+  border-radius: 20px;
+  opacity: 1;
+  background: color-mix(in srgb, var(--ui-muted) 35%, var(--ui-paper));
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiSwitch-root
+  .MuiSwitch-switchBase.Mui-checked
+  + .MuiSwitch-track {
+  background: var(--ui-accent);
+  opacity: 1;
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiSwitch-root
+  .MuiSwitch-switchBase.Mui-disabled
+  + .MuiSwitch-track {
+  opacity: 0.4;
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiFormControlLabel-label {
+  font-size: 12px;
+  color: var(--ui-muted);
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiCheckbox-root,
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiRadio-root {
+  color: var(--ui-muted);
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiCheckbox-root.Mui-checked,
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiRadio-root.Mui-checked {
+  color: var(--ui-accent);
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiSlider-root {
+  color: var(--ui-accent);
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiMenu-paper,
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiPopover-paper,
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiDialog-paper,
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiAutocomplete-paper {
+  border: 1px solid var(--ui-edge);
+  border-radius: var(--ui-card-radius);
+  background-image: none;
+  box-shadow: 0 10px 32px #10182014;
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiMenuItem-root,
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiAutocomplete-option {
+  font-size: 12px;
+  min-height: 34px;
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiMenuItem-root.Mui-selected,
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiAutocomplete-option[aria-selected="true"] {
+  background: var(--ui-fill);
+  color: var(--ui-text);
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiMenuItem-root.Mui-selected:hover {
+  background: var(--ui-fill);
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiChip-root:not(.MuiChip-colorError):not(.MuiChip-colorWarning):not(
+    .MuiChip-colorSuccess
+  ) {
+  background: transparent;
+  border: 1px solid var(--ui-edge);
+  color: var(--ui-muted);
+  border-radius: 4px;
+  font-size: 10px;
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiTab-root {
+  text-transform: none;
+  font-size: 12px;
+  color: var(--ui-muted);
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiTab-root.Mui-selected {
+  color: var(--ui-text);
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiTabs-indicator {
+  background: var(--ui-text);
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiTableCell-root {
+  border-color: var(--ui-edge);
+  font-size: 12px;
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiTableCell-head {
+  color: var(--ui-muted);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  background: var(--ui-fill);
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .interface-card,
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiCard-root {
+  border: 1px solid var(--ui-edge);
+  border-radius: var(--ui-card-radius);
+  background: var(--ui-paper);
+  box-shadow: none;
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .interface-card-header {
+  padding: 12px 16px;
+  border-color: var(--ui-edge);
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .interface-card-content {
+  padding: 16px;
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .interface-card-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ui-text);
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .interface-title-icon {
+  background: transparent;
+  color: var(--ui-muted);
+  border-radius: var(--ui-radius);
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .interface-title-icon
+  .MuiSvgIcon-root {
+  font-size: 18px;
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .card-legend {
+  gap: 10px;
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .card-legend-item {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  gap: 5px;
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .card-legend-item
+  .MuiTypography-root {
+  font-size: 10px;
+  color: var(--ui-muted);
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .card-legend-dot {
+  width: 5px;
+  height: 5px;
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .interface-nav-button {
+  border-radius: var(--ui-radius);
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .interface-nav-button.Mui-selected,
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .interface-nav-button.Mui-selected:hover {
+  background: var(--ui-fill);
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .interface-nav-button
+  .MuiTypography-root,
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .interface-nav-button
+  .MuiSvgIcon-root {
+  color: var(--ui-muted);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .interface-nav-button.Mui-selected
+  .MuiTypography-root,
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .interface-nav-button.Mui-selected
+  .MuiSvgIcon-root {
+  color: var(--ui-text);
+  font-weight: 600;
+}
+
+html[data-interface-style="soft"] .MuiOutlinedInput-root,
+html[data-interface-style="soft"] .MuiButtonBase-root[role="combobox"],
+html[data-interface-style="soft"] .MuiButton-outlined {
+  background: var(--ui-fill);
+}
+
+html[data-interface-style="soft"] .MuiOutlinedInput-notchedOutline {
+  border-color: transparent;
+}
+
+html[data-interface-style="soft"] .interface-card-header {
+  border-color: transparent;
+  padding-bottom: 4px;
+}
+
+html[data-interface-style="soft"]
+  .MuiChip-root:not(.MuiChip-colorError):not(.MuiChip-colorWarning):not(
+    .MuiChip-colorSuccess
+  ) {
+  background: var(--ui-fill);
+  border-color: transparent;
+}
+
+html[data-interface-style="glass"] #root {
+  background-image:
+    radial-gradient(
+      at 10% 10%,
+      color-mix(in srgb, var(--ui-accent) 9%, transparent),
+      transparent 60%
+    ),
+    radial-gradient(
+      at 90% 40%,
+      color-mix(in srgb, var(--ui-accent) 5%, transparent),
+      transparent 60%
+    );
+}
+
+html[data-interface-style="glass"] .interface-card,
+html[data-interface-style="glass"] .MuiCard-root,
+html[data-interface-style="glass"] .MuiDialog-paper,
+html[data-interface-style="glass"] .MuiMenu-paper,
+html[data-interface-style="glass"] .MuiPopover-paper {
+  background: color-mix(in srgb, var(--ui-paper) 56%, transparent);
+  backdrop-filter: blur(24px) saturate(145%);
+  border-color: color-mix(in srgb, var(--ui-text) 9%, transparent);
+  box-shadow:
+    inset 0 1px 0 #ffffff38,
+    0 6px 24px #0b22390a;
+}
+
+html[data-interface-style="glass"] .MuiOutlinedInput-root,
+html[data-interface-style="glass"] .MuiButton-outlined {
+  background: color-mix(in srgb, var(--ui-fill) 65%, transparent);
+}
+
+html[data-interface-style="bold"] .interface-card,
+html[data-interface-style="bold"] .MuiCard-root {
+  border-top: 2px solid var(--ui-text);
+}
+
+html[data-interface-style="bold"] .MuiOutlinedInput-notchedOutline,
+html[data-interface-style="bold"] .MuiButton-outlined {
+  border-color: var(--ui-muted);
+}
+
+html[data-interface-style="bold"] .MuiButtonGroup-root .MuiButton-contained,
+html[data-interface-style="bold"]
+  .MuiButtonGroup-root
+  .MuiButton-root[aria-pressed="true"],
+html[data-interface-style="bold"]
+  .MuiToggleButtonGroup-root
+  .MuiToggleButton-root.Mui-selected {
+  background: var(--ui-text);
+  color: var(--ui-paper);
+}
+
+html[data-interface-compact="true"] .MuiIconButton-root {
+  padding: 4px;
+}
+
+html[data-interface-compact="true"] .MuiOutlinedInput-input:not(textarea),
+html[data-interface-compact="true"] .MuiSelect-select {
+  padding-top: 5px;
+  padding-bottom: 5px;
+  font-size: 12px;
+}
+
+html[data-interface-compact="true"] .MuiMenuItem-root,
+html[data-interface-compact="true"] .MuiListItem-root,
+html[data-interface-compact="true"] .MuiListItemButton-root {
+  min-height: 28px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+html[data-interface-compact="true"] .interface-nav-item {
+  height: 40px;
+  min-height: 40px;
+}
+
+html[data-interface-compact="true"] .MuiFormControlLabel-label,
+html[data-interface-compact="true"] .MuiTableCell-root {
+  font-size: 12px;
+}
+
+html[data-interface-compact="true"] .MuiTableCell-root {
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+
+html[data-interface-compact="true"] .interface-card-header {
+  padding: 8px 12px;
+}
+
+html[data-interface-compact="true"] .interface-card-content {
+  padding: 12px;
+}
+
+html[data-interface-compact="true"] .MuiSwitch-root {
+  width: 29px;
+  height: 17px;
+  padding: 0;
+  margin: 4px 6px;
+  overflow: visible;
+}
+
+html[data-interface-compact="true"] .MuiSwitch-root .MuiSwitch-switchBase {
+  padding: 2px;
+  margin: 0;
+}
+
+html[data-interface-compact="true"]
+  .MuiSwitch-root
+  .MuiSwitch-switchBase.Mui-checked {
+  transform: translateX(12px);
+}
+
+html[data-interface-compact="true"] .MuiSwitch-root .MuiSwitch-thumb {
+  width: 13px;
+  height: 13px;
+  box-sizing: border-box;
+}
+
+html[data-interface-compact="true"] .MuiButtonGroup-root .MuiButton-root {
+  min-height: 22px;
+  padding: 3px 9px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:where([data-interface-style]):not([data-interface-style="clash"])
+    .MuiButton-root {
+    transition: none;
+  }
+}
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .interface-metric {
+  background: transparent;
+  border-color: var(--ui-edge);
+  border-radius: var(--ui-radius);
+  box-shadow: none;
+}
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .interface-metric-icon {
+  background: transparent;
+  width: 24px;
+  height: 24px;
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiOutlinedInput-root:hover
+  .MuiOutlinedInput-notchedOutline {
+  border-color: var(--ui-muted);
+}
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .overview-topbar
+  .MuiIconButton-root {
+  width: var(--ui-control-height);
+  height: var(--ui-control-height);
+}
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .interface-mode-group
+  .MuiButton-root {
+  height: auto;
+}
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiOutlinedInput-root.Mui-error
+  .MuiOutlinedInput-notchedOutline {
+  border-color: var(--mui-palette-error-main);
+}
+html[data-interface-compact="true"] {
+  --ui-control-height: 26px;
+}
+
+/* Shared page typography; the overview supplies the same hierarchy. */
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .interface-page {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ui-text);
+}
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  :is(
+    .MuiTypography-body1,
+    .MuiTypography-body2,
+    .MuiListItemText-primary,
+    .MuiMenuItem-root,
+    .MuiTableCell-body
+  ) {
+  font-size: 12px;
+  font-weight: 400;
+}
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  :is(.MuiTypography-caption, .MuiListItemText-secondary) {
+  font-size: 10px;
+  font-weight: 400;
+}
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  :is(.MuiTypography-h6, .MuiListSubheader-root, .MuiTableCell-head) {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ui-text);
+}
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .interface-page-title {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 24px;
+}
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .interface-page
+  :is(.text-sm, .text-base, .text-lg) {
+  font-size: 12px;
+}
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .interface-page
+  .font-bold {
+  font-weight: 600;
+}
+
+/* Keep the overview and navigation on the same type scale as Test. */
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .interface-card-content {
+  font-size: 12px;
+}
+html .MuiIconButton-root.interface-borderless,
+html .MuiIconButton-root.interface-borderless[aria-pressed="true"] {
+  border: 0;
+  box-shadow: none;
+  background: transparent;
+}
+html .MuiIconButton-root.interface-borderless:hover {
+  background: var(--mui-palette-action-hover);
+}
+html[data-interface-style="glass"] #root .bg-background-default {
+  background-color: transparent;
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .interface-metric
+  .MuiTypography-body1 {
+  font-size: 18px;
+  font-weight: 550;
+  line-height: 1.25;
+}
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .interface-nav-button
+  .lucide {
+  color: var(--ui-muted);
+}
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .interface-nav-button.Mui-selected
+  .lucide {
+  color: var(--ui-text);
+}
+
+/* Test uses bare glyphs: no persistent tile, outline or shadow around icons. */
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  :is(.interface-title-icon, .interface-metric-icon) {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+}
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .interface-title-icon {
+  width: 20px;
+  height: 20px;
+}
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .interface-proxy-group {
+  background-image: none;
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .interface-setting-label {
+  font-size: 12px;
+  font-weight: 400;
+}
+
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .interface-page
+  :where(th, td) {
+  font-size: 12px;
+  font-weight: 400;
+}
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .interface-page
+  th {
+  font-weight: 600;
+}
+
+/* Keep the active subscription visible over every modern card surface. */
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiCard-root.interface-profile-card[aria-selected="true"] {
+  border-color: color-mix(in srgb, var(--ui-accent) 45%, var(--ui-edge));
+  border-inline-start: 3px solid var(--ui-accent);
+  background: color-mix(in srgb, var(--ui-accent) 10%, var(--ui-paper));
+}
+
+html[data-interface-style="glass"]
+  .MuiCard-root.interface-profile-card[aria-selected="true"] {
+  background: color-mix(in srgb, var(--ui-accent) 12%, transparent);
+}
+
+.interface-proxy-group-controls {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+html .interface-page .interface-proxy-group.MuiCard-root .MuiTypography-root,
+html
+  .interface-page
+  .interface-proxy-group.MuiCard-root
+  .interface-proxy-group-controls
+  .MuiInputBase-input {
+  font-size: 12px;
+  line-height: 20px;
+}
+
+html
+  .interface-page
+  .interface-proxy-group.MuiCard-root
+  .interface-proxy-group-controls
+  .MuiIconButton-root {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  padding: 6px;
+}
+
+html
+  .interface-page
+  .interface-proxy-group.MuiCard-root
+  .interface-proxy-group-controls
+  .MuiSvgIcon-root {
+  width: 16px;
+  height: 16px;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+html
+  .interface-page
+  .interface-proxy-group.MuiCard-root
+  .interface-proxy-group-controls
+  .MuiInputBase-root {
+  height: 28px;
+  min-height: 28px;
+}
+
+html
+  .interface-page
+  .interface-proxy-group.MuiCard-root
+  .interface-proxy-group-controls
+  .MuiInputBase-input {
+  padding-block: 4px;
+}
+
+/* Match resting outlined labels to the themed input padding in dialogs. */
+html:where([data-interface-style]):not([data-interface-style="clash"])
+  .MuiDialog-root
+  .MuiInputLabel-outlined:not(.MuiInputLabel-shrink) {
+  transform: translate(14px, 8px) scale(1);
+}
+html:where([data-interface-style]):not(
+    [data-interface-style="clash"]
+  )[data-interface-compact="true"]
+  .MuiDialog-root
+  .MuiInputLabel-outlined:not(.MuiInputLabel-shrink) {
+  transform: translate(14px, 5px) scale(1);
+}

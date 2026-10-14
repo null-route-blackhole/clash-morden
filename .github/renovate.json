@@ -1,0 +1,41 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:best-practices",
+    ":prConcurrentLimitNone",
+    ":prHourlyLimitNone",
+    ":rebaseStalePrs",
+    ":automergeMinor",
+    "docker:disable"
+  ],
+  "baseBranchPatterns": ["dev"],
+  "labels": ["dependencies"],
+  "packageRules": [
+    {
+      "matchManagers": ["github-actions"],
+      "labels": ["github-actions"],
+      "semanticCommitType": "ci",
+      "semanticCommitScope": "action",
+      "automerge": true
+    },
+    {
+      "matchDatasources": ["github-runners"],
+      "matchPackageNames": ["ubuntu"],
+      "versioning": "22.04"
+    },
+    {
+      "matchPackageNames": ["monaco-editor"],
+      "groupName": "monaco deps",
+      "allowedVersions": "<0.55.0"
+    },
+    {
+      "matchPackageNames": ["sha2", "hkdf"],
+      "groupName": "crypto deps"
+    },
+    {
+      "matchManagers": ["rust-toolchain"],
+      "matchDepTypes": ["toolchain"],
+      "enabled": false
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+node_modules
+.pnpm-store
+.DS_Store
+dist
+dist-ssr
+# zashboard 静态资源随包分发，需要入库（dist 规则默认忽略任何 dist 目录）。
+!src/public/zashboard/dist/
+!src/public/zashboard/dist/**
+*.local
+update.json
+scripts/_env.sh
+.tool-versions
+target
+.vfox/
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# Local editor state
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.example.json
+
+# Local logs and temporary files
+*.log
+*.tmp
+*.temp
+*.swp
+*.swo
+*.bak
+*.orig
+
+# OS metadata
+Thumbs.db
+Desktop.ini
+.Spotlight-V100/
+.Trashes/
+
+archbuild/local_build/*
+!archbuild/local_build/PKGBUILD
+!archbuild/local_build/clash-verge-self.install
+!archbuild/local_build/build.sh
+.gitnexus
+
+# codex plan files
+findings.md
+progress.md
+task_plan.md

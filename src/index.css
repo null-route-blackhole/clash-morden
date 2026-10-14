@@ -1,0 +1,598 @@
+@layer theme, base, mui, components, utilities;
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* MUI default theme */
+@theme inline {
+  /* Material UI typography */
+  --font-h1: var(--mui-font-h1);
+  --font-h2: var(--mui-font-h2);
+  --font-h3: var(--mui-font-h3);
+  --font-h4: var(--mui-font-h4);
+  --font-h5: var(--mui-font-h5);
+  --font-h6: var(--mui-font-h6);
+  --font-subtitle1: var(--mui-font-subtitle1);
+  --font-subtitle2: var(--mui-font-subtitle2);
+  --font-body1: var(--mui-font-body1);
+  --font-body2: var(--mui-font-body2);
+  --font-button: var(--mui-font-button);
+  --font-caption: var(--mui-font-caption);
+  --font-overline: var(--mui-font-overline);
+
+  --letter-spacing-h1: -0.01562em;
+  --letter-spacing-h2: -0.00833em;
+  --letter-spacing-h4: 0.00735em;
+  --letter-spacing-h6: 0.0075em;
+  --letter-spacing-body1: 0.00938em;
+  --letter-spacing-body2: 0.01071em;
+
+  /* Material UI breakpoints */
+  --breakpoint-sm: 37.5rem;
+  /* 600px */
+  --breakpoint-md: 56.25rem;
+  /* 900px */
+  --breakpoint-lg: 75rem;
+  /* 1200px */
+  --breakpoint-xl: 96rem;
+  /* 1536px */
+  --breakpoint-2xl: 120rem;
+  /* 1920px */
+
+  /* Material UI theme colors */
+  --color-primary: var(--mui-palette-primary-main);
+  --color-primary-light: var(--mui-palette-primary-light);
+  --color-primary-dark: var(--mui-palette-primary-dark);
+  --color-primary-contrast: var(--mui-palette-primary-contrastText);
+
+  --color-secondary: var(--mui-palette-secondary-main);
+  --color-secondary-light: var(--mui-palette-secondary-light);
+  --color-secondary-dark: var(--mui-palette-secondary-dark);
+  --color-secondary-contrast: var(--mui-palette-secondary-contrastText);
+
+  /* Material UI status colors */
+  --color-info: var(--mui-palette-info-main);
+  --color-info-light: var(--mui-palette-info-light);
+  --color-info-dark: var(--mui-palette-info-dark);
+  --color-info-contrast: var(--mui-palette-info-contrastText);
+
+  --color-error: var(--mui-palette-error-main);
+  --color-error-light: var(--mui-palette-error-light);
+  --color-error-dark: var(--mui-palette-error-dark);
+  --color-error-contrast: var(--mui-palette-error-contrastText);
+
+  --color-success: var(--mui-palette-success-main);
+  --color-success-light: var(--mui-palette-success-light);
+  --color-success-dark: var(--mui-palette-success-dark);
+  --color-success-contrast: var(--mui-palette-success-contrastText);
+
+  --color-warning: var(--mui-palette-warning-main);
+  --color-warning-light: var(--mui-palette-warning-light);
+  --color-warning-dark: var(--mui-palette-warning-dark);
+  --color-warning-contrast: var(--mui-palette-warning-contrastText);
+
+  /* Material UI text & common colors */
+  --color-text-primary: var(--mui-palette-text-primary);
+  --color-text-secondary: var(--mui-palette-text-secondary);
+  --color-text-disabled: var(--mui-palette-text-disabled);
+  --color-common-background: var(--mui-palette-common-background);
+  --color-common-onBackground: var(--mui-palette-common-onBackground);
+  --color-divider: var(--mui-palette-divider);
+
+  /* Material UI background colors */
+  --color-background-default: var(--mui-palette-background-default);
+  --color-background-paper: var(--mui-palette-background-paper);
+
+  /* Material UI action colors */
+  --color-action-active: var(--mui-palette-action-active);
+  --color-action-hover: var(--mui-palette-action-hover);
+  --color-action-selected: var(--mui-palette-action-selected);
+  --color-action-disabled: var(--mui-palette-action-disabled);
+  --color-action-focus: var(--mui-palette-action-focus);
+
+  /* Material UI gray scale */
+  --color-gray-50: var(--mui-palette-grey-50);
+  --color-gray-100: var(--mui-palette-grey-100);
+  --color-gray-200: var(--mui-palette-grey-200);
+  --color-gray-300: var(--mui-palette-grey-300);
+  --color-gray-400: var(--mui-palette-grey-400);
+  --color-gray-500: var(--mui-palette-grey-500);
+  --color-gray-600: var(--mui-palette-grey-600);
+  --color-gray-700: var(--mui-palette-grey-700);
+  --color-gray-800: var(--mui-palette-grey-800);
+  --color-gray-900: var(--mui-palette-grey-900);
+  --color-gray-A100: var(--mui-palette-grey-A100);
+  --color-gray-A200: var(--mui-palette-grey-A200);
+  --color-gray-A400: var(--mui-palette-grey-A400);
+  --color-gray-A700: var(--mui-palette-grey-A700);
+
+  /* Material UI Component Colors */
+  /* Alert */
+  --color-Alert-error: var(--mui-palette-Alert-errorColor);
+  --color-Alert-info: var(--mui-palette-Alert-infoColor);
+  --color-Alert-success: var(--mui-palette-Alert-successColor);
+  --color-Alert-warning: var(--mui-palette-Alert-warningColor);
+  --color-Alert-errorFilled: var(--mui-palette-Alert-errorFilledBg);
+  --color-Alert-infoFilled: var(--mui-palette-Alert-infoFilledBg);
+  --color-Alert-successFilled: var(--mui-palette-Alert-successFilledBg);
+  --color-Alert-warningFilled: var(--mui-palette-Alert-warningFilledBg);
+  --color-Alert-errorFilledColor: var(--mui-palette-Alert-errorFilledColor);
+  --color-Alert-infoFilledColor: var(--mui-palette-Alert-infoFilledColor);
+  --color-Alert-successFilledColor: var(--mui-palette-Alert-successFilledColor);
+  --color-Alert-warningFilledColor: var(--mui-palette-Alert-warningFilledColor);
+  --color-Alert-errorStandard: var(--mui-palette-Alert-errorStandardBg);
+  --color-Alert-infoStandard: var(--mui-palette-Alert-infoStandardBg);
+  --color-Alert-successStandard: var(--mui-palette-Alert-successStandardBg);
+  --color-Alert-warningStandard: var(--mui-palette-Alert-warningStandardBg);
+  --color-Alert-errorIcon: var(--mui-palette-Alert-errorIconColor);
+  --color-Alert-infoIcon: var(--mui-palette-Alert-infoIconColor);
+  --color-Alert-successIcon: var(--mui-palette-Alert-successIconColor);
+  --color-Alert-warningIcon: var(--mui-palette-Alert-warningIconColor);
+
+  /* AppBar */
+  --color-AppBar-default: var(--mui-palette-AppBar-defaultBg);
+
+  /* Avatar */
+  --color-Avatar-default: var(--mui-palette-Avatar-defaultBg);
+
+  /* Button */
+  --color-Button-inheritContained: var(--mui-palette-Button-inheritContainedBg);
+  --color-Button-inheritContainedHover: var(
+    --mui-palette-Button-inheritContainedHoverBg
+  );
+
+  /* Chip */
+  --color-Chip-defaultBorder: var(--mui-palette-Chip-defaultBorder);
+  --color-Chip-defaultAvatar: var(--mui-palette-Chip-defaultAvatarColor);
+  --color-Chip-defaultIcon: var(--mui-palette-Chip-defaultIconColor);
+
+  /* FilledInput */
+  --color-FilledInput-bg: var(--mui-palette-FilledInput-bg);
+  --color-FilledInput-hover: var(--mui-palette-FilledInput-hoverBg);
+  --color-FilledInput-disabled: var(--mui-palette-FilledInput-disabledBg);
+
+  /* LinearProgress */
+  --color-LinearProgress-primary: var(--mui-palette-LinearProgress-primaryBg);
+  --color-LinearProgress-secondary: var(
+    --mui-palette-LinearProgress-secondaryBg
+  );
+  --color-LinearProgress-error: var(--mui-palette-LinearProgress-errorBg);
+  --color-LinearProgress-info: var(--mui-palette-LinearProgress-infoBg);
+  --color-LinearProgress-success: var(--mui-palette-LinearProgress-successBg);
+  --color-LinearProgress-warning: var(--mui-palette-LinearProgress-warningBg);
+
+  /* Skeleton */
+  --color-Skeleton-bg: var(--mui-palette-Skeleton-bg);
+
+  /* Slider */
+  --color-Slider-primary: var(--mui-palette-Slider-primaryTrack);
+  --color-Slider-secondary: var(--mui-palette-Slider-secondaryTrack);
+  --color-Slider-error: var(--mui-palette-Slider-errorTrack);
+  --color-Slider-info: var(--mui-palette-Slider-infoTrack);
+  --color-Slider-success: var(--mui-palette-Slider-successTrack);
+  --color-Slider-warning: var(--mui-palette-Slider-warningTrack);
+
+  /* SnackbarContent */
+  --color-SnackbarContent-bg: var(--mui-palette-SnackbarContent-bg);
+  --color-SnackbarContent-text: var(--mui-palette-SnackbarContent-color);
+
+  /* SpeedDialAction */
+  --color-SpeedDialAction-fabHover: var(
+    --mui-palette-SpeedDialAction-fabHoverBg
+  );
+
+  /* StepConnector & StepContent */
+  --color-StepConnector-border: var(--mui-palette-StepConnector-border);
+  --color-StepContent-border: var(--mui-palette-StepContent-border);
+
+  /* Switch */
+  --color-Switch-default: var(--mui-palette-Switch-defaultColor);
+  --color-Switch-defaultDisabled: var(
+    --mui-palette-Switch-defaultDisabledColor
+  );
+  --color-Switch-primaryDisabled: var(
+    --mui-palette-Switch-primaryDisabledColor
+  );
+  --color-Switch-secondaryDisabled: var(
+    --mui-palette-Switch-secondaryDisabledColor
+  );
+  --color-Switch-errorDisabled: var(--mui-palette-Switch-errorDisabledColor);
+  --color-Switch-infoDisabled: var(--mui-palette-Switch-infoDisabledColor);
+  --color-Switch-successDisabled: var(
+    --mui-palette-Switch-successDisabledColor
+  );
+  --color-Switch-warningDisabled: var(
+    --mui-palette-Switch-warningDisabledColor
+  );
+
+  /* TableCell */
+  --color-TableCell-border: var(--mui-palette-TableCell-border);
+
+  /* Tooltip */
+  --color-Tooltip-bg: var(--mui-palette-Tooltip-bg);
+
+  /* Material UI shadows */
+  --shadow-1: var(--mui-shadows-1);
+  --shadow-2: var(--mui-shadows-2);
+  --shadow-3: var(--mui-shadows-3);
+  --shadow-4: var(--mui-shadows-4);
+  --shadow-5: var(--mui-shadows-5);
+  --shadow-6: var(--mui-shadows-6);
+  --shadow-7: var(--mui-shadows-7);
+  --shadow-8: var(--mui-shadows-8);
+  --shadow-9: var(--mui-shadows-9);
+  --shadow-10: var(--mui-shadows-10);
+  --shadow-11: var(--mui-shadows-11);
+  --shadow-12: var(--mui-shadows-12);
+  --shadow-13: var(--mui-shadows-13);
+  --shadow-14: var(--mui-shadows-14);
+  --shadow-15: var(--mui-shadows-15);
+  --shadow-16: var(--mui-shadows-16);
+  --shadow-17: var(--mui-shadows-17);
+  --shadow-18: var(--mui-shadows-18);
+  --shadow-19: var(--mui-shadows-19);
+  --shadow-20: var(--mui-shadows-20);
+  --shadow-21: var(--mui-shadows-21);
+  --shadow-22: var(--mui-shadows-22);
+  --shadow-23: var(--mui-shadows-23);
+  --shadow-24: var(--mui-shadows-24);
+
+  /* Material UI opacity */
+  --opacity-activated: calc(100% * var(--mui-palette-action-activatedOpacity));
+  --opacity-disabled: calc(100% * var(--mui-palette-action-disabledOpacity));
+  --opacity-focus: calc(100% * var(--mui-palette-action-focusOpacity));
+  --opacity-hover: calc(100% * var(--mui-palette-action-hoverOpacity));
+  --opacity-selected: calc(100% * var(--mui-palette-action-selectedOpacity));
+
+  /* Material UI overlays */
+  --overlay-1: var(--mui-overlays-1);
+  --overlay-2: var(--mui-overlays-2);
+  --overlay-3: var(--mui-overlays-3);
+  --overlay-4: var(--mui-overlays-4);
+  --overlay-5: var(--mui-overlays-5);
+  --overlay-6: var(--mui-overlays-6);
+  --overlay-7: var(--mui-overlays-7);
+  --overlay-8: var(--mui-overlays-8);
+  --overlay-9: var(--mui-overlays-9);
+  --overlay-10: var(--mui-overlays-10);
+  --overlay-11: var(--mui-overlays-11);
+  --overlay-12: var(--mui-overlays-12);
+  --overlay-13: var(--mui-overlays-13);
+  --overlay-14: var(--mui-overlays-14);
+  --overlay-15: var(--mui-overlays-15);
+  --overlay-16: var(--mui-overlays-16);
+  --overlay-17: var(--mui-overlays-17);
+  --overlay-18: var(--mui-overlays-18);
+  --overlay-19: var(--mui-overlays-19);
+  --overlay-20: var(--mui-overlays-20);
+  --overlay-21: var(--mui-overlays-21);
+  --overlay-22: var(--mui-overlays-22);
+  --overlay-23: var(--mui-overlays-23);
+  --overlay-24: var(--mui-overlays-24);
+}
+
+/* Custom theme */
+@theme {
+  /* animate-marquee 需要 */
+  --duration: 3s;
+
+  /* animation */
+  --animate-marquee: marquee var(--duration) infinite linear;
+  --animate-highlight: highlight-pulse 1s ease-in-out infinite;
+  --animate-marquee-vertical: marquee-vertical var(--duration) infinite linear;
+  --animate-shake: shake 3s ease-in-out infinite;
+
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+
+    to {
+      /* 双副本轨道：整体位移一份内容宽度（轨道宽度的 50% + 半个 gap） */
+      transform: translateX(calc(-50% - var(--gap) / 2));
+    }
+  }
+
+  /* 高亮动画关键帧 */
+  @keyframes highlight-pulse {
+    0% {
+      /*background-color: var(--background-color-alpha);*/
+      box-shadow: 0 0 0 0 var(--background-color-alpha);
+    }
+
+    50% {
+      /*background-color: var(--background-color-alpha);*/
+      box-shadow: 0 0 6px 1px var(--mui-palette-primary-main);
+    }
+
+    100% {
+      /*background-color: var(--background-color-alpha);*/
+      box-shadow: 0 0 0 0 var(--background-color-alpha);
+    }
+  }
+
+  @keyframes marquee-vertical {
+    from {
+      transform: translateY(0);
+    }
+
+    to {
+      /* 双副本轨道：整体位移一份内容高度（轨道高度的 50% + 半个 gap） */
+      transform: translateY(calc(-50% - var(--gap) / 2));
+    }
+  }
+
+  @keyframes shake {
+    0%,
+    100% {
+      transform: rotate(0deg);
+    }
+
+    25% {
+      transform: rotate(0.5deg);
+    }
+
+    50% {
+      transform: rotate(-0.5deg);
+    }
+
+    75% {
+      transform: rotate(0.3deg);
+    }
+  }
+}
+
+/*
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  /*:root {
+    --selection-color: #f5f5f5;
+    --scroller-color: #8c8c8c;
+    --background-color: #f5f5f5;
+    --background-color-alpha: rgba(24, 103, 192, 0.1);
+  }*/
+
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    background-color: transparent;
+    font-family:
+      -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+      "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+      sans-serif;
+    -webkit-font-smoothing: antialiased;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+  }
+
+  /* scrollbar */
+  ::-webkit-scrollbar {
+    @apply h-1.25 w-1.25;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply rounded-[5px];
+    background-color: var(--scroller-color);
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-primary;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    @apply hidden;
+  }
+
+  .scrollbar::-webkit-scrollbar {
+    @apply block;
+  }
+
+  ::selection {
+    color: var(--selection-color);
+    background-color: var(--mui-palette-primary-main);
+  }
+
+  /* Material UI base styles */
+  /*h1 {
+    font: var(--mui-font-h1);
+    letter-spacing: -0.01562em;
+  }
+  h2 {
+    font: var(--mui-font-h2);
+    letter-spacing: -0.00833em;
+  }
+  h3 {
+    font: var(--mui-font-h3);
+  }
+  h4 {
+    font: var(--mui-font-h4);
+    letter-spacing: 0.00735em;
+  }
+  h5 {
+    font: var(--mui-font-h5);
+  }
+  h6 {
+    font: var(--mui-font-h6);
+    letter-spacing: 0.0075em;
+  }
+  p {
+    font: var(--mui-font-body1);
+    letter-spacing: 0.00938em;
+  }
+  span {
+    font: var(--mui-font-body2);
+    letter-spacing: 0.01071em;
+  }*/
+}
+
+/* Material UI typography utilities */
+@utility typography-* {
+  font: --value(--font-*);
+}
+
+/* Material UI overlay utilities */
+@utility overlay-* {
+  background-image: --value(--overlay-*);
+}
+
+/* Material UI elevation utilities */
+@utility elevation-* {
+  background-image: --value(--overlay-*);
+  box-shadow: --value(--shadow-*);
+}
+
+/* 修复：恢复被 Tailwind 的 preflight 重置的 MUI OutlinedInput 中 legend/span 行为
+   Tailwind 的 preflight 可能会改变表单元素（例如 legend）的默认 display、padding、line-height，
+   这会破坏 MUI 在运行时测量 notched outline（凹槽）所依赖的行为。
+   这些规则是最小化的，仅针对 MUI 的 outlined input，并放在 Tailwind 导入之后以覆盖 preflight。
+*/
+.MuiOutlinedInput-notchedOutline legend,
+.MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline legend {
+  padding: 0;
+  height: 11px;
+  /* match MUI's expected legend height for correct notch rendering */
+  display: block;
+  /* MUI expects legend to be block for measurement and overflow handling */
+  overflow: hidden;
+  /* clip excess so only the intended notch is visible */
+  line-height: normal;
+  white-space: nowrap;
+  /* ensure measured width equals label width */
+}
+
+.MuiOutlinedInput-notchedOutline legend span,
+.MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline legend span {
+  display: inline-block;
+  /* 移除水平内边距以避免在没有 label 时出现可见的凹槽 */
+  padding: 0;
+}
+
+/* 仅在同一 FormControl 中存在 label 时为 legend span 重新应用水平内边距
+   （匹配 MUI 的 DOM：label + .MuiOutlinedInput-root）。这样可以防止当 TextField 使用 `hiddenLabel`
+   或没有 label 时出现不需要的凹槽间隙。 */
+.MuiFormControl-root
+  .MuiInputLabel-root
+  + .MuiOutlinedInput-root
+  .MuiOutlinedInput-notchedOutline
+  legend
+  span {
+  padding: 0 8px;
+}
+
+/* react-markdown-preview 的样式不应受 Tailwind 影响：
+   @uiw/react-markdown-preview 的样式表是非 layered 的 author 样式，天然优先于
+   Tailwind 的 preflight（位于 `@layer base`）和 utilities，因此库的 GitHub 风格会被完整保留。
+   唯一漏网的是 preflight 的 `ol, ul { list-style: none }`——库样式没有为顶层列表声明
+   list-style，导致 "### Features" 下的 "- 支持排序…" 等列表项不显示圆点/编号。
+   这里用非 layered 的 `list-style: revert` 统一补回浏览器默认符号；
+   因选择器优先级低于库自身的嵌套规则，嵌套 ol 的 lower-roman/lower-alpha 编号不受影响。 */
+.wmde-markdown ol,
+.wmde-markdown ul {
+  list-style: revert;
+}
+
+[data-dnd-dragging] {
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.32);
+}
+
+/* 内核启停加载动画：图标转圈圈 */
+@keyframes clashmorden-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---- Leaflet 2D 地图（地球卡）---- */
+.clashmorden-maplibre {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  background: #f8f4f0;
+}
+
+.clashmorden-maplibre-dark {
+  filter: brightness(0.78) saturate(0.9);
+}
+
+.clashmorden-map-city-label {
+  pointer-events: none;
+  white-space: nowrap;
+  padding: 2px 6px;
+  border-radius: 5px;
+  color: var(--mui-palette-text-primary, #263238);
+  background: color-mix(
+    in srgb,
+    var(--mui-palette-background-paper, #fff) 82%,
+    transparent
+  );
+  border: 1px solid
+    color-mix(in srgb, var(--mui-palette-divider, #ddd) 75%, transparent);
+  box-shadow: 0 1px 4px rgb(0 0 0 / 16%);
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.2;
+  backdrop-filter: blur(4px);
+  transform: translateY(-5px);
+}
+
+.clashmorden-maplibre-dark .clashmorden-map-city-label {
+  color: #f4f7fb;
+  background: rgb(22 35 48 / 84%);
+}
+
+.clashmorden-leaflet {
+  background: #a9d1ea;
+}
+.clashmorden-leaflet-dark {
+  background: #143049;
+}
+/* 深色主题：Liberty 瓦片反色滤镜 */
+.clashmorden-leaflet-dark .leaflet-tile {
+  filter: invert(1) hue-rotate(190deg) brightness(0.92) contrast(0.92)
+    saturate(0.75);
+}
+.clashmorden-leaflet .leaflet-control-attribution {
+  font-size: 9px;
+  opacity: 0.8;
+}
+.clashmorden-leaflet-dark .leaflet-control-attribution,
+.clashmorden-leaflet-dark .leaflet-control-attribution a {
+  color: #cfe3f5;
+}
+.clashmorden-leaflet-dark .leaflet-bar a {
+  background: #1c3a52;
+  color: #d7e8f5;
+  border-color: #3d6482;
+}
+
+@keyframes clashmorden-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

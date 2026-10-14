@@ -1,0 +1,684 @@
+//！
+//! feat mod 里的函数主要用于
+//! - hotkey 快捷键
+//! - timer 定时器
+//! - cmds 页面调用
+//!
+use anyhow::{Context, Result};
+use clash_verge_self_service::model::JsonResponse;
+use rust_i18n::t;
+use serde_yaml::{Mapping, Value};
+use tauri::AppHandle;
+use tauri_plugin_clipboard_manager::ClipboardExt;
+use tauri_plugin_dialog::{MessageDialogButtons, MessageDialogKind};
+use verge_log::VergeLog;
+
+use crate::{
+    cmds,
+    config::*,
+    core::*,
+    log_err,
+    utils::{dirs, help, resolve},
+};
+
+/// 打开面板
+pub fn open_or_close_dashboard() {
+    if let Some(window) = handle::Handle::get_window()
+        && let Ok(true) = window.is_focused()
+    {
+        let _ = window.close();
+        return;
+    }
+    resolve::create_window();
+}
+
+/// 关闭面板
+pub fn close_dashboard() {
+    if let Some(window) = handle::Handle::get_window() {
+        let _ = window.close();
+    }
+}
+
+/// 重启clash
+pub fn restart_clash_core() {
+    tauri::async_runtime::spawn(async {
+        match CoreManager::global().run_core().await {
+            Ok(_) => {
+                handle::Handle::refresh_clash();
+                handle::Handle::notice_message(handle::NoticeStatus::Success, "messages.clash.configUpdated");
+            }
+            Err(err) => {
+                handle::Handle::notice_message(handle::NoticeStatus::Error, format!("{err}"));
+                tracing::error!(target:"app", "{err}");
+            }
+        }
+    });
+}
+
+/// 切换模式 rule/global/direct/script mode
+pub fn change_clash_mode(mode: String) {
+    tracing::debug!("change clash mode to {mode}");
+    let mut mapping = Mapping::new();
+    mapping.insert(Value::from("mode"), mode.into());
+
+    tauri::async_runtime::spawn(async move {
+        match patch_clash(mapping).await {
+            Ok(_) => log_err!(handle::Handle::update_systray_part()),
+            Err(err) => tracing::error!("{err}"),
+        }
+    });
+}
+
+/// 切换系统代理
+pub fn toggle_system_proxy() {
+    let enable = Config::verge().latest().enable_system_proxy;
+    let enable = enable.unwrap_or(false);
+
+    tauri::async_runtime::spawn(async move {
+        match patch_verge(IVerge {
+            enable_system_proxy: Some(!enable),
+            ..IVerge::default()
+        })
+        .await
+        {
+            Ok(_) => handle::Handle::refresh_verge(),
+            Err(err) => tracing::error!("{err}"),
+        }
+        let _ = handle::Handle::update_systray_part();
+    });
+}
+
+/// 切换服务模式 (仅内核)
+pub fn toggle_service_mode() {
+    let enable = Config::verge().latest().enable_service_mode.unwrap_or(false);
+    let toggle_failed_msg = if enable {
+        t!("notice.disable.failed")
+    } else {
+        t!("notice.enable.failed")
+    };
+
+    tauri::async_runtime::spawn(async move {
+        match cmds::service::check_service().await {
+            Ok(JsonResponse { code: 400, .. } | JsonResponse { code: 0, .. }) => {
+                let patch = IVerge {
+                    enable_service_mode: Some(!enable),
+                    ..IVerge::default()
+                };
+                if let Err(err) = patch_verge(patch).await {
+                    handle::Handle::notify("ClashMorden Service", format!("{toggle_failed_msg}, {err}"));
+                    tracing::error!("{err}")
+                } else {
+                    handle::Handle::refresh_verge()
+                }
+            }
+            Ok(response) => {
+                handle::Handle::notify(
+                    "ClashMorden Service",
+                    format!("{}, {}", toggle_failed_msg, response.msg),
+                );
+            }
+            Err(err) => {
+                tracing::error!("toggle service mode failed: {err}");
+                let status = handle::Handle::show_block_dialog(
+                    "ClashMorden Service",
+                    t!("dialog.install.service.ask"),
+                    MessageDialogKind::Info,
+                    MessageDialogButtons::OkCancel,
+                )
+                .unwrap_or(false);
+                if status {
+                    let _ = install_and_run_service().await;
+                }
+            }
+        }
+        let _ = handle::Handle::update_systray_part();
+    });
+}
+
+/// 切换tun模式
+pub fn toggle_tun_mode() {
+    let enable = Config::clash().data().get_enable_tun();
+    let toggle_failed_msg = if enable {
+        t!("notice.disable.failed")
+    } else {
+        t!("notice.enable.failed")
+    };
+
+    let mut tun = Mapping::new();
+    let mut tun_val = Mapping::new();
+    tun_val.insert("enable".into(), Value::from(!enable));
+    tun.insert("tun".into(), tun_val.into());
+
+    tauri::async_runtime::spawn(async move {
+        if cfg!(target_os = "linux") && dirs::is_portable_version() {
+            match patch_clash(tun).await {
+                Ok(_) => tracing::info!("change tun mode to {}", !enable),
+                Err(err) => {
+                    tracing::error!("toggle tun mode failed: {err}");
+                    handle::Handle::notify("Tun Mode", format!("{toggle_failed_msg}, {err}"));
+                }
+            }
+        } else {
+            match cmds::service::check_service().await {
+                Ok(JsonResponse { code: 0, .. }) => match patch_clash(tun).await {
+                    Ok(_) => {
+                        tracing::info!("change tun mode to {}", !enable)
+                    }
+                    Err(err) => {
+                        tracing::error!("toggle tun mode failed: {err}")
+                    }
+                },
+                Ok(JsonResponse { code: 400, .. }) => {
+                    // service installed but no enable, need to patch verge to enable service mode
+                    if let Err(err) = patch_verge(IVerge {
+                        enable_service_mode: Some(true),
+                        ..IVerge::default()
+                    })
+                    .await
+                    {
+                        handle::Handle::notify("Tun Mode", format!("{toggle_failed_msg}, {err}"));
+                    } else {
+                        log_err!(cmds::check_service_and_clash().await, "check service failed");
+                        handle::Handle::refresh_verge();
+                        match patch_clash(tun).await {
+                            Ok(_) => {
+                                tracing::info!("change tun mode to {}", !enable)
+                            }
+                            Err(err) => tracing::error!("{err}"),
+                        }
+                    }
+                }
+                Ok(response) => {
+                    handle::Handle::notify("Tun Mode", format!("{}, {}", toggle_failed_msg, response.msg));
+                }
+                Err(err) => {
+                    tracing::error!("toggle service mode failed: {err}");
+                    let status = handle::Handle::show_block_dialog(
+                        "ClashMorden Service",
+                        t!("dialog.install.service.ask"),
+                        MessageDialogKind::Info,
+                        MessageDialogButtons::OkCancel,
+                    )
+                    .unwrap_or(false);
+                    if status && install_and_run_service().await.is_ok() {
+                        if let Err(err) = cmds::check_service_and_clash().await {
+                            handle::Handle::notify("Tun Mode", format!("{toggle_failed_msg}, {err}"));
+                        } else if let Err(err) = patch_clash(tun).await {
+                            handle::Handle::notify("Tun Mode", format!("{toggle_failed_msg}, {err}"));
+                            tracing::error!("{err}")
+                        } else {
+                            tracing::info!("change tun mode to {}", !enable);
+                        }
+                    }
+                }
+            }
+        }
+
+        log_err!(handle::Handle::update_systray_part());
+    });
+}
+
+/// 安装并运行服务 (仅内核)
+async fn install_and_run_service() -> Result<()> {
+    if let Err(err) = cmds::service::install_service().await {
+        handle::Handle::notify(
+            "ClashMorden Service",
+            format!("{}, {}", t!("notice.install.failed"), err),
+        );
+        anyhow::bail!("{err}");
+    }
+    if let Err(err) = patch_verge(IVerge {
+        enable_service_mode: Some(true),
+        ..IVerge::default()
+    })
+    .await
+    {
+        handle::Handle::notify(
+            "ClashMorden Service",
+            format!("{}, {}", t!("notice.service.install.run.failed"), err),
+        );
+        return Err(err);
+    }
+    handle::Handle::notify("ClashMorden Service", t!("notice.service.install.run.success"));
+    handle::Handle::refresh_verge();
+    Ok(())
+}
+
+/// 修改clash的订阅
+pub async fn patch_clash(patch: Mapping) -> Result<()> {
+    tracing::debug!("patch clash");
+    // enable-random-port filed store in verge config, only need update verge config
+    if let Some(random_val) = patch.get("enable-random-port") {
+        let enable_random_port = random_val.as_bool().unwrap_or(false);
+        // disable other port & update clash config
+        let mut tmp_map = Mapping::new();
+        if enable_random_port {
+            let port = help::find_unused_port().unwrap_or(Config::clash().latest().get_mixed_port());
+            tmp_map.insert("mixed-port".into(), port.into());
+        } else if help::local_port_available(7890) {
+            tmp_map.insert("mixed-port".into(), 7890.into());
+        } else {
+            let port = help::find_unused_port()?;
+            handle::Handle::notice_message_with_args(
+                handle::NoticeStatus::Warning,
+                "messages.clash.portFallback",
+                [("port", port.to_string())],
+            );
+            tmp_map.insert("mixed-port".into(), port.into());
+        }
+
+        tmp_map.insert("port".into(), 0.into());
+        tmp_map.insert("socks-port".into(), 0.into());
+        tmp_map.insert("redir-port".into(), 0.into());
+        tmp_map.insert("tproxy-port".into(), 0.into());
+        handle::Handle::mihomo().patch_base_config(&tmp_map).await?;
+        // clash config
+        tracing::debug!("patch latest clash config");
+        Config::clash().latest_mut().patch_config(tmp_map);
+        tracing::debug!("save latest clash config to file");
+        Config::clash().latest().save_config()?;
+        // runtime config
+        tracing::debug!("generate runtime config");
+        Config::generate()?;
+        Config::generate_file(ConfigType::Run)?;
+        // verge config
+        tracing::debug!("patch latest verge config");
+        Config::verge().latest_mut().patch_config(IVerge {
+            enable_random_port: Some(enable_random_port),
+            ..IVerge::default()
+        });
+        // update sysproxy
+        tracing::debug!("update system proxy");
+        sysopt::Sysopt::global().update_sysproxy()?;
+        // emit refresh event & emit set config ok message
+        tracing::debug!("emit refresh verge and clash event");
+        handle::Handle::refresh_verge();
+        handle::Handle::refresh_clash();
+        tracing::debug!("emit notice message event");
+        handle::Handle::notice_message(handle::NoticeStatus::Success, "messages.clash.configUpdated");
+        return Ok(());
+    }
+
+    if let Some(external_controller) = patch.get("external-controller") {
+        let external_controller = external_controller.as_str().unwrap();
+        let (host, port) = external_controller
+            .split_once(':')
+            .context("invalid external controller")?;
+        let port = port.parse()?;
+        let mihomo = handle::Handle::mihomo();
+        mihomo.update_external_host(Some(host));
+        mihomo.update_external_port(Some(port));
+    }
+    if let Some(secret) = patch.get("secret") {
+        let secret = secret.as_str().unwrap();
+        handle::Handle::mihomo().update_secret(Some(secret));
+    }
+
+    Config::clash().draft().patch_and_merge_config(patch.clone());
+    let mut generate_runtime_config = false;
+    let res = {
+        let mut update_tun_failed = false;
+        for key in CLASH_BASIC_CONFIG {
+            if patch.get(key).is_some() {
+                if !generate_runtime_config {
+                    generate_runtime_config = true;
+                }
+                let mut mapping = Mapping::new();
+                let clash_config_mapping = Config::clash().latest().0.clone();
+                let value = clash_config_mapping.get(key).unwrap();
+
+                mapping.insert(key.into(), value.clone());
+                handle::Handle::mihomo().patch_base_config(&mapping).await?;
+
+                // handle tun config
+                if key == "tun" {
+                    let clash_basic_configs = handle::Handle::mihomo().get_base_config().await?;
+                    let tun_enable = value
+                        .as_mapping()
+                        .unwrap()
+                        .get("enable")
+                        .is_some_and(|val| val.as_bool().unwrap_or(false));
+                    if tun_enable == clash_basic_configs.tun.enable {
+                        if Config::verge().latest().auto_close_connection.unwrap_or_default() {
+                            log_err!(handle::Handle::mihomo().close_all_connections().await);
+                        }
+                        handle::Handle::update_systray_part()?;
+                    } else {
+                        update_tun_failed = true;
+                        break;
+                    }
+                }
+                // handle system proxy
+                if key == "mixed-port" {
+                    sysopt::Sysopt::global().update_sysproxy()?;
+                }
+            }
+        }
+
+        if update_tun_failed {
+            #[cfg(target_os = "linux")]
+            {
+                use crate::core::manager::check_permissions_granted;
+
+                if dirs::is_portable_version() && !Config::verge().latest().enable_service_mode.unwrap_or_default() {
+                    let mihomo_core = Config::verge()
+                        .latest()
+                        .clash_core
+                        .clone()
+                        .unwrap_or("self-mihomo".to_string());
+                    if check_permissions_granted(mihomo_core)? {
+                        Err(anyhow::anyhow!("{}", t!("error.tun.busy")))
+                    } else {
+                        Err(anyhow::anyhow!("{}", t!("error.tun.needPermissions")))
+                    }
+                } else {
+                    Err(anyhow::anyhow!("{}", t!("error.tun.busy")))
+                }
+            }
+            #[cfg(not(target_os = "linux"))]
+            Err(anyhow::anyhow!("{}", t!("error.tun.busy")))
+        } else {
+            // 重新载入订阅
+            if patch.get("unified-delay").is_some() {
+                update_core_config().await?;
+            }
+            // 激活订阅
+            if Config::verge().latest().enable_external_controller.unwrap_or_default()
+                && (patch.get("secret").is_some()
+                    || patch.get("external-controller").is_some()
+                    || patch.get("external-controller-cors").is_some())
+            {
+                Config::generate()?;
+                CoreManager::global().run_core().await?;
+            }
+
+            if patch.get("mode").is_some() {
+                if Config::verge().latest().auto_close_connection.unwrap_or_default() {
+                    handle::Handle::mihomo().close_all_connections().await?;
+                }
+                log_err!(handle::Handle::update_systray_part());
+            }
+
+            Config::runtime().latest_mut().patch_config(patch);
+            if generate_runtime_config {
+                // if the clash basic config changed, we need to sync the runtime configuration file now
+                Config::generate()?;
+                Config::generate_file(ConfigType::Run)?;
+            }
+            Ok(())
+        }
+    };
+    match res {
+        Ok(()) => {
+            tracing::info!("update success, apply clash config");
+            Config::clash().apply();
+            Config::clash().data().save_config()?;
+            handle::Handle::refresh_clash();
+            Ok(())
+        }
+        Err(err) => {
+            tracing::error!("update failed, discard clash config");
+            Config::clash().discard();
+            Err(err)
+        }
+    }
+}
+
+/// 修改verge的订阅
+/// 一般都是一个个的修改
+pub async fn patch_verge(patch: IVerge) -> Result<()> {
+    tracing::debug!("patch verge draft");
+    Config::verge().draft().patch_config(patch.clone());
+
+    tracing::debug!("resolve config settings");
+    let res = {
+        let enable_external_controller = patch.enable_external_controller;
+        let auto_launch = patch.enable_auto_launch;
+        let silent_start_mode = patch.silent_start_mode;
+        let system_proxy = patch.enable_system_proxy;
+        let pac = patch.proxy_auto_config;
+        let pac_content = patch.pac_file_content;
+        // bypass
+        let proxy_bypass = patch.system_proxy_bypass;
+        let windows_bypass = patch.windows_bypass;
+        let macos_bypass = patch.macos_bypass;
+        let linux_bypass = patch.linux_bypass;
+
+        let language = patch.language;
+        #[cfg(target_os = "macos")]
+        let tray_icon = patch.tray_icon;
+        let common_tray_icon = patch.common_tray_icon;
+        let sysproxy_tray_icon = patch.sysproxy_tray_icon;
+        let tun_tray_icon = patch.tun_tray_icon;
+        let log_level = patch.app_log_level;
+        let enable_tray = patch.enable_tray;
+        let service_mode = patch.enable_service_mode;
+
+        if let Some(enable_external_controller) = enable_external_controller {
+            tracing::info!("enable external controller: {enable_external_controller}");
+            Config::generate()?;
+            CoreManager::global().run_core().await?;
+        }
+
+        if log_level.is_some() {
+            let log_level = Config::verge().latest().get_log_level();
+            VergeLog::update_app_log_level(log_level)?;
+        }
+
+        if let Some(service_mode) = service_mode {
+            tracing::debug!("change service mode to {service_mode}");
+            Config::generate()?;
+            CoreManager::global().run_core().await?;
+        }
+        if silent_start_mode.is_some() {
+            sysopt::Sysopt::global().init_launch()?;
+            if Config::verge().latest().enable_auto_launch.unwrap_or_default() {
+                sysopt::Sysopt::global().update_launch()?;
+            }
+        }
+        if auto_launch.is_some() {
+            sysopt::Sysopt::global().update_launch()?;
+        }
+        if system_proxy.is_some()
+            || proxy_bypass.is_some()
+            || windows_bypass.is_some()
+            || macos_bypass.is_some()
+            || linux_bypass.is_some()
+            || pac.is_some()
+            || pac_content.is_some()
+        {
+            tracing::debug!("update system proxy");
+            sysopt::Sysopt::global().update_sysproxy()?;
+        }
+
+        if let Some(true) = patch.enable_proxy_guard {
+            tracing::debug!("enable system proxy guard");
+            sysopt::Sysopt::global().guard_proxy();
+        }
+
+        if let Some(hotkeys) = patch.hotkeys {
+            tracing::debug!("update global hotkeys");
+            hotkey::Hotkey::global().update(hotkeys)?;
+        }
+
+        if let Some(language) = language {
+            tracing::debug!("change app language");
+            rust_i18n::set_locale(&language);
+            handle::Handle::update_systray()?;
+        } else if system_proxy.is_some()
+            || common_tray_icon.is_some()
+            || sysproxy_tray_icon.is_some()
+            || tun_tray_icon.is_some()
+            || service_mode.is_some()
+        {
+            tracing::debug!("update tray cause by some settings changed");
+            handle::Handle::update_systray_part()?;
+        }
+        #[cfg(target_os = "macos")]
+        if tray_icon.is_some() {
+            tracing::debug!("macos tray icon changed, update tray");
+            handle::Handle::update_systray_part()?;
+        }
+
+        if let Some(enable_tray) = enable_tray {
+            tracing::debug!("toggle tray enable: {enable_tray}");
+            handle::Handle::set_tray_visible(enable_tray)?;
+        }
+
+        Ok(())
+    };
+    match res {
+        Ok(()) => {
+            Config::verge().apply();
+            Config::verge().data().save_file()?;
+            Ok(())
+        }
+        Err(err) => {
+            Config::verge().discard();
+            Err(err)
+        }
+    }
+}
+
+/// 更新某个profile
+/// 如果更新当前订阅就激活订阅
+pub async fn update_profile(uid: &str, option: Option<PrfOption>) -> Result<()> {
+    let url_opt = {
+        let profiles = Config::profiles();
+        let profiles = profiles.latest();
+        let item = profiles
+            .get_item(uid)
+            .with_context(|| format!("failed to find the profile item \"uid:{uid}\""))?;
+        let is_remote = item.itype.as_ref().is_some_and(|s| *s == ProfileType::Remote);
+
+        if let Some(url) = item.url.as_ref() {
+            Some((
+                url.clone(),
+                item.option.clone(),
+                item.itype == Some(ProfileType::Script),
+                item.enable.unwrap_or_default(),
+            ))
+        } else if !is_remote {
+            None
+        } else {
+            anyhow::bail!("failed to get the profile item url");
+        }
+    };
+
+    let should_update = match url_opt {
+        Some((url, opt, script, enabled)) => {
+            let merged_opt = PrfOption::merge(opt, option);
+            let item = if script {
+                PrfItem::from_script_url(&url, None, None, merged_opt).await?
+            } else {
+                PrfItem::from_url(&url, None, None, merged_opt).await?
+            };
+
+            let profiles = Config::profiles();
+            let mut profiles = profiles.latest_mut();
+            profiles.update_item(uid, item)?;
+
+            (script && enabled) || profiles.get_current().is_some_and(|v| v == uid)
+        }
+        None => true,
+    };
+
+    if should_update {
+        update_core_config().await?;
+    }
+
+    Ok(())
+}
+
+/// 更新订阅
+async fn update_core_config() -> Result<()> {
+    match CoreManager::global().update_config().await {
+        Ok(_) => {
+            handle::Handle::refresh_clash();
+            handle::Handle::notice_message(handle::NoticeStatus::Success, "messages.clash.configUpdated");
+            Ok(())
+        }
+        Err(err) => {
+            handle::Handle::notice_message(handle::NoticeStatus::Error, format!("{err}"));
+            Err(err)
+        }
+    }
+}
+
+/// copy env variable
+pub fn copy_clash_env(app_handle: &AppHandle) {
+    let port = Config::clash().latest().get_mixed_port();
+    let http_proxy = format!("http://127.0.0.1:{port}");
+    let socks5_proxy = format!("socks5://127.0.0.1:{port}");
+
+    let sh = format!("export http_proxy={http_proxy} https_proxy={http_proxy} all_proxy={socks5_proxy}");
+    let cmd = format!("set http_proxy={http_proxy}\r\nset https_proxy={http_proxy}");
+    let ps = format!("$env:HTTP_PROXY=\"{http_proxy}\"; $env:HTTPS_PROXY=\"{http_proxy}\"");
+    let nu = format!("load-env {{http_proxy:\"{http_proxy}\", https_proxy:\"{http_proxy}\"}}");
+
+    let clipboard = app_handle.clipboard();
+
+    let verge = Config::verge();
+    let verge = verge.latest();
+    let env_type = match verge.env_type.as_deref() {
+        Some(env_type) => env_type,
+        None => {
+            #[cfg(not(target_os = "windows"))]
+            let default = "bash";
+            #[cfg(target_os = "windows")]
+            let default = "powershell";
+            default
+        }
+    };
+    match env_type {
+        "bash" => clipboard.write_text(sh).unwrap_or_default(),
+        "cmd" => clipboard.write_text(cmd).unwrap_or_default(),
+        "powershell" => clipboard.write_text(ps).unwrap_or_default(),
+        "nushell" => clipboard.write_text(nu).unwrap_or_default(),
+        _ => tracing::error!("copy_clash_env: Invalid env type! {env_type}"),
+    };
+}
+
+pub async fn test_delay(url: String) -> Result<u32> {
+    use tokio::time::{Duration, Instant};
+    let mut builder = reqwest::ClientBuilder::new().use_rustls_tls().no_proxy();
+
+    let port = Config::clash().latest().get_mixed_port();
+    let tun_mode = Config::clash().latest().get_enable_tun();
+
+    let proxy_scheme = format!("http://127.0.0.1:{port}");
+
+    if !tun_mode {
+        if let Ok(proxy) = reqwest::Proxy::http(&proxy_scheme) {
+            builder = builder.proxy(proxy);
+        }
+        if let Ok(proxy) = reqwest::Proxy::https(&proxy_scheme) {
+            builder = builder.proxy(proxy);
+        }
+        if let Ok(proxy) = reqwest::Proxy::all(&proxy_scheme) {
+            builder = builder.proxy(proxy);
+        }
+    }
+
+    let request = builder.timeout(Duration::from_millis(5000)).build()?.get(url).header(
+        "User-Agent",
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 Edg/120.0.0.0",
+    );
+    let start = Instant::now();
+
+    let response = request.send().await;
+    match response {
+        Ok(response) => {
+            tracing::trace!("test_delay response: {:#?}", response);
+            if response.status().is_success() {
+                Ok(start.elapsed().as_millis() as u32)
+            } else {
+                Ok(5000u32)
+            }
+        }
+        Err(err) => {
+            tracing::trace!("test_delay error: {:#?}", err);
+            Err(err.into())
+        }
+    }
+}

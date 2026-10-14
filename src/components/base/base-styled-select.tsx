@@ -1,0 +1,16 @@
+import { Select, type SelectProps, styled } from "@mui/material";
+
+export const BaseStyledSelect = styled((props: SelectProps<string>) => {
+  return (
+    <Select
+      size="small"
+      autoComplete="off"
+      sx={{
+        width: 120,
+        height: 33.375,
+        '[role="button"]': { py: 0.65 },
+      }}
+      {...props}
+    />
+  );
+})(() => ({}));

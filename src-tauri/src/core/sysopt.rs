@@ -1,0 +1,421 @@
+use std::{
+    env::current_exe,
+    sync::{
+        Arc,
+        atomic::{AtomicBool, Ordering},
+    },
+};
+
+use anyhow::{Context, Result};
+use auto_launch::{AutoLaunch, AutoLaunchBuilder};
+use once_cell::sync::OnceCell;
+use parking_lot::Mutex;
+use rust_i18n::t;
+use sysproxy::{Autoproxy, Sysproxy};
+
+use crate::{
+    config::{Config, SilentStartMode},
+    log_err,
+    utils::server::get_embed_server_port,
+};
+
+pub struct Sysopt {
+    /// current system proxy setting
+    cur_sysproxy: Arc<Mutex<Option<Sysproxy>>>,
+
+    /// record the original system proxy
+    /// recover it when exit
+    old_sysproxy: Arc<Mutex<Option<Sysproxy>>>,
+
+    /// current auto proxy setting
+    cur_autoproxy: Arc<Mutex<Option<Autoproxy>>>,
+
+    /// record the original auto proxy
+    /// recover it when exit
+    old_autoproxy: Arc<Mutex<Option<Autoproxy>>>,
+
+    /// helps to auto launch the app
+    auto_launch: Arc<Mutex<Option<AutoLaunch>>>,
+
+    /// record whether the guard async is running or not
+    guard_state: Arc<AtomicBool>,
+}
+
+#[cfg(target_os = "windows")]
+const DEFAULT_BYPASS: &str = "localhost;127.*;192.168.*;10.*;172.16.*;172.17.*;172.18.*;172.19.*;172.20.*;172.21.*;172.22.*;172.23.*;172.24.*;172.25.*;172.26.*;172.27.*;172.28.*;172.29.*;172.30.*;172.31.*;<local>";
+#[cfg(target_os = "linux")]
+const DEFAULT_BYPASS: &str = "localhost,127.0.0.1,192.168.0.0/16,10.0.0.0/8,172.16.0.0/12,::1";
+#[cfg(target_os = "macos")]
+const DEFAULT_BYPASS: &str =
+    "127.0.0.1,192.168.0.0/16,10.0.0.0/8,172.16.0.0/12,localhost,*.local,*.crashlytics.com,<local>";
+
+pub fn get_default_bypass() -> String {
+    DEFAULT_BYPASS.to_string()
+}
+
+fn get_bypass() -> String {
+    let res = {
+        let verge = Config::verge();
+        let verge = verge.latest();
+        #[cfg(target_os = "windows")]
+        {
+            verge.windows_bypass.clone()
+        }
+        #[cfg(target_os = "linux")]
+        {
+            verge.linux_bypass.clone()
+        }
+        #[cfg(target_os = "macos")]
+        {
+            verge.macos_bypass.clone()
+        }
+    };
+    match res {
+        Some(custom_bypass) => custom_bypass,
+        None => DEFAULT_BYPASS.to_string(),
+    }
+}
+
+impl Sysopt {
+    pub fn global() -> &'static Sysopt {
+        static SYSOPT: OnceCell<Sysopt> = OnceCell::new();
+
+        SYSOPT.get_or_init(|| Sysopt {
+            cur_sysproxy: Arc::new(Mutex::new(None)),
+            old_sysproxy: Arc::new(Mutex::new(None)),
+            cur_autoproxy: Arc::new(Mutex::new(None)),
+            old_autoproxy: Arc::new(Mutex::new(None)),
+            auto_launch: Arc::new(Mutex::new(None)),
+            guard_state: Arc::new(AtomicBool::new(false)),
+        })
+    }
+
+    /// init the sysproxy
+    pub fn init_sysproxy(&self) -> Result<()> {
+        let port = Config::clash().latest().get_mixed_port();
+        let pac_port = get_embed_server_port();
+
+        let enable = Config::verge().latest().enable_system_proxy.unwrap_or_default();
+        let pac = Config::verge().latest().proxy_auto_config.unwrap_or_default();
+
+        let mut sys = Sysproxy {
+            enable,
+            host: "127.0.0.1".into(),
+            port,
+            bypass: get_bypass(),
+        };
+        let mut auto = Autoproxy {
+            enable,
+            url: format!("http://127.0.0.1:{pac_port}/commands/pac"),
+        };
+        if pac {
+            sys.enable = false;
+            let old = Sysproxy::get_system_proxy().ok();
+            if sys.set_system_proxy().is_ok() {
+                *self.old_sysproxy.lock() = old;
+                *self.cur_sysproxy.lock() = Some(sys);
+            } else {
+                anyhow::bail!("{}", t!("error.sysproxy.updateFailed"));
+            }
+
+            let old = Autoproxy::get_auto_proxy().ok();
+            if auto.set_auto_proxy().is_ok() {
+                *self.cur_autoproxy.lock() = Some(auto);
+                *self.old_autoproxy.lock() = old;
+            } else {
+                anyhow::bail!("{}", t!("error.sysproxy.pac.updateFailed"));
+            }
+        } else {
+            auto.enable = false;
+            let old = Autoproxy::get_auto_proxy().ok();
+            if auto.set_auto_proxy().is_ok() {
+                *self.old_autoproxy.lock() = old;
+                *self.cur_autoproxy.lock() = Some(auto);
+            } else {
+                anyhow::bail!("{}", t!("error.sysproxy.updateFailed"));
+            }
+
+            let old = Sysproxy::get_system_proxy().ok();
+            if sys.set_system_proxy().is_ok() {
+                *self.old_sysproxy.lock() = old;
+                *self.cur_sysproxy.lock() = Some(sys);
+            } else {
+                anyhow::bail!("{}", t!("error.sysproxy.updateFailed"));
+            }
+        }
+
+        // run the system proxy guard
+        self.guard_proxy();
+        Ok(())
+    }
+
+    /// update the system proxy
+    pub fn update_sysproxy(&self) -> Result<()> {
+        let mut cur_sysproxy = self.cur_sysproxy.lock();
+        let old_sysproxy = { self.old_sysproxy.lock().clone() };
+        let mut cur_autoproxy = self.cur_autoproxy.lock();
+        let old_autoproxy = { self.old_autoproxy.lock().clone() };
+
+        let enable = Config::verge().latest().enable_system_proxy.unwrap_or_default();
+        let pac = Config::verge().latest().proxy_auto_config.unwrap_or_default();
+        if pac && (cur_autoproxy.is_none() || old_autoproxy.is_none()) {
+            tracing::info!("init pac proxy");
+            drop(cur_autoproxy);
+            drop(old_autoproxy);
+            return self.init_sysproxy();
+        }
+
+        if !pac && (cur_sysproxy.is_none() || old_sysproxy.is_none()) {
+            tracing::info!("init system proxy");
+            drop(cur_sysproxy);
+            drop(old_sysproxy);
+            return self.init_sysproxy();
+        }
+
+        tracing::info!("update system proxy");
+        let port = Config::clash().latest().get_mixed_port();
+        let pac_port = get_embed_server_port();
+
+        let mut sysproxy = cur_sysproxy.take().unwrap();
+        let sysproxy_ = sysproxy.clone();
+        sysproxy.bypass = get_bypass();
+        sysproxy.port = port;
+
+        let mut autoproxy = cur_autoproxy.take().unwrap();
+        let autoproxy_ = autoproxy.clone();
+        autoproxy.url = format!("http://127.0.0.1:{pac_port}/commands/pac");
+
+        if pac {
+            sysproxy.enable = false;
+            if sysproxy.set_system_proxy().is_ok() {
+                *cur_sysproxy = Some(sysproxy);
+                autoproxy.enable = enable;
+                if autoproxy.set_auto_proxy().is_ok() {
+                    *cur_autoproxy = Some(autoproxy);
+                } else {
+                    *cur_autoproxy = Some(autoproxy_);
+                    anyhow::bail!("{}", t!("error.sysproxy.pac.updateFailed"));
+                }
+            } else {
+                *cur_sysproxy = Some(sysproxy_);
+                anyhow::bail!("{}", t!("error.sysproxy.updateFailed"));
+            }
+        } else {
+            autoproxy.enable = false;
+            if autoproxy.set_auto_proxy().is_ok() {
+                *cur_autoproxy = Some(autoproxy);
+                sysproxy.enable = enable;
+                if sysproxy.set_system_proxy().is_ok() {
+                    *cur_sysproxy = Some(sysproxy);
+                } else {
+                    *cur_sysproxy = Some(sysproxy_);
+                    anyhow::bail!("{}", t!("error.sysproxy.updateFailed"));
+                }
+            } else {
+                *cur_autoproxy = Some(autoproxy_);
+                anyhow::bail!("{}", t!("error.sysproxy.pac.updateFailed"));
+            }
+        }
+
+        Ok(())
+    }
+
+    /// reset the sysproxy
+    pub fn reset_sysproxy(&self) -> Result<()> {
+        let mut cur_sysproxy = self.cur_sysproxy.lock();
+        let mut old_sysproxy = self.old_sysproxy.lock();
+        let mut cur_autoproxy = self.cur_autoproxy.lock();
+        let mut old_autoproxy = self.old_autoproxy.lock();
+
+        let cur_sysproxy = cur_sysproxy.take();
+        let cur_autoproxy = cur_autoproxy.take();
+
+        if let Some(mut old) = old_sysproxy.take() {
+            // 如果原代理和当前代理 端口一致，就disable关闭，否则就恢复原代理设置
+            // 当前没有设置代理的时候，不确定旧设置是否和当前一致，全关了
+            let port_same = cur_sysproxy.is_none_or(|cur| old.port == cur.port);
+
+            if old.enable && port_same {
+                old.enable = false;
+                tracing::info!("reset proxy by disabling the original proxy");
+            } else {
+                tracing::info!("reset proxy to the original proxy");
+            }
+
+            old.set_system_proxy()?;
+        } else if let Some(mut cur @ Sysproxy { enable: true, .. }) = cur_sysproxy {
+            // 没有原代理，就按现在的代理设置disable即可
+            tracing::info!("reset proxy by disabling the current proxy");
+            cur.enable = false;
+            cur.set_system_proxy()?;
+        } else {
+            tracing::info!("reset proxy with no action");
+        }
+
+        if let Some(mut old) = old_autoproxy.take() {
+            // 如果原代理和当前代理 URL一致，就disable关闭，否则就恢复原代理设置
+            // 当前没有设置代理的时候，不确定旧设置是否和当前一致，全关了
+            let url_same = cur_autoproxy.is_none_or(|cur| old.url == cur.url);
+
+            if old.enable && url_same {
+                old.enable = false;
+                tracing::info!("reset proxy by disabling the original proxy");
+            } else {
+                tracing::info!("reset proxy to the original proxy");
+            }
+
+            old.set_auto_proxy()?;
+        } else if let Some(mut cur @ Autoproxy { enable: true, .. }) = cur_autoproxy {
+            // 没有原代理，就按现在的代理设置disable即可
+            tracing::info!("reset proxy by disabling the current proxy");
+            cur.enable = false;
+            cur.set_auto_proxy()?;
+        } else {
+            tracing::info!("reset proxy with no action");
+        }
+
+        Ok(())
+    }
+
+    /// init the auto launch
+    pub fn init_launch(&self) -> Result<()> {
+        let app_exe = current_exe()?;
+        // let app_exe = dunce::canonicalize(app_exe)?;
+        let app_name = app_exe
+            .file_stem()
+            .and_then(|f| f.to_str())
+            .context("failed to get file stem")?;
+
+        let app_path = app_exe
+            .as_os_str()
+            .to_str()
+            .context("failed to get app_path")?
+            .to_string();
+
+        // fix issue #26
+        #[cfg(target_os = "windows")]
+        let app_path = format!("\"{app_path}\"");
+
+        // use the /Applications/ClashMorden.app path
+        // #[cfg(target_os = "macos")]
+        // let app_path = (|| -> Option<String> {
+        //     let path = std::path::PathBuf::from(&app_path);
+        //     let path = path.parent()?.parent()?.parent()?;
+        //     let extension = path.extension()?.to_str()?;
+        //     match extension == "app" {
+        //         true => Some(path.as_os_str().to_str()?.to_string()),
+        //         false => None,
+        //     }
+        // })()
+        // .unwrap_or(app_path);
+
+        // fix #403
+        #[cfg(target_os = "linux")]
+        let app_path = {
+            use tauri::Manager;
+
+            use crate::core::handle::Handle;
+
+            let app_handle = Handle::app_handle();
+            let appimage = app_handle.env().appimage;
+            appimage
+                .and_then(|p| p.to_str().map(|s| s.to_string()))
+                .unwrap_or(app_path)
+        };
+
+        let mut args = [""];
+        if let Some(silent_start_mode) = Config::verge().latest().silent_start_mode.clone()
+            && matches!(silent_start_mode, SilentStartMode::Bootup)
+        {
+            args = ["--hidden"];
+        };
+
+        let auto = AutoLaunchBuilder::new()
+            .set_app_name(app_name)
+            .set_app_path(&app_path)
+            .set_args(&args)
+            .build()?;
+
+        *self.auto_launch.lock() = Some(auto);
+
+        Ok(())
+    }
+
+    /// update the startup
+    pub fn update_launch(&self) -> Result<()> {
+        let auto_launch = self.auto_launch.lock();
+
+        if auto_launch.is_none() {
+            drop(auto_launch);
+            return self.init_launch();
+        }
+        let enable = Config::verge().latest().enable_auto_launch;
+        let enable = enable.unwrap_or(false);
+        let auto_launch = auto_launch.as_ref().unwrap();
+
+        match enable {
+            true => auto_launch.enable()?,
+            false => log_err!(auto_launch.disable()), // 忽略关闭的错误
+        };
+
+        Ok(())
+    }
+
+    /// launch a system proxy guard
+    /// read config from file directly
+    pub fn guard_proxy(&self) {
+        use tokio::time::{Duration, sleep};
+
+        let guard_state = self.guard_state.clone();
+        tauri::async_runtime::spawn(async move {
+            // if it is running, exit
+            if guard_state.load(Ordering::SeqCst) {
+                return;
+            }
+            guard_state.store(true, Ordering::SeqCst);
+
+            // default duration is 10s
+            let mut wait_secs = 10u64;
+
+            loop {
+                sleep(Duration::from_secs(wait_secs)).await;
+
+                let enable = Config::verge().latest().enable_system_proxy.unwrap_or_default();
+                let guard = Config::verge().latest().enable_proxy_guard.unwrap_or_default();
+
+                // stop loop
+                if !enable || !guard {
+                    break;
+                }
+
+                // update duration
+                let guard_duration = Config::verge().latest().proxy_guard_duration.unwrap_or(10);
+                wait_secs = guard_duration;
+
+                tracing::debug!("try to guard the system proxy");
+
+                let port = Config::clash().latest().get_mixed_port();
+                let pac_port = get_embed_server_port();
+                let pac = Config::verge().latest().proxy_auto_config.unwrap_or_default();
+                if pac {
+                    let autoproxy = Autoproxy {
+                        enable: true,
+                        url: format!("http://127.0.0.1:{pac_port}/commands/pac"),
+                    };
+                    log_err!(autoproxy.set_auto_proxy());
+                } else {
+                    let sysproxy = Sysproxy {
+                        enable: true,
+                        host: "127.0.0.1".into(),
+                        port,
+                        bypass: get_bypass(),
+                    };
+
+                    log_err!(sysproxy.set_system_proxy());
+                }
+            }
+
+            guard_state.store(false, Ordering::SeqCst);
+        });
+    }
+}

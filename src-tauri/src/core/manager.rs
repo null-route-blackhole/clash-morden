@@ -1,0 +1,109 @@
+#![cfg(any(target_os = "macos", target_os = "linux"))]
+
+use std::{collections::HashMap, sync::LazyLock};
+
+use anyhow::Result;
+use parking_lot::RwLock;
+
+#[cfg(any(target_os = "macos", target_os = "linux"))]
+static GRANTED_PERMISSIONS: LazyLock<RwLock<HashMap<String, Option<bool>>>> = LazyLock::new(|| {
+    RwLock::new(HashMap::from_iter([
+        (String::from("self-mihomo"), None),
+        (String::from("self-mihomo-alpha"), None),
+        (String::from("self-mihomo-smart"), None),
+    ]))
+});
+
+/// 给 mihomo 内核的 tun 模式授权
+#[cfg(any(target_os = "macos", target_os = "linux"))]
+pub fn grant_permissions(core: String) -> Result<()> {
+    use std::process::Command;
+
+    use tauri::utils::platform::current_exe;
+
+    use crate::utils::dirs;
+
+    let path = current_exe()?.with_file_name(&core);
+    let path = dirs::path_to_str(&path)?;
+
+    tracing::debug!("grant permissions, core path: {path}");
+
+    #[cfg(target_os = "macos")]
+    let output = {
+        let path = path.replace(' ', "\\\\ ");
+        let shell = format!("chown root:admin {path}\nchmod +sx {path}");
+        let command = format!(r#"do shell script "{shell}" with administrator privileges"#);
+        Command::new("osascript").args(vec!["-e", &command]).output()?
+    };
+
+    #[cfg(target_os = "linux")]
+    let output = {
+        use crate::utils::unix_helper;
+
+        let path = path.replace(' ', "\\ "); // 避免路径中有空格
+        let shell = format!("setcap cap_net_bind_service,cap_net_admin,cap_dac_override=+ep {path}");
+        let sudo = unix_helper::linux_elevator();
+
+        Command::new(sudo).arg("sh").arg("-c").arg(shell).output()?
+    };
+
+    if output.status.success() {
+        GRANTED_PERMISSIONS.write().entry(core).and_modify(|i| *i = Some(true));
+        Ok(())
+    } else {
+        let stderr = std::str::from_utf8(&output.stderr).unwrap_or_default();
+        Err(anyhow::anyhow!("{stderr}"))
+    }
+}
+
+#[cfg(target_os = "linux")]
+pub fn check_permissions_granted(core: String) -> Result<bool> {
+    if let Some(Some(granted)) = GRANTED_PERMISSIONS.read().get(&core) {
+        tracing::debug!("check permissions granted by cache, core: {core}");
+        return Ok(*granted);
+    }
+
+    use std::process::Command;
+
+    use tauri::utils::platform::current_exe;
+
+    use crate::utils::dirs;
+
+    let path = current_exe()?.with_file_name(&core);
+    let path = dirs::path_to_str(&path)?;
+
+    tracing::debug!("check permissions granted, core path: {path}");
+
+    let output = {
+        let path = path.replace(' ', "\\ "); // 避免路径中有空格
+        Command::new("getcap").arg(path).output()?
+    };
+
+    if output.status.success() {
+        let caps: String = String::from_utf8(output.stdout).unwrap_or_default();
+        if caps.contains("cap_net_bind_service") && caps.contains("cap_net_admin") && caps.contains("cap_dac_override")
+        {
+            tracing::debug!("permissions granted, core: {core}");
+            GRANTED_PERMISSIONS.write().entry(core).and_modify(|i| *i = Some(true));
+            Ok(true)
+        } else {
+            tracing::debug!("permissions not granted, core: {core}");
+            GRANTED_PERMISSIONS.write().entry(core).and_modify(|i| *i = Some(false));
+            Ok(false)
+        }
+    } else {
+        let stderr = std::str::from_utf8(&output.stderr).unwrap_or_default();
+        Err(anyhow::anyhow!("{stderr}"))
+    }
+}
+
+#[cfg(target_os = "linux")]
+pub fn refresh_permissions_granted() -> Result<()> {
+    tracing::debug!("refresh permissions granted");
+    GRANTED_PERMISSIONS.write().iter_mut().for_each(|(_, v)| *v = None);
+    let mihomo_cores = ["self-mihomo", "self-mihomo-alpha", "self-mihomo-smart"];
+    for core in mihomo_cores {
+        check_permissions_granted(core.to_string())?;
+    }
+    Ok(())
+}

@@ -1,0 +1,1339 @@
+{
+  "common": {
+    "actions": {
+      "back": "Назад",
+      "close": "Закрыть",
+      "cancel": "Отмена",
+      "confirm": "Подтвердить",
+      "auto": "Авто",
+      "new": "Новый",
+      "edit": "Редактировать",
+      "save": "Сохранить",
+      "delete": "Удалить",
+      "enable": "Включить",
+      "disable": "Отключить",
+      "add": "Добавить",
+      "apply": "Применить",
+      "browse": "Просмотреть",
+      "clear": "Очистить",
+      "pause": "Пауза",
+      "refresh": "Обновить",
+      "import": "Импорт",
+      "update": "Обновить",
+      "updateAll": "Обновить все",
+      "upgrade": "Обновить",
+      "restart": "Перезапустить",
+      "versionManager": "Диспетчер версий",
+      "use": "Использовать",
+      "install": "Установить",
+      "uninstall": "Удалить",
+      "grant": "Выдать",
+      "reGrant": "Выдать повторно",
+      "select": "Выбрать",
+      "openUrl": "Открыть URL",
+      "chooseFile": "Выбрать файл",
+      "resetToDefault": "Сбросить настройки по умолчанию",
+      "expandAll": "Расширить все",
+      "collapseAll": "Свернуть все",
+      "scrollToTop": "Прокрутить вверх",
+      "exit": "Выход",
+      "retry": "Повторить"
+    },
+    "status": {
+      "active": "Активные",
+      "closed": "Закрытые",
+      "default": "По умолчанию",
+      "service": {
+        "pending": "Ожидание",
+        "installed": "Установлен",
+        "uninstall": "Не установлен",
+        "active": "Активен",
+        "unknown": "Неизвестно"
+      },
+      "enabled": "Включено",
+      "disabled": "Отключено",
+      "granted": "Предоставлено",
+      "notGranted": "Не предоставлено",
+      "readOnly": "Только для чтения",
+      "notAvailable": "Недоступно",
+      "recommended": "Рекомендуется",
+      "required": "Обязательно"
+    },
+    "fields": {
+      "name": "Название",
+      "type": "Тип",
+      "description": "Описание",
+      "icon": "Икона",
+      "location": "Местоположение",
+      "host": "Хост",
+      "process": "Процесс",
+      "time": "Время подключения",
+      "source": "Исходный адрес",
+      "destination": "Назначение",
+      "from": "Источник",
+      "updatedTime": "Время обновления",
+      "expireTime": "Время истечения",
+      "usedTotal": "Использовано / Всего",
+      "device": "Имя устройства",
+      "stack": "Стек",
+      "language": "Язык",
+      "startPage": "Главная страница",
+      "startupScript": "Скрипт запуска"
+    },
+    "search": {
+      "filter": "Фильтр",
+      "filterConditions": "Условия фильтрации",
+      "content": "Содержимое",
+      "contentPlaceholder": "Поиск по содержимому правила",
+      "domain": "Домен",
+      "domainPlaceholder": "Поиск домена, например google.com",
+      "cidr": "CIDR",
+      "cidrPlaceholder": "Поиск IP или CIDR, например 8.8.8.8 или 8.8.8.0/24",
+      "rulesTotal": "Всего правил: {{count}}",
+      "rulesMatched": "{{mode}}: {{text}} · {{groups}} групп / {{items}} записей",
+      "searching": "Поиск...",
+      "matchCase": "Учитывать регистр",
+      "matchWholeWord": "Полное совпадение слова",
+      "useRegularExpression": "Использовать регулярные выражения"
+    },
+    "empty": {
+      "noConnections": "Нет подключений",
+      "noLogs": "Нет журналов",
+      "noRules": "Нет правил",
+      "noProxies": "Нет прокси",
+      "directMode": "Прямой режим",
+      "empty": "Пусто"
+    }
+  },
+  "navigation": {
+    "sidebar": {
+      "styleTest": "Test",
+      "proxies": "Прокси",
+      "profiles": "Конфигурации",
+      "connections": "Соединения",
+      "rules": "Правила",
+      "logs": "Логи",
+      "test": "Тест",
+      "settings": "Настройки",
+      "home": "Обзор",
+      "actions": {
+        "expanded": "Свернуть панель",
+        "collapsed": "Скрыть панель",
+        "hidden": "Развернуть панель"
+      },
+      "kernel": "Core"
+    }
+  },
+  "pages": {
+    "overview": {
+      "title": "Обзор",
+      "runtime": {
+        "title": "Состояние",
+        "status": "Статус",
+        "online": "Работает",
+        "offline": "Остановлено",
+        "unavailable": "Недоступно",
+        "mode": "Режим",
+        "controller": "Контроллер",
+        "connections": "Подключения",
+        "closed": "Закрытые"
+      },
+      "delay": {
+        "title": "Задержка",
+        "ms": "мс",
+        "test": "Проверить задержку"
+      },
+      "network": {
+        "title": "Сведения о сети",
+        "interfaces": "Интерфейсов: {{count}}",
+        "noInterfaces": "Сетевые интерфейсы не найдены",
+        "refresh": "Обновить"
+      },
+      "globalConnections": {
+        "title": "Карта связей",
+        "active": "Активные подключения",
+        "empty": "Нет активных подключений"
+      },
+      "topology": {
+        "title": "Топология соединений",
+        "empty": "Нет активной топологии"
+      },
+      "statistics": {
+        "title": "Статистика подключений",
+        "details": "Подробная статистика",
+        "active": "Активные",
+        "closed": "Закрытые",
+        "protocols": "Протоколы",
+        "network": "Сеть",
+        "rules": "Правила",
+        "processes": "Процессы"
+      }
+    },
+    "proxies": {
+      "title": "Прокси",
+      "groups": "Группы прокси",
+      "groupBadge": "Группа",
+      "provider": "Провайдер прокси",
+      "updateAt": "Обновлено в",
+      "modes": {
+        "rule": "Правила",
+        "global": "Глобальный",
+        "direct": "Прямой",
+        "script": "Скрипт",
+        "merge": "Слияние",
+        "remote": "Удалённый",
+        "local": "Локальный"
+      },
+      "actions": {
+        "delayCheck": "Проверка задержки",
+        "delayCheckUrl": "URL проверки задержки",
+        "delayCheckToCancelFixed": "Проверить задержку, чтобы снять фиксацию",
+        "jumpToGroup": "Перейти к этой группе прокси",
+        "groupJump": "Переход к группе прокси",
+        "showHiddenGroups": "Показать скрытые группы"
+      },
+      "sort": {
+        "default": "Сортировать по умолчанию",
+        "delay": "Сортировать по задержке",
+        "name": "Сортировать по названию"
+      },
+      "view": {
+        "basic": "Скрыть детали прокси",
+        "detail": "Показать детали прокси"
+      }
+    },
+    "profiles": {
+      "title": "Конфигурации",
+      "actions": {
+        "enhanceScripts": "Улучшенные скрипты",
+        "updateProfile": "Обновить профиль",
+        "updateAllProfiles": "Обновить все профили",
+        "viewRuntimeConfig": "Просмотреть текущую конфигурацию",
+        "reactivateProfiles": "Реактивировать профили",
+        "paste": "Вставить",
+        "home": "Главная",
+        "editInfo": "Изменить информацию",
+        "editFile": "Изменить файл",
+        "openFile": "Открыть файл",
+        "updateProxy": "Обновить (прокси)",
+        "toTop": "Переместить вверх",
+        "toEnd": "Переместить вниз",
+        "selectMode": "Выбрать",
+        "deleteSelected": "Удалить выбранные ({{count}})",
+        "enableSelected": "Включить выбранные ({{count}})",
+        "disableSelected": "Отключить выбранные ({{count}})"
+      },
+      "inputs": {
+        "profileUrl": "URL профиля"
+      },
+      "dialog": {
+        "createTitle": "Создать профиль",
+        "editTitle": "Изменить профиль",
+        "scriptConsole": "Консоль скрипта",
+        "confirmDeletion": "Подтвердите удаление",
+        "confirmDeletionMessage": "Эта операция необратима",
+        "confirmBatchDeletion": "Удалить {{count}} элемента?",
+        "confirmBatchDeletionMessage": "Эта операция необратима"
+      },
+      "fields": {
+        "subscriptionUrl": "URL подписки",
+        "updateInterval": "Интервал обновления",
+        "requestTimeout": "Тайм-аут HTTP-запроса",
+        "requestTimeoutHint": "Оставьте пустым для значения 10 секунд.",
+        "useSystemProxy": "Использовать системный прокси для обновления",
+        "useClashProxy": "Использовать прокси Clash для обновления",
+        "acceptInvalidCertsDanger": "Принимать недействительные сертификаты (Опасно)"
+      },
+      "runtime": {
+        "scriptConsole": "Консоль скрипта",
+        "console": "Консоль (текущий запуск)"
+      },
+      "editor": {
+        "console": "Консоль",
+        "restoreChanges": "Отменить изменения",
+        "runCheck": "Запустить проверку{{keymap}}"
+      },
+      "dragImport": {
+        "title": "Импорт профилей перетаскиванием",
+        "description": "Перетащите локальные файлы профилей в любое место этого окна и отпустите, чтобы сразу импортировать их.",
+        "ready": "Отпустите, чтобы импортировать {{count}} файлов профилей",
+        "waiting": "Ожидание распознаваемых файлов профилей",
+        "importable": "Можно импортировать",
+        "notImportable": "Не поддерживается",
+        "hint": "Поддерживаются `.yaml` / `.yml`, вся область окна может использоваться как зона сброса",
+        "hintWithInvalid": "Поддерживаются `.yaml` / `.yml`, файлы не в формате YAML будут проигнорированы"
+      },
+      "sections": {
+        "subscriptionConfigs": "Конфигурации подписок"
+      },
+      "globalScripts": {
+        "title": "Глобальные скрипты",
+        "description": "JavaScript для всех страниц интерфейса приложения.",
+        "defaultName": "Мой глобальный скрипт",
+        "import": "Импорт JS",
+        "empty": "Нет скриптов. Создайте скрипт или импортируйте JS.",
+        "edit": "Редактировать глобальный скрипт",
+        "help": "Доступны: document, window, console, GM_addStyle, GM_getValue, GM_setValue, onRouteChange, onCleanup и signal.",
+        "logs": "Журнал выполнения",
+        "running": "Выполняется",
+        "error": "Ошибка выполнения",
+        "stopped": "Остановлен",
+        "confirmDelete": "Удалить глобальный скрипт «{{name}}»?"
+      },
+      "remoteScript": {
+        "enabled": "Remote script",
+        "subscribe": "Subscribe",
+        "url": "Update URL (leave empty for local scripts)",
+        "updated": "Script updated",
+        "systemProxy": "Download using system proxy",
+        "appProxy": "Download using app proxy"
+      }
+    },
+    "connections": {
+      "title": "Соединения",
+      "view": {
+        "table": "Табличный вид",
+        "list": "Список"
+      },
+      "actions": {
+        "closeAll": "Закрыть всё",
+        "pauseRefresh": "Приостановить обновление списка",
+        "resumeRefresh": "Возобновить обновление списка",
+        "closeConnection": "Закрыть соединение"
+      },
+      "columns": {
+        "actions": "Действия",
+        "closedTime": "Время закрытия",
+        "downloadSpeed": "Скорость загрузки",
+        "uploadSpeed": "Скорость загрузки",
+        "totalDownloaded": "Всего загружено",
+        "totalUploaded": "Всего отправлено",
+        "downloaded": "Скачано",
+        "uploaded": "Загружено",
+        "dlSpeed": "Скорость загрузки",
+        "ulSpeed": "Скорость выгрузки",
+        "chains": "Цепочки",
+        "rule": "Правило",
+        "dragToReorder": "Перетаскивайте для изменения порядка столбцов",
+        "startAt": "Начато в {{time}}"
+      },
+      "filters": {
+        "placeholder": "Фильтр по полям соединения",
+        "hostPlaceholder": "Поиск хоста",
+        "noOptions": "Нет значений фильтра",
+        "destinationIP": "IP назначения",
+        "destinationPort": "Порт назначения",
+        "sourceIP": "IP источника",
+        "sourcePort": "Порт источника",
+        "network": "Сеть",
+        "inbound": "Входящее"
+      }
+    },
+    "rules": {
+      "title": "Правила",
+      "provider": "Поставщик правил",
+      "actions": {
+        "toggleDisable": "Включить/Отключить правило",
+        "enable": "Включить правило",
+        "disable": "Отключить правило"
+      }
+    },
+    "logs": {
+      "title": "Логи"
+    },
+    "test": {
+      "title": "Тест",
+      "actions": {
+        "testAll": "Проверить всё"
+      },
+      "dialog": {
+        "createTitle": "Создать тест",
+        "editTitle": "Редактировать тест"
+      },
+      "fields": {
+        "url": "Тестовый URL"
+      }
+    },
+    "settings": {
+      "title": "Настройки",
+      "system": {
+        "title": "Настройки системы",
+        "proxy": {
+          "label": "Системный прокси",
+          "info": "Включите этот параметр, чтобы изменить настройки прокси в операционной системе. Если включение не удалось, настройте прокси вручную.",
+          "dialogTitle": "Настройка системного прокси",
+          "current": "Текущий системный прокси",
+          "enableStatus": "Статус:",
+          "serverAddr": "Адрес сервера: ",
+          "bypassValue": "Исключения:",
+          "guard": {
+            "label": "Защита системного прокси",
+            "info": "Не позволяет другим программам изменять настройки прокси в системе",
+            "duration": "Интервал проверки защиты"
+          },
+          "bypass": {
+            "label": "Исключения прокси:",
+            "duplicate": "Повторяющееся исключение прокси",
+            "resetDefault": "Сбросить исключения прокси по умолчанию"
+          },
+          "pac": {
+            "useMode": "Использовать режим PAC",
+            "content": "Содержимое PAC-скрипта",
+            "url": "Адрес PAC: "
+          }
+        },
+        "autoLaunch": "Автозапуск",
+        "silentStart": {
+          "label": "Тихий запуск",
+          "options": {
+            "bootup": "Только при запуске системы",
+            "global": "Глобально",
+            "off": "Отключено"
+          }
+        }
+      },
+      "clash": {
+        "title": "Настройки Clash",
+        "tun": {
+          "label": "Режим туннеля",
+          "info": "Режим туннеля требует предоставления разрешений, связанных с ядрам. Пожалуйста, включите сервисный режим перед его использованием",
+          "serviceModeOnly": "Система и смешанные могут использоваться только в сервисном режиме",
+          "autoRoute": "Автоматическая маршрутизация",
+          "strictRoute": "Строгий маршрут",
+          "autoDetectInterface": "Автоопределение интерфейса",
+          "dnsHijack": "DNS-перехват",
+          "mtu": "Максимальная единица передачи"
+        },
+        "serviceMode": {
+          "label": "Режим сервиса",
+          "currentState": "Текущее состояние",
+          "info": "Информация: Пожалуйста, убедитесь, что сервис ClashMorden Service установлен и включен",
+          "disable": "Отключить режим обслуживания"
+        },
+        "allowLan": "Разрешить локальную сеть",
+        "networkInterfaceInfo": "Информация о сетевом интерфейсе",
+        "ipv6": "IPv6",
+        "findProcessMode": {
+          "label": "Режим сопоставления процессов",
+          "options": {
+            "always": "Всегда сопоставлять все процессы",
+            "strict": "Определяется Clash",
+            "off": "Не сопоставлять процессы"
+          }
+        },
+        "logLevel": "Уровень логов",
+        "portConfig": {
+          "label": "Настройка порта",
+          "randomPort": "Случайный порт",
+          "dialogTitle": "Порты Clash"
+        },
+        "externalController": {
+          "label": "Внешний контроллер",
+          "host": "Адрес прослушивания",
+          "secret": "Секрет",
+          "enabled": "Внешний контроллер включен",
+          "disabled": "Внешний контроллер отключен",
+          "allowPrivateNetwork": "Разрешить доступ из частной сети",
+          "allowOrigins": "Разрешённые источники",
+          "duplicateAllowOrigins": "Повторяющийся разрешённый источник",
+          "resetDefaultAllowOrigins": "Сбросить источники по умолчанию"
+        },
+        "webUi": {
+          "label": "Веб-интерфейс",
+          "replaceTemplateHint": "Замените хост, порт, секрет на %host, %port, %secret",
+          "supportPlaceholders": "Поддержка %host, %port, %secret"
+        },
+        "core": {
+          "label": "Ядра Clash",
+          "updateRequires": "требуется обновление ядра",
+          "inUse": "Используется"
+        },
+        "versionManager": {
+          "title": "Диспетчер версий Mihomo",
+          "channel": {
+            "all": "Все",
+            "stable": "Стабильные",
+            "alpha": "Alpha",
+            "smart": "Smart",
+            "nightly": "Nightly"
+          },
+          "prerelease": "Пре-релиз",
+          "currentVersion": "Текущая версия",
+          "downloaded": "Скачано",
+          "variants": "файлов",
+          "unknownDate": "неизвестная дата",
+          "publishDate": "Опубликовано {{date}}",
+          "updatedDate": "Обновлено {{date}}",
+          "activeCore": "Используется: ядро {{slot}} · {{version}}",
+          "behindLatest": "Установленная версия ({{version}}) не совпадает с последней; возможно, она устарела. Выберите последнюю для обновления.",
+          "replacesCurrent": "Эта версия заменит текущее ядро {{slot}}.",
+          "switchSlot": "Версия устанавливается в слот {{slot}} (сейчас: {{current}}). Текущее ядро не будет перезаписано; после установки произойдёт переключение.",
+          "empty": "Нет доступных версий",
+          "loadFailed": "Не удалось загрузить: {{error}}",
+          "selectHint": "Выберите версию и вариант для скачивания и установки",
+          "selected": "Выбрано {{tag}} · {{variant}}",
+          "downloadAndInstall": "Скачать и установить",
+          "installing": "Установка…",
+          "cannotDeleteCurrent": "Текущую версию нельзя удалить",
+          "deleteConfirmTitle": "Удалить скачанный файл",
+          "deleteConfirmMessage": "Удалить скачанный файл {{name}}?",
+          "downloadCancelled": "Загрузка отменена"
+        },
+        "openUwpTool": "Открыть UWP инструмент",
+        "updateGeoData": "Обновление GeoData",
+        "unifiedDelay": {
+          "label": "единая задержка",
+          "info": "Когда унифицированная задержка включена, будут выполнены два теста задержки, чтобы устранить различия в задержке между разными типами узлов, вызванные подтверждением соединения и т. д"
+        },
+        "flushCache": "Очистить кэш Fake-IP",
+        "cacheFlushed": "Кэш Fake-IP очищен",
+        "dns": {
+          "title": "Настройки DNS",
+          "configure": "Настроить",
+          "scope": "Для всех подписок. Только явно заданные поля заменяют DNS подписки и скриптов. Сохранение проверяет конфигурацию и перезапускает ядро.",
+          "enable": "Включить DNS",
+          "ipv6": "DNS IPv6",
+          "listen": "Адрес прослушивания",
+          "mode": "Расширенный режим",
+          "inherit": "Наследовать из подписки / скриптов",
+          "enabled": "Включено",
+          "disabled": "Выключено",
+          "emptyInherits": "Оставьте пустым для наследования из подписки или скриптов.",
+          "tunNote": "TUN требует DNS и оставляет его включённым, пока TUN активен.",
+          "range": "Диапазон Fake-IP IPv4",
+          "range6": "Диапазон Fake-IP IPv6",
+          "filterMode": "Режим фильтра Fake-IP",
+          "blacklist": "Чёрный список",
+          "whitelist": "Белый список",
+          "filter": "Фильтр Fake-IP",
+          "overrideFilter": "Заменить список фильтра",
+          "filterHint": "Одна запись на строку. Пустая замена очищает список.",
+          "default-nameserver": "DNS по умолчанию",
+          "nameserver": "Основные DNS",
+          "fallback": "Резервные DNS",
+          "proxy-server-nameserver": "DNS прокси-узлов",
+          "direct-nameserver": "DNS прямых соединений",
+          "overrideServers": "Заменить список серверов",
+          "serverHint": "Один сервер на строку. Пустая замена очищает список. Mihomo проверяет формат перед сохранением.",
+          "respect-rules": "Следовать правилам маршрутизации",
+          "prefer-h3": "Предпочитать HTTP/3",
+          "direct-nameserver-follow-policy": "Прямой DNS следует политике",
+          "policy": "Политика DNS (YAML)",
+          "overridePolicy": "Заменить политику",
+          "policyHint": "YAML: правило домена и сервер или список серверов. Пустое поле очищает политику.",
+          "invalidPolicy": "Политика должна быть YAML-словарём.",
+          "fallbackFilter": "Фильтр резервного DNS (YAML)",
+          "fallbackHint": "Поля: geoip, geoip-code, ipcidr, domain, geosite. Пустое поле заменяет фильтр пустым словарём.",
+          "use-hosts": "Использовать Hosts",
+          "use-system-hosts": "Использовать системный Hosts",
+          "hosts": "Hosts (YAML)",
+          "hostsHint": "Hosts верхнего уровня: IP, псевдоним или список. Пустое поле очищает замену.",
+          "advancedMode": "Расширенный YAML",
+          "formMode": "Редактор формы",
+          "advancedHint": "Поддерживаемые поля DNS находятся в dns, Hosts — в hosts. Отсутствие поля или null означает наследование; false, [] и {} переопределяют значение. Остальные сохранённые поля DNS не изменяются.",
+          "invalidAdvanced": "Некорректный или неподдерживаемый DNS YAML"
+        }
+      },
+      "verge": {
+        "title": "Настройки Verge",
+        "updateChannel": {
+          "label": "Канал обновлений",
+          "options": {
+            "stable": "Стабильный",
+            "preview": "Превью"
+          }
+        },
+        "themeMode": {
+          "label": "Режим темы",
+          "options": {
+            "light": "Светлая",
+            "dark": "Тёмная",
+            "system": "Системная"
+          }
+        },
+        "tray": {
+          "clickEvent": "Событие щелчка в лотке",
+          "showMainWindow": "Показать главное окно"
+        },
+        "env": {
+          "copyType": "Скопировать тип Env",
+          "copySuccess": "Переменные окружения скопированы"
+        },
+        "theme": {
+          "interfaceStyle": "Стиль интерфейса",
+          "compactMode": "Компактный режим",
+          "interfaceStyles": {
+            "clash": "Исходный Clash",
+            "outline": "Контуры",
+            "soft": "Мягкие слои",
+            "glass": "Стекло",
+            "bold": "Чёткая структура"
+          },
+          "title": "Настройки темы",
+          "default": "Настройки по умолчанию",
+          "currentTheme": "Текущая тема",
+          "presets": {
+            "custom": "Пользовательская",
+            "default": "По умолчанию (лавандовый)",
+            "ocean": "Бирюзовый океан",
+            "indigo": "Тёмное индиго",
+            "sunset": "Розовая роза",
+            "lavender": "Лавандовый фиолетовый",
+            "monochrome": "Каменно-серый"
+          },
+          "colors": {
+            "primary": "Основной цвет",
+            "secondary": "Вторичный цвет",
+            "primaryText": "Основной текст",
+            "secondaryText": "Вторичный текст",
+            "info": "Информационный цвет",
+            "warning": "Цвет предупреждения",
+            "error": "Цвет ошибки",
+            "success": "Цвет успеха",
+            "background": "Цвет фона",
+            "paperBackground": "Цвет фона карточек"
+          },
+          "fontFamily": "Семейство шрифтов",
+          "cssInjection": "Внедрение CSS",
+          "colorIntensity": "Color intensity",
+          "colorOpacity": "Color opacity"
+        },
+        "layout": {
+          "title": "Настройки раскладки",
+          "trafficGraph": "График трафика",
+          "memoryUsage": "Использование памяти",
+          "proxyGroupIcon": "Иконка Группы прокси",
+          "menuIcon": "Иконка меню",
+          "sidebarLeftAligned": "Выровнять боковую панель слева",
+          "icon": {
+            "monochrome": "Монохромный",
+            "colorful": "Полноцветный"
+          },
+          "tray": {
+            "label": "системный лоток",
+            "icon": "Иконка лотка",
+            "common": "Общий значок в лотке",
+            "systemProxy": "Значок системного прокси в лотке",
+            "tun": "Значок туннеля в лотке"
+          },
+          "splashscreen": "заставка",
+          "systemTitleBar": "Панель заголовка системы",
+          "keepInDock": {
+            "label": "Оставлять в Dock",
+            "info": "Значок приложения остаётся в Dock после закрытия окна"
+          },
+          "keepUiActive": {
+            "label": "Поддерживайте пользовательский интерфейс в активном состоянии",
+            "info": "Сохраняйте пользовательский интерфейс активным и открывайте его снова, не перерисовывая интерфейс."
+          }
+        },
+        "misc": {
+          "title": "Настройки Прочие",
+          "appLogLevel": "Уровень журнала приложения",
+          "autoCloseConnections": "Автоматическое закрытие соединений",
+          "autoCheckUpdate": "Автоматическая проверка обновлений",
+          "enableBuiltinEnhanced": "Включить встроенные улучшения",
+          "proxyLayoutColumn": "Количество столбцов в макете прокси",
+          "autoLogClean": {
+            "label": "Автоматическая очистка журналов",
+            "options": {
+              "never": "Никогда не очищать",
+              "sevenDays": "Сохранять 7 дней",
+              "thirtyDays": "Сохранять 30 дней",
+              "ninetyDays": "Сохранять 90 дней"
+            }
+          },
+          "defaultLatencyTest": "Ссылка на тестирование задержки по умолчанию",
+          "defaultLatencyTimeout": "Таймаут задержки по умолчанию",
+          "logRollSizeMb": "Размер ротации логов (МБ)",
+          "logRollSizeMbInfo": "Макс. размер файла лога до ротации. Применяется к логу ядра при следующем запуске ядра и к логу приложения при следующем перезапуске приложения.",
+          "logMaxKeepFiles": "Максимум файлов логов",
+          "logMaxKeepFilesInfo": "Макс. число ротированных файлов логов на диске. Применяется к логу ядра при следующем запуске ядра и к логу приложения при следующем перезапуске приложения."
+        },
+        "hotkeys": {
+          "title": "Настройки клавиатурных сокращений",
+          "global": "Глобальные",
+          "app": "В приложении",
+          "restore": "Восстановить настройки",
+          "clear": "Очистить все",
+          "conflict": "Это сочетание клавиш уже существует",
+          "invalid": "Сочетание не может состоять только из клавиш-модификаторов",
+          "notAvailable": "Недоступно",
+          "actions": {
+            "openOrCloseDashboard": "Открыть/Закрыть панель управления",
+            "closeDashboard": "Закрыть панель управления",
+            "ruleMode": "Режим правил",
+            "globalMode": "Глобальный режим",
+            "directMode": "Прямой режим",
+            "toggleSystemProxy": "Включить/Отключить системный прокси",
+            "toggleTunMode": "Включить/Отключить режим туннеля",
+            "exitApp": "Выйти из приложения"
+          }
+        },
+        "runtimeConfig": "Используемый конфиг",
+        "actions": {
+          "openAppDir": "Открыть папку приложения",
+          "openCoreDir": "Открыть папку ядра",
+          "openLogsDir": "Открыть папку логов",
+          "checkForUpdates": "Проверить обновления",
+          "goToReleasePage": "Перейти на страницу релизов",
+          "openDevTools": "Открыть инструменты разработчика"
+        },
+        "version": "Версия Verge",
+        "backup": {
+          "title": "Настройки резервного копирования",
+          "types": {
+            "local": "Локально",
+            "webdav": "WebDAV"
+          },
+          "invalidFileFormat": "Недопустимый формат файла",
+          "webdavTitle": "Резервная копия WebDAV",
+          "actions": {
+            "recovery": "Восстановление",
+            "viewFiles": "Показать резервные копии",
+            "backup": "Резервное копирование"
+          },
+          "onlyProfiles": "Резервировать только профили",
+          "local": {
+            "dir": "Папка локальных копий",
+            "defaultDir": "Папка резервных копий по умолчанию"
+          },
+          "webdav": {
+            "url": "Адрес WebDAV",
+            "username": "Имя пользователя WebDAV",
+            "password": "Пароль WebDAV"
+          },
+          "files": "Файлы резервных копий",
+          "scopes": {
+            "all": "Конфигурация + профили",
+            "profiles": "Профили"
+          }
+        },
+        "updateViewer": {
+          "title": "Доступна новая версия",
+          "released": "Выпущено {{date}}",
+          "preview": "Превью",
+          "whatsNew": "Что нового",
+          "downloading": "Загрузка обновления",
+          "preparing": "Подготовка обновления…",
+          "noNotes": "Примечания к выпуску недоступны",
+          "installed": "Обновление установлено. Перезапустите приложение, чтобы применить его",
+          "restart": "Перезапустить и применить",
+          "later": "Позже"
+        }
+      },
+      "appearance": {
+        "title": "Настройки темы"
+      },
+      "directoriesTitle": "Directory navigation"
+    },
+    "home": {
+      "cards": {
+        "trafficStats": "Статистика трафика"
+      },
+      "settings": {
+        "cards": {
+          "profile": "Конфигурация и среда",
+          "currentProxy": "Карточка текущего прокси",
+          "traffic": "Карточка статистики трафика",
+          "tests": "Карточка тестов сайтов",
+          "ip": "Карточка IP-информации",
+          "clashInfo": "Карточка информации Clash",
+          "systemInfo": "Карточка системной информации",
+          "globe": "Карта связей",
+          "legacyTopology": "Топология соединений",
+          "topology": "Топология соединений",
+          "countryStats": "Страны / регионы",
+          "connectionStats": "Статистика соединений",
+          "rulesStats": "Статистика срабатываний правил",
+          "domainStats": "Попадания доменов",
+          "nodeStats": "Статистика узлов",
+          "destIpStats": "IP назначения",
+          "clientStats": "Клиенты",
+          "processStats": "Процессы"
+        }
+      },
+      "components": {
+        "profile": {
+          "clickToImport": "Нажмите, чтобы импортировать подписку",
+          "title": "Конфигурация и среда",
+          "current": "Текущая конфигурация",
+          "memory": "Использование памяти",
+          "copyEnvironment": "Копировать информацию о среде",
+          "viewConfig": "Открыть конфигурацию",
+          "updating": "Обновление",
+          "disconnect": "Отключить"
+        },
+        "clashInfo": {
+          "title": "Информация Clash",
+          "fields": {
+            "coreVersion": "Версия ядра",
+            "systemProxyAddress": "Адрес системного прокси",
+            "mixedPort": "Смешанный порт",
+            "uptime": "Время работы",
+            "rulesCount": "Количество правил"
+          }
+        },
+        "systemInfo": {
+          "title": "Системная информация",
+          "fields": {
+            "osInfo": "Информация об ОС",
+            "autoLaunch": "Автозапуск",
+            "runningMode": "Режим работы",
+            "lastCheckUpdate": "Последняя проверка обновлений",
+            "vergeVersion": "Версия Verge"
+          },
+          "actions": {
+            "settings": "Настройки"
+          },
+          "badges": {
+            "serviceMode": "Сервисный режим",
+            "sidecarMode": "Пользовательский режим",
+            "adminServiceMode": "Администратор + сервисный режим"
+          },
+          "notifications": {
+            "upToDate": "Уже актуальная версия",
+            "updateAvailable": "Доступна новая версия"
+          }
+        },
+        "ipInfo": {
+          "title": "IP-информация",
+          "labels": {
+            "ip": "IP",
+            "asn": "ASN",
+            "isp": "Провайдер",
+            "org": "Организация",
+            "location": "Местоположение",
+            "timezone": "Часовой пояс",
+            "autoRefresh": "Автообновление",
+            "unknown": "Неизвестно"
+          },
+          "errors": {
+            "load": "Не удалось получить IP-информацию",
+            "loadWithDetails": "Не удалось получить IP-информацию: {{message}}"
+          }
+        },
+        "currentProxy": {
+          "title": "Текущий узел",
+          "actions": {
+            "refreshDelay": "Проверка задержки"
+          },
+          "labels": {
+            "globalMode": "Глобальный режим",
+            "directMode": "Прямой режим",
+            "group": "Группа",
+            "proxy": "Прокси",
+            "noActiveNode": "Нет активного узла"
+          },
+          "status": {
+            "testing": "Тестирование",
+            "untested": "Не тестировался",
+            "error": "Ошибка",
+            "timeout": "Тайм-аут",
+            "latencyHigh": "Высокая задержка",
+            "latencyMedium": "Средняя задержка",
+            "latencyGood": "Хорошая задержка",
+            "latencyExcellent": "Отличная задержка",
+            "uninitialized": "Не инициализирован",
+            "noProxyNode": "Нет узла"
+          }
+        },
+        "tests": {
+          "current": "Текущая",
+          "max": "Максимум",
+          "min": "Минимум",
+          "average": "Средняя",
+          "title": "Latency Test",
+          "view": "Display style",
+          "history": "History bars",
+          "window": "Последние 100 тестов",
+          "legacy": "Legacy progress"
+        },
+        "traffic": {
+          "metrics": {
+            "activeConnections": "Активные соединения",
+            "closedConnections": "Закрытые соединения"
+          }
+        },
+        "ipCheck": {
+          "title": "Информация о сети",
+          "status": {
+            "getting": "Получение...",
+            "failed": "Ошибка проверки"
+          },
+          "labels": {
+            "showIp": "Показать IP",
+            "hideIp": "Скрыть IP"
+          },
+          "serviceLabel": "Сервис IP-информации"
+        },
+        "earth": {
+          "title": "Карта связей",
+          "styleSpace": "Космос",
+          "styleFlat": "Плоский",
+          "pauseRotation": "Остановить вращение",
+          "resumeRotation": "Возобновить вращение",
+          "localIP": "Локальный IP",
+          "roleOrigin": "Локальное устройство",
+          "legendProxied": "Через прокси",
+          "directLabel": "Напрямую",
+          "role": "Роль",
+          "roleDestination": "Назначение",
+          "connectionCount": "Количество соединений",
+          "rendererError": "3D-рендеринг недоступен в этом браузере.",
+          "originError": "Не удалось определить публичный IP. Повторите попытку.",
+          "noConnections": "Нет активных соединений",
+          "noLocated": "Не удалось определить конечные точки соединений",
+          "database": {
+            "checking": "Проверка локальной базы городов…",
+            "loading": "Загрузка кэшированной базы городов…",
+            "consentTitle": "Загрузить локальную базу городов?",
+            "consent": "Конечные точки соединений остаются в этом браузере. DB-IP City Lite требует около {download} для загрузки и {stored} локального хранилища после распаковки.",
+            "cacheRecovered": "Повреждённая кэшированная база была удалена. Загрузите новую копию.",
+            "download": "Загрузить базу",
+            "learnMore": "О DB-IP City Lite",
+            "downloading": "Загрузка базы городов",
+            "errors": {
+              "space": "Недостаточно места в хранилище браузера для базы городов.",
+              "network": "Не удалось загрузить базу городов.",
+              "decompress": "Не удалось распаковать базу городов.",
+              "invalid": "Загруженная база городов повреждена.",
+              "storage": "Не удалось сохранить базу городов в хранилище браузера.",
+              "unsupported": "Этот браузер не может распаковать базу городов.",
+              "unknown": "Не удалось загрузить базу городов."
+            }
+          },
+          "hideCityLabels": "Скрыть названия городов",
+          "showCityLabels": "Показать названия городов",
+          "mapStyle": "Map style"
+        },
+        "topology": {
+          "collapseGroups": "Свернуть группы прокси",
+          "view": "Вид топологии",
+          "flow": "Поток соединений",
+          "legacy": "Топология соединений",
+          "source": "Источник",
+          "matchedRule": "Правило / набор правил",
+          "group": "Группа прокси",
+          "exit": "Выходной прокси",
+          "destination": "Назначение : порт",
+          "process": "Процесс",
+          "targetToggle": "Цель",
+          "connections": "соединений",
+          "stats": {
+            "clients": "Клиенты",
+            "rules": "Правила",
+            "groups": "Группы",
+            "nodes": "Узлы"
+          },
+          "legend": {
+            "proxyGroups": "Группы прокси",
+            "proxyNodes": "Узлы прокси",
+            "rules": "Правила",
+            "sourceIP": "IP источника",
+            "sourcePort": "Порт источника"
+          },
+          "pause": "Пауза",
+          "resume": "Продолжить",
+          "waiting": "Ожидание соединений…",
+          "tooManyNodes": "Слишком много узлов, сверните уровни",
+          "zoomIn": "Zoom in",
+          "zoomOut": "Zoom out",
+          "fit": "Fit width",
+          "expandHeight": "Expand full height"
+        },
+        "countryStats": {
+          "title": "Страны назначения",
+          "connections": "Соединения",
+          "traffic": "Трафик",
+          "empty": "Нет локализуемых соединений"
+        },
+        "connectionStats": {
+          "ipUnavailable": "IP назначения не предоставлен",
+          "regionUnavailable": "Регион недоступен",
+          "title": "Статистика соединений",
+          "scope": "Connections captured since {{since}}. History is retained by day; rules use core hit counters.",
+          "retention": "History retention",
+          "days": "Keep {{count}} days",
+          "forever": "Keep forever",
+          "clear": "Clear statistics history",
+          "confirmClear": "Clear accumulated connection statistics? Active connections and core rule counters remain unchanged. Subsequent traffic is counted from the reset.",
+          "totalTraffic": "Общий трафик",
+          "noData": "Нет данных",
+          "dimensions": {
+            "nodes": "Узлы",
+            "clients": "Клиенты",
+            "destIp": "IP назначения",
+            "process": "Процессы",
+            "rules": "Срабатывания правил",
+            "countries": "Регион назначения",
+            "hosts": "Destination host",
+            "groups": "Proxy group"
+          },
+          "sort": {
+            "count": "По соединениям",
+            "traffic": "По трафику"
+          },
+          "columns": {
+            "name": "Имя",
+            "count": "Кол-во",
+            "traffic": "Трафик",
+            "download": "Download",
+            "upload": "Upload"
+          },
+          "view": {
+            "table": "Таблица",
+            "chart": "График"
+          }
+        },
+        "ruleStats": {
+          "title": "Статистика срабатываний правил",
+          "noHitData": "Нет данных о срабатываниях правил",
+          "disabledHint": "Подсчёт срабатываний правил не включён в конфигурации ядра."
+        },
+        "domainStats": {
+          "title": "Попадания по доменам",
+          "noHitData": "Нет данных о попаданиях доменов"
+        },
+        "nodeStats": {
+          "title": "Статистика узлов",
+          "empty": "Нет активных соединений"
+        },
+        "destIpStats": {
+          "title": "IP назначения",
+          "empty": "Нет активных соединений"
+        },
+        "clientStats": {
+          "title": "Статистика клиентов",
+          "targets": "целей",
+          "empty": "Нет активных соединений"
+        },
+        "processStats": {
+          "title": "Статистика процессов",
+          "empty": "Нет данных о процессах"
+        }
+      },
+      "topbar": {
+        "coreRunning": "Ядро запущено",
+        "coreStopped": "Ядро остановлено",
+        "coreSwitching": "Обработка…",
+        "tunRequiresService": "Режим Tun требует сервисный режим. Установите и запустите службу на странице общих настроек ядра."
+      },
+      "edit": {
+        "hint": "Редактирование обзора: перетаскивание для сортировки, ✕ — убрать",
+        "addCard": "Добавить модуль",
+        "done": "Готово",
+        "allVisible": "Все модули отображаются",
+        "dragHint": "Удерживайте для перетаскивания",
+        "remove": "Убрать"
+      }
+    },
+    "kernel": {
+      "title": "Core",
+      "inherit": "Restore inheritance",
+      "inherited": "Inherited / unset (suggested value shown)",
+      "automatic": "Automatic",
+      "empty": "(Empty)",
+      "username": "Username",
+      "password": "Password",
+      "mapHint": "Value accepts a string or a YAML list, for example [223.5.5.5, 119.29.29.29].",
+      "scope": "Only edited fields are saved. Configuration is validated before reloading the core. Save restored inheritance to refresh effective values. Enabling DNS, TUN or sniffing fills suggested settings absent from the profile.",
+      "smart": "Smart model",
+      "model": "Model.bin",
+      "custom": "Custom",
+      "sync": "Sync",
+      "modelSynced": "Model synced; restart the Smart core to load it",
+      "smartHint": "Only Smart-capable cores use this model. Sync writes Model.bin in the data directory. Save URL edits; restart the core to load the model.",
+      "coreManagement": "Clash core version management",
+      "networkTools": "Network tools and controller",
+      "refreshInterfaces": "Current interfaces",
+      "tabs": {
+        "general": "General",
+        "network": "Network",
+        "dns": "DNS",
+        "tun": "TUN",
+        "sniffer": "Sniffer"
+      },
+      "sections": {
+        "routing": "Routing and connections",
+        "cache": "Cache and fingerprint",
+        "ports": "Clash ports",
+        "globalNetwork": "Global network",
+        "access": "Access control",
+        "dnsStatus": "Runtime status",
+        "dnsBehavior": "Mode and behavior",
+        "dnsInbound": "Inbound and redirection",
+        "fakeip": "Fake-IP settings",
+        "nameservers": "Upstream DNS servers",
+        "specialDns": "Dedicated DNS servers",
+        "policies": "Custom policies and Hosts",
+        "fallback": "Fallback filter",
+        "dnsTuning": "Advanced tuning",
+        "tunStatus": "Runtime status",
+        "tunRouting": "Stack and routing",
+        "darwin": "Darwin performance (macOS)",
+        "tunGeneral": "General settings",
+        "hijack": "DNS hijack",
+        "excludeRoute": "Excluded routes",
+        "interfaceFilter": "Interface filters",
+        "portFilter": "Port filters",
+        "includeRoute": "Included routes (Fake-IP bypass)",
+        "sniffStatus": "Runtime status",
+        "sniffBehavior": "Sniff behavior",
+        "sniffPorts": "Sniff ports",
+        "forceSniff": "Forced sniffing",
+        "skipSniff": "Skip sniffing"
+      },
+      "hints": {
+        "cache": "Persist Fake-IP mappings to preserve applications using cached addresses after restart. Global UA identifies the core when downloading databases and subscriptions; leave blank to inherit the profile.",
+        "ports": "0 disables a port. Redir is unavailable on Windows; TProxy is Linux only. Disable random ports before editing fixed ports.",
+        "quic": "QUIC blocking targets UDP 443. Foreign mode excludes CN and LAN addresses and requires GeoIP data. It applies in rule mode.",
+        "nameservers": "Default resolves DoH/DoT server hostnames. Primary servers handle ordinary queries; fallback servers are used when results match fallback filters.",
+        "specialDns": "Resolve proxy server hostnames and direct endpoints separately.",
+        "fallback": "Control when fallback DNS is used. With GeoIP enabled, results outside the configured country trigger fallback.",
+        "tunRouting": "Auto route configures system routes. Strict route prevents leaks but may affect inbound LAN services. Endpoint independent NAT helps some P2P games.",
+        "darwin": "RecvMsgX can reduce CPU usage during fast receives. SendMsgX is disabled by default to avoid stalls in some core versions during multithreaded downloads.",
+        "hijack": "Intercept DNS requests matching these targets and send them to the core DNS engine. Existing TUN behavior also enables DNS.",
+        "excludeRoute": "Traffic matching these CIDRs bypasses TUN and routes through physical interfaces.",
+        "interfaceFilter": "Limit the physical interfaces handled by TUN or exclude specific interfaces.",
+        "portFilter": "Bypass TUN for these source or destination ports, useful for discovery and some games.",
+        "includeRoute": "Restrict TUN routes to these ranges. Actual routing also depends on auto route, exclusions and the core version.",
+        "sniffStatus": "Extract hostnames from IP traffic so domain routing rules can apply.",
+        "sniffBehavior": "Override destinations with sniffed hostnames. Force DNS mapping and parse pure IP control which traffic is sniffed.",
+        "sniffPorts": "Set sniffing ports and destination overrides per protocol. Individual ports and ranges such as 8080-8880 are supported.",
+        "forceSniff": "Force sniffing and destination overrides for these domains.",
+        "skipSniff": "Skip these domains or addresses. Apple push and some IoT services validate destination hostnames; overrides may break connections."
+      },
+      "options": {
+        "always": "Always",
+        "strict": "Strict",
+        "off": "Off",
+        "fake-ip": "Fake IP",
+        "redir-host": "Redir Host",
+        "blacklist": "Blacklist (exclude)",
+        "whitelist": "Whitelist",
+        "arc": "ARC (adaptive replacement)",
+        "lru": "LRU",
+        "mixed": "Mixed",
+        "system": "System",
+        "gvisor": "gVisor",
+        "foreign": "Block foreign QUIC (recommended)",
+        "all": "Block all",
+        "mips": "MIPS"
+      },
+      "models": {
+        "0": "Standard (recommended)",
+        "1": "Medium (balanced)",
+        "2": "Large (precise)"
+      },
+      "fields": {
+        "tcp-concurrent": "TCP concurrent connections",
+        "unified-delay": "Unified delay",
+        "interface-name": "Bind network interface",
+        "find-process-mode": "Process matching",
+        "disable-keep-alive": "Disable Keep-Alive",
+        "keep-alive-interval": "Keep-Alive interval (seconds)",
+        "keep-alive-idle": "Keep-Alive idle (seconds)",
+        "profile": {
+          "store-selected": "Remember node selections",
+          "store-fake-ip": "Persist Fake-IP"
+        },
+        "global-ua": "Global User-Agent",
+        "etag-support": "ETag support",
+        "port": "HTTP port",
+        "socks-port": "SOCKS port",
+        "redir-port": "Redir port",
+        "tproxy-port": "TProxy port",
+        "mixed-port": "Mixed port",
+        "ipv6": "IPv6 support",
+        "tcp-fast-open": "TCP Fast Open (TFO)",
+        "mptcp": "Multipath TCP (MPTCP)",
+        "app-quic-block": "QUIC blocking",
+        "allow-lan": "Allow LAN connections",
+        "lan-allowed-ips": "Allowed addresses",
+        "lan-disallowed-ips": "Disallowed addresses",
+        "authentication": "Proxy authentication",
+        "skip-auth-prefixes": "Authentication bypass CIDRs",
+        "dns": {
+          "enable": "Enable DNS engine",
+          "enhanced-mode": "DNS resolution mode",
+          "ipv6": "IPv6 resolution",
+          "respect-rules": "Respect rules",
+          "prefer-h3": "Prefer HTTP/3 (DoH/3)",
+          "ipv6-timeout": "IPv6 timeout (ms)",
+          "listen": "DNS listen address",
+          "use-system-hosts": "Use system Hosts",
+          "use-hosts": "Use configured Hosts",
+          "fake-ip-range": "IPv4 Fake-IP range",
+          "fake-ip-range6": "IPv6 Fake-IP range",
+          "fake-ip-filter-mode": "Filter mode",
+          "fake-ip-ttl": "Fake-IP TTL (seconds)",
+          "fake-ip-filter": "Fake-IP filter list",
+          "default-nameserver": "Default DNS servers",
+          "nameserver": "Primary DNS servers",
+          "fallback": "Fallback DNS servers",
+          "proxy-server-nameserver": "Proxy server DNS",
+          "direct-nameserver": "Direct connection DNS",
+          "direct-nameserver-follow-policy": "Direct DNS follows nameserver policy",
+          "nameserver-policy": "Domain nameserver policy",
+          "proxy-server-nameserver-policy": "Proxy nameserver policy",
+          "fallback-filter": {
+            "geoip": "Enable GeoIP filter",
+            "geoip-code": "GeoIP country code",
+            "ipcidr": "IP CIDR filter",
+            "geosite": "GeoSite filter",
+            "domain": "Domain filter"
+          },
+          "cache-algorithm": "Cache algorithm",
+          "cache-max-size": "Maximum cache size"
+        },
+        "hosts": "Hosts overrides",
+        "tun": {
+          "enable": "Enable TUN",
+          "stack": "TUN network stack",
+          "auto-route": "Auto route",
+          "auto-detect-interface": "Auto detect outbound interface",
+          "strict-route": "Strict route",
+          "endpoint-independent-nat": "Endpoint independent NAT",
+          "disable-icmp-forwarding": "Disable ICMP forwarding",
+          "recvmsgx": "Enable RecvMsgX receive acceleration",
+          "sendmsgx": "Enable SendMsgX send acceleration",
+          "mtu": "MTU",
+          "device": "Device name",
+          "udp-timeout": "UDP timeout (seconds)",
+          "dns-hijack": "DNS hijack targets",
+          "route-exclude-address": "Excluded route CIDRs",
+          "include-interface": "Included interfaces",
+          "exclude-interface": "Excluded interfaces",
+          "exclude-src-port": "Excluded source ports",
+          "exclude-dst-port": "Excluded destination ports",
+          "route-address": "Included route addresses"
+        },
+        "sniffer": {
+          "enable": "Enable sniffer",
+          "override-destination": "Override destination",
+          "force-dns-mapping": "Force DNS mapping",
+          "parse-pure-ip": "Parse pure IP",
+          "sniff": {
+            "HTTP": {
+              "ports": "HTTP ports",
+              "override-destination": "Override HTTP destination"
+            },
+            "TLS": {
+              "ports": "TLS ports",
+              "override-destination": "Override TLS destination"
+            },
+            "QUIC": {
+              "ports": "QUIC ports",
+              "override-destination": "Override QUIC destination"
+            }
+          },
+          "force-domain": "Forced sniff domains",
+          "skip-domain": "Skip domains",
+          "skip-src-address": "Skip source addresses",
+          "skip-dst-address": "Skip destination addresses"
+        }
+      },
+      "effectiveState": "Current generated runtime configuration",
+      "quic": {
+        "foreign": "Block foreign QUIC (recommended)",
+        "all": "Block all",
+        "off": "Do not block"
+      },
+      "warningTitle": "Before changing core settings",
+      "warningBody": "Please make sure you understand these settings. Incorrect configuration can interrupt connectivity, DNS resolution or proxy routing. If unsure, keep the current configuration. Confirming will show this reminder next time.",
+      "warningDismiss": "Don't show again",
+      "sources": {
+        "config": "Current configuration",
+        "override": "Saved override",
+        "edited": "Edited · unsaved",
+        "suggested": "Not configured · suggested value",
+        "reset": "Restore inheritance · actual value after saving"
+      },
+      "footerDismissTitle": "Hide the footer warning permanently?",
+      "footerDismissBody": "The footer warning will stay hidden. Changing kernel settings can disrupt connectivity, DNS resolution or proxy routing. Keep your current configuration if you are unsure. Confirm hiding this warning?"
+    }
+  },
+  "messages": {
+    "editor": {
+      "readOnly": "Невозможно редактировать в режиме только для чтения",
+      "regenerateTemplateContent": "Восстановить содержимое шаблона",
+      "readMonacoContentFailed": "Не удалось прочитать содержимое Monaco"
+    },
+    "profiles": {
+      "imported": "Профиль успешно импортирован",
+      "switched": "Профиль переключён",
+      "reactivated": "Профиль повторно активирован",
+      "batchDeleteSuccess": "Успешно удалено {{count}} элемента",
+      "batchToggleSuccess": "Обновлено {{count}} элемента",
+      "onlyYamlSupported": "Поддерживаются только файлы YAML",
+      "unsupportedFiles": "Неподдерживаемые файлы: {{files}}",
+      "importFileFailed": "Не удалось импортировать файл: {{file}}",
+      "scriptRunCheckFailed": "Проверка запуска скрипта не удалась, проверьте корректность скрипта",
+      "scriptRunCheckSuccessful": "Проверка запуска скрипта выполнена успешно",
+      "contentSaved": "Содержимое успешно сохранено",
+      "contentUnchanged": "Содержимое профиля не изменилось",
+      "configUnchanged": "Настройки профиля не изменились",
+      "configUpdated": "Настройки профиля обновлены",
+      "contentSaveFailed": "Не удалось сохранить содержимое",
+      "invalidRequestTimeout": "Введите целое число от 1 до 3600 секунд.",
+      "saveContent": "Сохранить содержимое{{keymap}}",
+      "askSaveContentNow": "Содержимое изменилось. Сохранить его сейчас?"
+    },
+    "clash": {
+      "configUpdated": "Clash конфигурация Обновлена",
+      "portModified": "Clash порт изменен",
+      "portConflict": "{{portName}} Конфликт портов",
+      "invalidPort": "Введите 0 для отключения или целое число от 1000 до 65535.",
+      "portFallback": "Порт по умолчанию `7890` уже используется, выбран свободный порт `{{port}}`",
+      "externalControllerAddressModified": "Изменен адрес внешнего контроллера",
+      "core": {
+        "permissionsGranted": "Разрешения успешно предоставлены для ядра {{core}}",
+        "requireGrant": "Tun уже включён. Предоставьте права для ядра {{core}} перед переключением",
+        "versionUpdated": "Обновлена версия ядра",
+        "noVersionInfo": "Не удалось получить информацию о релизах mihomo",
+        "versionInstalled": "{{tag}} установлена и переключена",
+        "versionDeleted": "Скачанный файл удалён",
+        "restarted": "Clash ядра перезапущено",
+        "runFailed": "Не удалось запустить ядро mihomo, проверьте журнал mihomo для поиска проблемы",
+        "switched": "Переключено на ядра {{core}}"
+      },
+      "geoDataUpdated": "GeoData Обновлена",
+      "tun": {
+        "macosDeviceNameError": "Имена устройств Tun на MacOS должны следовать комбинации `utun` + номер, например, `utun1234`",
+        "deviceBusy": "Устройство настройки или ресурс заняты, режим настройки будет отключен. Попробуйте включить режим настройки позже",
+        "updateConfigFailed": "Не удалось обновить конфигурацию Tun. Повторите попытку позже"
+      }
+    },
+    "settings": {
+      "applied": "Применены настройки",
+      "serviceInstalled": "Служба успешно установлена",
+      "serviceUninstalled": "Служба успешно удалена",
+      "proxyGuardDurationTooShort": "Продолжительность работы прокси-демона не может быть меньше 1 секунды",
+      "invalidBypassFormat": "Неверный формат обхода"
+    },
+    "app": {
+      "restartToApply": "Чтобы изменения вступили в силу, необходимо перезапустить приложение",
+      "latestVersion": "В настоящее время используется последняя версия",
+      "restartSoon": "Приложение скоро будет перезапущено"
+    },
+    "rules": {
+      "updateProviderError": "[ {{name}} ] Не удалось обновить：{{errorMsg}}",
+      "readProvidersError": "Не удалось прочитать наборы правил. Убедитесь, что файлы правил обновлены и синхронизированы."
+    },
+    "updater": {
+      "portableError": "Портативная версия не поддерживает обновление внутри приложения, пожалуйста, скачайте и замените вручную",
+      "breakingChangeError": "Это крупное обновление, которое не поддерживает обновление внутри приложения. Пожалуйста, удалите его и загрузите установочный файл вручную."
+    },
+    "backup": {
+      "webdavConnectionFailed": "Не удалось подключиться к WebDAV: {{error}}",
+      "success": "Резервная копия успешно создана",
+      "failed": "Не удалось создать резервную копию: {{error}}",
+      "deleteSuccess": "Резервная копия удалена",
+      "deleteFailed": "Не удалось удалить резервную копию: {{error}}",
+      "applySuccess": "Резервная копия применена, приложение будет перезапущено",
+      "applyFailed": "Не удалось применить резервную копию: {{error}}",
+      "platformNoMatch": "Платформа не совпадает"
+    }
+  }
+}

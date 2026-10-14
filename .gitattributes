@@ -1,0 +1,2 @@
+# Dependency patch context retains upstream CRLF line endings.
+patches/vite-plugin-monaco-editor@1.1.0.patch -text whitespace=cr-at-eol

@@ -1,0 +1,105 @@
+[package]
+name = "clashmorden"
+version = "1.0.0"
+description = "clash verge self"
+authors = ["Anonymous"]
+license = "GPL-3.0-only"
+repository = "https://github.com/ClashMorden/ClashMorden.git"
+default-run = "clashmorden"
+edition.workspace = true
+build = "build.rs"
+
+[lib]
+name = "clashmorden_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri-plugin-mihomo.workspace = true
+mihomo-rule-parser.workspace = true
+process_supervisor.workspace = true
+clash-verge-self-utils.workspace = true
+clash-verge-self-service.workspace = true
+
+tokio.workspace = true
+reqwest = { workspace = true, features = ["gzip"] }
+dirs.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+serde_yaml.workspace = true
+once_cell.workspace = true
+parking_lot.workspace = true
+anyhow.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+tracing-appender.workspace = true
+log.workspace = true
+logroller.workspace = true
+uuid.workspace = true
+
+# tauri
+tauri = { version = "2", features = [
+  "protocol-asset",
+  "devtools",
+  "tray-icon",
+  "image-ico",
+  "image-png",
+] }
+tauri-plugin-notification = "2"
+tauri-plugin-shell = "2"
+tauri-plugin-process = "2"
+tauri-plugin-clipboard-manager = "2"
+tauri-plugin-fs = "2"
+tauri-plugin-dialog = "2"
+tauri-plugin-opener = "2"
+tauri-plugin-deep-link = "2"
+tauri-plugin-http = "2"
+tauri-plugin-global-shortcut = "2"
+tauri-plugin-updater = "2"
+tauri-plugin-single-instance = { version = "2", features = ["deep-link"] }
+
+time = { version = "0.3", features = ["macros", "parsing"] }
+url = "2"
+warp = { version = "0.4", features = ["server"] }
+dunce = "1.0"
+nanoid = "0.5"
+chrono = {version = "0.4", features = ["serde"] }
+sysinfo = "0.39"
+delay_timer = "0.11.6"
+auto-launch = "0.6"
+percent-encoding = "2.3"
+reqwest_dav = "0.3"
+zip = "8.0"
+sysproxy = { git = "https://github.com/oomeow/sysproxy-rs", branch = "main" }
+rust-i18n = "4"
+rfd = { version = "0.17", default-features = false, features = [
+  "gtk3",
+  "common-controls-v6",
+] }
+mihomo-versions = { git = "https://github.com/oomeow/mihomo-versions" }
+network-interface = "2.0.1"
+rquickjs = { version = "0.14", features = ["bindgen"] }
+dark-light = "3.0.0"
+console-subscriber = { version = "0.5.0", optional = true }
+
+[target.'cfg(windows)'.dependencies]
+runas = "=1.2"
+deelevate = "0.2"
+windows-sys = { version = "0.61", features = [
+  "Win32_Foundation",
+  "Win32_UI_WindowsAndMessaging",
+] }
+
+[target.'cfg(target_os = "linux")'.dependencies]
+users = "0.11"
+
+[target.'cfg(any(target_os = "linux", target_os = "macos"))'.dependencies]
+signal-hook = "0.4"
+
+[features]
+default = ["custom-protocol"]
+custom-protocol = ["tauri/custom-protocol"]
+verge-dev = []
+tokio-console = ["dep:console-subscriber", "tokio/tracing"]

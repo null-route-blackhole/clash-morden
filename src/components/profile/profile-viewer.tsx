@@ -1,0 +1,445 @@
+import {
+  Button,
+  ButtonGroup,
+  FormControlLabel,
+  InputAdornment,
+  InputLabel,
+  TextField,
+} from "@mui/material";
+import { getVersion } from "@tauri-apps/api/app";
+import { useLockFn } from "ahooks";
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
+import { Controller, useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
+
+import { BaseDialog, SwitchLovely } from "@/components/base";
+import { FileInput } from "@/components/profile/file-input";
+import { useProfilesStore } from "@/stores";
+import { getErrorMessage } from "@/utils";
+
+import { useNotice } from "../base/notifies";
+
+interface Props {
+  onChange: () => void;
+}
+
+export interface ProfileViewerRef {
+  create: (profileUid: string | null) => void;
+  edit: (item: IProfileItem) => void;
+}
+
+const text = {
+  fullWidth: true,
+  size: "small",
+  margin: "normal",
+  variant: "outlined",
+  autoComplete: "off",
+  autoCorrect: "off",
+} as const;
+
+// create or edit the profile
+// remote / local / merge / script
+export const ProfileViewer = forwardRef<ProfileViewerRef, Props>(
+  (props, ref) => {
+    const { t } = useTranslation();
+    const { notice } = useNotice();
+    const createProfile = useProfilesStore((s) => s.createProfile);
+    const patchProfile = useProfilesStore((s) => s.patchProfile);
+    const [open, setOpen] = useState(false);
+    const [openType, setOpenType] = useState<"new" | "edit">("new");
+    const [loading, setLoading] = useState(false);
+    const [appVersion, setAppVersion] = useState("");
+    const [onlyChain, setOnlyChain] = useState(false);
+
+    // file input
+    const fileDataRef = useRef<string | null>(null);
+
+    const { control, watch, register, ...formIns } = useForm<IProfileItem>({
+      defaultValues: {
+        type: "remote",
+        name: "",
+        desc: "",
+        url: "",
+        option: {
+          with_proxy: false,
+          self_proxy: false,
+        },
+      },
+    });
+
+    const [scriptRemote, setScriptRemote] = useState(false);
+    const formType = watch("type");
+    const isRemote =
+      formType === "remote" || (formType === "script" && scriptRemote);
+    const isLocal = formType === "local";
+    const selfProxy = watch("option.self_proxy");
+    const withProxy = watch("option.with_proxy");
+
+    let selectType = ["remote", "local", "merge", "script"];
+    if (onlyChain) {
+      selectType = ["merge", "script"];
+    }
+
+    let defaultName = "remote file";
+    switch (formType) {
+      case "remote": {
+        defaultName = "remote file";
+        break;
+      }
+      case "local": {
+        defaultName = "local file";
+        break;
+      }
+      case "merge": {
+        defaultName = "merge file";
+        break;
+      }
+      case "script": {
+        defaultName = "script file";
+        break;
+      }
+    }
+
+    useEffect(() => {
+      if (openType === "edit") return;
+      if (selfProxy) formIns.setValue("option.with_proxy", false);
+    }, [openType, selfProxy, formIns.setValue]);
+
+    useEffect(() => {
+      if (openType === "edit") return;
+      if (withProxy) formIns.setValue("option.self_proxy", false);
+    }, [openType, withProxy, formIns.setValue]);
+
+    useEffect(() => {
+      if (openType === "edit") return;
+      formIns.setValue("name", defaultName);
+    }, [openType, defaultName, formIns.setValue]);
+
+    useEffect(() => {
+      if (isRemote || openType === "edit") return;
+      formIns.setValue("option.user_agent", `clash-verge/${appVersion}`);
+    }, [isRemote, openType, appVersion, formIns.setValue]);
+
+    useImperativeHandle(ref, () => ({
+      create: async (profileUid) => {
+        setScriptRemote(false);
+        formIns.setValue("url", "");
+        if (profileUid) {
+          // it means create a chain in this profile
+          formIns.setValue("parent", profileUid);
+          formIns.setValue("type", "merge");
+          formIns.setValue("name", "merge file");
+          formIns.setValue("scope", "specific");
+          setOnlyChain(true);
+        } else {
+          formIns.setValue("type", "remote");
+          formIns.setValue("name", "remote file");
+        }
+        const version = await getVersion();
+        setAppVersion(version);
+        formIns.setValue("option.user_agent", `clash-verge/${version}`);
+        setOpenType("new");
+        setOpen(true);
+      },
+      edit: async (item) => {
+        setScriptRemote(item.type === "script" && !!item.url);
+        const version = await getVersion();
+        setAppVersion(version);
+        if (item) {
+          Object.entries(item).forEach(([key, value]) => {
+            formIns.setValue(key as any, value);
+          });
+          if (item.parent) {
+            formIns.setValue("parent", item.parent);
+            formIns.setValue("scope", "specific");
+            setOnlyChain(true);
+          }
+        }
+        setOpenType("edit");
+        setOpen(true);
+      },
+    }));
+
+    const handleOk = useLockFn(
+      formIns.handleSubmit(async (form) => {
+        setLoading(true);
+        try {
+          if (!form.type) throw new Error("`Type` should not be null");
+          if (!form.name) {
+            throw new Error("The name should not be empty");
+          }
+          if (isRemote && !form.url) {
+            throw new Error("The URL should not be null");
+          }
+          if (!isRemote && form.type !== "local") {
+            delete form.option;
+          }
+          if (form.option?.update_interval) {
+            form.option.update_interval = +form.option.update_interval;
+          } else {
+            delete form.option?.update_interval;
+          }
+          if (form.option?.user_agent === "") {
+            delete form.option.user_agent;
+          }
+          if (form.type === "script" && !scriptRemote) form.url = "";
+          // const name = form.name || `${form.type} file`;
+          const item = { ...form };
+
+          // 创建
+          if (openType === "new") {
+            await createProfile(item, fileDataRef.current);
+          }
+          // 编辑
+          else {
+            if (!form.uid) throw new Error("UID not found");
+            await patchProfile(form.uid, item);
+          }
+          setOpen(false);
+          setLoading(false);
+          setTimeout(() => formIns.reset(), 500);
+          fileDataRef.current = null;
+          props.onChange();
+        } catch (err: unknown) {
+          notice("error", getErrorMessage(err));
+          setLoading(false);
+        }
+      }),
+    );
+
+    const handleClose = () => {
+      setOpen(false);
+      fileDataRef.current = null;
+      formIns.reset();
+    };
+
+    return (
+      <BaseDialog
+        open={open}
+        title={
+          openType === "new"
+            ? t("pages.profiles.dialog.createTitle")
+            : t("pages.profiles.dialog.editTitle")
+        }
+        okBtn={t("common.actions.save")}
+        cancelBtn={t("common.actions.cancel")}
+        onClose={handleClose}
+        onCancel={handleClose}
+        onOk={handleOk}
+        loading={loading}>
+        <form>
+          <Controller
+            name="type"
+            control={control}
+            render={({ field }) => (
+              <ButtonGroup
+                size="small"
+                fullWidth
+                disabled={openType === "edit"}
+                aria-label="profile type button group">
+                {selectType.map((type) => (
+                  <Button
+                    key={type}
+                    variant={formType === type ? "contained" : "outlined"}
+                    onClick={() => field.onChange(type)}>
+                    {t(`pages.proxies.modes.${type}`)}
+                  </Button>
+                ))}
+              </ButtonGroup>
+            )}
+          />
+          <Controller
+            name="name"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                {...text}
+                {...field}
+                required
+                label={t("common.fields.name")}
+              />
+            )}
+          />
+          <Controller
+            name="desc"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                {...text}
+                {...field}
+                label={t("common.fields.description")}
+              />
+            )}
+          />
+          {isLocal && openType === "new" && (
+            <FileInput
+              onChange={(file, val) => {
+                if (!formIns.getValues("name")) {
+                  const name = file.name.substring(
+                    0,
+                    file.name.lastIndexOf("."),
+                  );
+                  formIns.setValue("name", name);
+                }
+                fileDataRef.current = val;
+              }}
+            />
+          )}
+          {formType === "script" && (
+            <FormControlLabel
+              label={t("pages.profiles.remoteScript.enabled")}
+              control={
+                <SwitchLovely
+                  checked={scriptRemote}
+                  onChange={(_, checked) => setScriptRemote(checked)}
+                />
+              }
+            />
+          )}
+          {isRemote && (
+            <>
+              <Controller
+                name="url"
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    {...text}
+                    {...field}
+                    multiline
+                    label={t("pages.profiles.fields.subscriptionUrl")}
+                  />
+                )}
+              />
+              <Controller
+                name="option.user_agent"
+                control={control}
+                render={({ field }) => (
+                  <TextField {...text} {...field} label="User Agent" />
+                )}
+              />
+              <Controller
+                name="option.update_interval"
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    {...text}
+                    {...field}
+                    onChange={(e) => {
+                      e.target.value = e.target.value
+                        ?.replace(/\D/, "")
+                        .slice(0, 10);
+                      field.onChange(e);
+                    }}
+                    label={t("pages.profiles.fields.updateInterval")}
+                    slotProps={{
+                      input: {
+                        endAdornment: (
+                          <InputAdornment position="end">mins</InputAdornment>
+                        ),
+                      },
+                    }}
+                  />
+                )}
+              />
+              <Controller
+                name="option.timeout_seconds"
+                control={control}
+                rules={{
+                  validate: (value) =>
+                    value === undefined ||
+                    (Number.isSafeInteger(value) &&
+                      value >= 1 &&
+                      value <= 3600) ||
+                    t("messages.profiles.invalidRequestTimeout"),
+                }}
+                render={({ field, fieldState }) => (
+                  <TextField
+                    {...text}
+                    {...field}
+                    type="number"
+                    value={field.value ?? ""}
+                    onChange={(e) =>
+                      field.onChange(
+                        e.target.value === ""
+                          ? undefined
+                          : Number(e.target.value),
+                      )
+                    }
+                    label={t("pages.profiles.fields.requestTimeout")}
+                    error={!!fieldState.error}
+                    helperText={
+                      fieldState.error?.message ??
+                      t("pages.profiles.fields.requestTimeoutHint")
+                    }
+                    slotProps={{
+                      htmlInput: { min: 1, max: 3600, step: 1 },
+                      input: {
+                        endAdornment: (
+                          <InputAdornment position="end">s</InputAdornment>
+                        ),
+                      },
+                    }}
+                  />
+                )}
+              />
+              <Controller
+                name="option.with_proxy"
+                control={control}
+                render={({ field }) => (
+                  <div className="my-2 ml-2 flex items-center justify-between">
+                    <InputLabel>
+                      {t("pages.profiles.fields.useSystemProxy")}
+                    </InputLabel>
+                    <SwitchLovely
+                      checked={field.value}
+                      {...field}
+                      color="primary"
+                    />
+                  </div>
+                )}
+              />
+              <Controller
+                name="option.self_proxy"
+                control={control}
+                render={({ field }) => (
+                  <div className="my-2 ml-2 flex items-center justify-between">
+                    <InputLabel>
+                      {t("pages.profiles.fields.useClashProxy")}
+                    </InputLabel>
+                    <SwitchLovely
+                      checked={field.value}
+                      {...field}
+                      color="primary"
+                    />
+                  </div>
+                )}
+              />
+              <Controller
+                name="option.danger_accept_invalid_certs"
+                control={control}
+                render={({ field }) => (
+                  <div className="my-2 ml-2 flex items-center justify-between">
+                    <InputLabel>
+                      {t("pages.profiles.fields.acceptInvalidCertsDanger")}
+                    </InputLabel>
+                    <SwitchLovely
+                      checked={field.value}
+                      {...field}
+                      color="primary"
+                    />
+                  </div>
+                )}
+              />
+            </>
+          )}
+        </form>
+      </BaseDialog>
+    );
+  },
+);

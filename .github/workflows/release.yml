@@ -1,0 +1,335 @@
+name: Release Build
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: release
+  cancel-in-progress: true
+
+permissions: write-all
+env:
+  CARGO_INCREMENTAL: 0
+  RUST_BACKTRACE: short
+
+jobs:
+  # 计算正式 release 版本（来自 tauri.conf.json，无 preview 后缀）
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      VERSION: ${{ steps.version.outputs.VERSION }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Compute Release Version
+        id: version
+        run: |
+          VERSION=$(node -p "require('./src-tauri/tauri.conf.json').version")
+          echo "VERSION=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "release version: ${VERSION}"
+
+  # 所有平台在同一个矩阵 job 中构建，产物由 upload-artifact 统一收集，
+  # 最后由 release-update 统一上传到 v$VERSION release
+  build:
+    needs: [prepare]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+          - os: windows-latest
+            target: i686-pc-windows-msvc
+          - os: windows-latest
+            target: aarch64-pc-windows-msvc
+          - os: macos-latest
+            target: aarch64-apple-darwin
+          - os: macos-latest
+            target: x86_64-apple-darwin
+          - os: ubuntu-22.04
+            target: x86_64-unknown-linux-gnu
+          - os: ubuntu-22.04
+            target: i686-unknown-linux-gnu
+          - os: ubuntu-22.04
+            target: aarch64-unknown-linux-gnu
+          - os: ubuntu-22.04
+            target: armv7-unknown-linux-gnueabihf
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Install Rust Stable
+        uses: dtolnay/rust-toolchain@89b12181fb390509a0842a86cc55eeb8eb928c1d # stable
+
+      - name: Add Rust Target
+        run: rustup target add ${{ matrix.target }}
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2
+
+      - name: Configure Fast APT Mirror
+        if: matrix.os == 'ubuntu-22.04'
+        uses: vegardit/fast-apt-mirror.sh@v1
+        with: # the following parameters are listed with their action default values and are optional
+          healthchecks: 20 # Number of mirrors from the mirrors list to check for availability and up-to-dateness
+          speedtests: 10 # Maximum number of healthy mirrors to test for speed
+          parallel: 2 # Number of parallel speed tests
+          sample-size: 1024 # Number of kilobytes to download during the speed from each mirror
+          sample-time: 3 # Maximum number of seconds within the sample download from a mirror must finish
+          country: "" # The country code for selecting Ubuntu mirrors. If not set, defaults to http://mirrors.ubuntu.com/mirrors.txt
+          exclude-current: false # If set to "true", don't include the current APT mirror in the speed tests
+          configure-mirror: auto # Whether to configure the APT mirror: auto, true, or false
+
+      - name: Install Packages
+        if: matrix.os == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
+      - name: Install Binstall
+        if: matrix.os == 'ubuntu-22.04' && matrix.target != 'x86_64-unknown-linux-gnu'
+        uses: cargo-bins/cargo-binstall@c06f6a0003f7c6165a00c89d1697731c9e8a5c72 # main
+
+      - name: Install Cross
+        if: matrix.os == 'ubuntu-22.04' && matrix.target != 'x86_64-unknown-linux-gnu'
+        run: cargo binstall -y cross
+
+      - name: Install Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: "24"
+
+      - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6
+        name: Install pnpm
+        with:
+          run_install: false
+
+      - name: Pnpm install and check
+        run: |
+          pnpm i
+          pnpm check --target ${{ matrix.target }} --no-confirm
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CLASH_VERGE_SELF_SERVICE_PSK: ${{secrets.CLASH_VERGE_SELF_SERVICE_PSK}}
+
+      - name: Tauri build (linux x86_64)
+        if: matrix.target == 'x86_64-unknown-linux-gnu'
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          CLASH_VERGE_SELF_SERVICE_PSK: ${{secrets.CLASH_VERGE_SELF_SERVICE_PSK}}
+        run: |
+          pnpm build --target ${{ matrix.target }}
+
+      - name: Tauri build (linux cross)
+        if: matrix.os == 'ubuntu-22.04' && matrix.target != 'x86_64-unknown-linux-gnu'
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          CLASH_VERGE_SELF_SERVICE_PSK: ${{secrets.CLASH_VERGE_SELF_SERVICE_PSK}}
+        run: |
+          pnpm build -r cross --target ${{ matrix.target }} -b deb,rpm
+
+      - name: Tauri build (windows/macos)
+        if: matrix.os != 'ubuntu-22.04'
+        shell: bash
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          CLASH_VERGE_SELF_SERVICE_PSK: ${{secrets.CLASH_VERGE_SELF_SERVICE_PSK}}
+        run: |
+          pnpm build --target ${{ matrix.target }}
+
+      # macOS 两个架构的 .app.tar.gz/.sig 文件名相同，重命名为带架构后缀，避免上传时相互覆盖
+      - name: Rename macOS bundles with arch
+        if: matrix.os == 'macos-latest'
+        run: |
+          ARCH=${{ matrix.target == 'aarch64-apple-darwin' && 'aarch64' || 'x64' }}
+          VERSION=${{ needs.prepare.outputs.VERSION }}
+          cd "target/${{ matrix.target }}/release/bundle/macos" || exit 0
+          for f in *.app.tar.gz*; do
+            [ -f "$f" ] || continue
+            case "$f" in
+              *.sig) dest="ClashMorden_${VERSION}_${ARCH}.app.tar.gz.sig" ;;
+              *)     dest="ClashMorden_${VERSION}_${ARCH}.app.tar.gz" ;;
+            esac
+            echo "rename: ${f} -> ${dest}"
+            mv "$f" "$dest"
+          done
+
+      - name: Portable Bundle
+        if: matrix.os != 'macos-latest'
+        run: pnpm portable --target ${{ matrix.target }} --version ${{ needs.prepare.outputs.VERSION }} --no-upload
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: release-${{ matrix.target }}
+          path: |
+            # windows
+            target/${{ matrix.target }}/release/bundle/**/*.exe
+            target/${{ matrix.target }}/release/bundle/**/*.exe.sig
+            *_portable.zip
+            # macos
+            target/${{ matrix.target }}/release/bundle/**/*.dmg
+            target/${{ matrix.target }}/release/bundle/**/*.app.tar.gz
+            target/${{ matrix.target }}/release/bundle/**/*.app.tar.gz.sig
+            # linux
+            target/${{ matrix.target }}/release/bundle/**/*.deb
+            target/${{ matrix.target }}/release/bundle/**/*.deb.sig
+            target/${{ matrix.target }}/release/bundle/**/*.rpm
+            target/${{ matrix.target }}/release/bundle/**/*.rpm.sig
+            *_portable.tar.gz
+          if-no-files-found: ignore
+
+  pkgbuild:
+    name: PKGBUILD for ArchLinux
+    needs: [prepare, build]
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Download amd64 deb artifact
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: release-x86_64-unknown-linux-gnu
+          path: amd64-deb
+
+      - name: Update PKGBUILD
+        run: |
+          VERSION=${{ needs.prepare.outputs.VERSION }}
+          echo "version: ${VERSION}"
+          DEB=$(find amd64-deb -name '*.deb' | head -n 1)
+          if [ -z "$DEB" ]; then
+            echo "::error::amd64 deb not found in artifact" >&2
+            exit 1
+          fi
+
+          # 统一上传前 release 上还没有本次 deb，source 改为 pkgdir 内的本地文件
+          # （makepkg 本地 source 使用 dest 文件名在构建目录中查找）
+          # 直接在统一模板中就地注入 release 渠道字段
+          cp "$DEB" "archbuild/common/amd64.deb"
+          sed -i 's|source_x86_64=.*|source_x86_64=("amd64.deb")|' archbuild/common/PKGBUILD
+          sed -i "s/pkgver=.*/pkgver=${VERSION}/" archbuild/common/PKGBUILD
+          sed -i "s/_pkgver=.*/_pkgver=${VERSION}/" archbuild/common/PKGBUILD
+          sed -i "s/sha256sums_x86_64=.*/sha256sums_x86_64=(\"$(sha256sum "$DEB" | awk '{print $1}')\")/" archbuild/common/PKGBUILD
+
+      - name: Makepkg Build and Check
+        id: makepkg
+        uses: CachyOS/pkgbuild-action@99a0608d129dae363a6174971400e018dd0f4577 # master
+        with:
+          pkgdir: archbuild/common
+
+      - name: Print Package Files
+        run: |
+          echo "Successfully created the following package archive"
+          echo "Package: ${{ steps.makepkg.outputs.pkgfile0 }}"
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: release-archlinux
+          path: ${{ steps.makepkg.outputs.pkgfile0 }}
+          if-no-files-found: error
+
+  release-update:
+    needs: [prepare, build, pkgbuild]
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Download artifacts
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          path: artifacts
+
+      # 统一上传本次构建的产物到 v$VERSION release
+      - name: Publish build assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ needs.prepare.outputs.VERSION }}
+        run: |
+          # 首次发布时 release 尚不存在，先创建
+          gh release create "v${VERSION}" --title "ClashMorden v${VERSION}" --notes "" \
+            2>/dev/null || true
+
+          find artifacts -type f -print0 | while IFS= read -r -d '' file; do
+            echo "upload: ${file}"
+            # gh 上传大文件偶发 "Bad Content-Length"（HTTP 400），重试直到成功
+            for attempt in 1 2 3 4 5; do
+              if gh release upload "v${VERSION}" "${file}" --clobber; then
+                echo "upload ok (attempt ${attempt}): ${file}"
+                break
+              fi
+              echo "upload failed (attempt ${attempt}), retrying: ${file}"
+              sleep 10
+            done
+          done
+
+      - name: Update release name and body
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ needs.prepare.outputs.VERSION }}
+        run: |
+          COMMIT_HASH=$(git rev-parse --short HEAD)
+          COMMIT_URL="https://github.com/${GITHUB_REPOSITORY}/commit/${COMMIT_HASH}"
+          {
+            echo "Commit: [\`${COMMIT_HASH}\`](${COMMIT_URL})"
+            echo "Version: v${VERSION}"
+            echo ""
+            # changelog 内容（去掉开头的 html 注释块模板占位）
+            if head -n 1 CHANGELOG.md | grep -q '^<!--'; then
+              sed '1,/^-->/d' CHANGELOG.md
+            else
+              cat CHANGELOG.md
+            fi
+          } > release-body.md
+          gh release edit "v${VERSION}" \
+            --title "ClashMorden v${VERSION}" \
+            --notes-file release-body.md
+
+      - name: Install Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: "24"
+
+      - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6
+        name: Install pnpm
+        with:
+          run_install: false
+
+      - name: Pnpm install
+        run: pnpm i
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update changelog & Release updater file
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          pnpm updater --changelog
+          pnpm updater
+
+      - name: Commit changelog
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin main
+          git rebase origin/main
+          git add CHANGELOG.md UPDATELOG.md
+          git commit -m "docs: update CHANGELOG.md and UPDATELOG.md" || true
+          for attempt in 1 2 3; do
+            git push origin HEAD:main && exit 0
+            git fetch origin main
+            git rebase origin/main
+          done
+          exit 1

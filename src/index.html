@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link
+      rel="shortcut icon"
+      href="./assets/image/logo.ico"
+      type="image/x-icon" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ClashMorden</title>
+    <!-- 预加载 zashboard 静态资源：SW 已卸载（无 PWA 缓存），把样式表与
+         主 JS 包在 app 启动时拉进 HTTP 缓存，概览页 iframe 打开即用 -->
+    <link
+      rel="preload"
+      as="style"
+      href="/zashboard/dist/assets/index-fq7b3-2W.css" />
+    <link
+      rel="preload"
+      as="script"
+      href="/zashboard/dist/assets/index-Cmoa7oGY.js" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="./main.tsx"></script>
+  </body>
+</html>

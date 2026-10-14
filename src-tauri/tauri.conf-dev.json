@@ -1,0 +1,156 @@
+{
+  "$schema": "https://raw.githubusercontent.com/tauri-apps/tauri/refs/heads/dev/crates/tauri-schema-generator/schemas/config.schema.json",
+  "productName": "ClashMorden",
+  "mainBinaryName": "ClashMorden",
+  "version": "1.0.0",
+  "identifier": "io.github.clashmorden.clashmorden-dev",
+  "app": {
+    "security": {
+      "assetProtocol": {
+        "enable": true,
+        "scope": {
+          "allow": [
+            "**"
+          ],
+          "requireLiteralLeadingDot": false
+        }
+      },
+      "csp": {
+        "default-src": "'self' customprotocol: asset: tauri:",
+        "connect-src": "ipc: http://ipc.localhost http: https: ws: wss:",
+        "font-src": [
+          "https://fonts.gstatic.com",
+          "tauri:",
+          "http://tauri.localhost"
+        ],
+        "img-src": "'self' asset: http://asset.localhost blob: data: http: https: https://tiles.openfreemap.org",
+        "style-src": "'unsafe-inline' 'self' https://fonts.googleapis.com",
+        "worker-src": "'self' blob:",
+        "script-src": "'self' customprotocol: asset: tauri: blob:"
+      }
+    },
+    "windows": []
+  },
+  "bundle": {
+    "license": "GPL-3.0-only",
+    "licenseFile": "../LICENSE",
+    "active": true,
+    "longDescription": "A Mihomo GUI based on tauri.",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico",
+      "icons/icon.png",
+      "icons/Square30x30Logo.png",
+      "icons/Square44x44Logo.png",
+      "icons/Square71x71Logo.png",
+      "icons/Square89x89Logo.png",
+      "icons/Square107x107Logo.png",
+      "icons/Square142x142Logo.png",
+      "icons/Square150x150Logo.png",
+      "icons/Square284x284Logo.png",
+      "icons/Square310x310Logo.png",
+      "icons/StoreLogo.png"
+    ],
+    "resources": [
+      "resources"
+    ],
+    "publisher": "ClashMorden",
+    "copyright": "GNU General Public License v3.0",
+    "category": "Utility",
+    "shortDescription": "A Mihomo GUI based on tauri.",
+    "createUpdaterArtifacts": true,
+    "targets": [
+      "app",
+      "dmg",
+      "nsis",
+      "deb",
+      "rpm"
+    ],
+    "macOS": {
+      "dmg": {
+        "appPosition": {
+          "x": 180,
+          "y": 170
+        },
+        "applicationFolderPosition": {
+          "x": 480,
+          "y": 170
+        },
+        "windowSize": {
+          "height": 400,
+          "width": 660
+        }
+      },
+      "files": {},
+      "hardenedRuntime": true,
+      "minimumSystemVersion": "10.13"
+    },
+    "windows": {
+      "certificateThumbprint": null,
+      "digestAlgorithm": "sha256",
+      "timestampUrl": "",
+      "webviewInstallMode": {
+        "type": "embedBootstrapper",
+        "silent": true
+      },
+      "nsis": {
+        "displayLanguageSelector": true,
+        "installerIcon": "icons/icon.ico",
+        "languages": [
+          "SimpChinese",
+          "English"
+        ],
+        "installMode": "perMachine",
+        "template": "./template/installer.nsi",
+        "installerHooks": "./template/installer-hooks.nsh"
+      }
+    },
+    "linux": {
+      "appimage": {
+        "bundleMediaFramework": false,
+        "files": {}
+      },
+      "deb": {
+        "files": {},
+        "depends": [
+          "openssl"
+        ],
+        "desktopTemplate": "./template/clashmorden.desktop"
+      },
+      "rpm": {
+        "epoch": 0,
+        "files": {},
+        "release": "1",
+        "depends": [
+          "openssl"
+        ],
+        "desktopTemplate": "./template/clashmorden.desktop"
+      }
+    }
+  },
+  "build": {
+    "beforeBuildCommand": "pnpm run web:build",
+    "frontendDist": "./frontend/dist",
+    "beforeDevCommand": "pnpm run web:dev",
+    "devUrl": "http://localhost:3000/"
+  },
+  "plugins": {
+    "deep-link": {
+      "desktop": {
+        "schemes": [
+          "clash"
+        ]
+      }
+    },
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEY5REVGQ0Q1MUQ2NDhCNjYKUldSbWkyUWQxZnplK1N3aUUxbzM0TXd3NVlqbE1obXdSaVZHQ3JSTjgwUzJaZjQ1L0FFQWk0a0sK",
+      "endpoints": [
+        "https://ghproxy.fangkuai.fun/https://github.com/ClashMorden/ClashMorden/releases/download/updater/update-proxy.json",
+        "https://github.com/ClashMorden/ClashMorden/releases/download/updater/update.json"
+      ]
+    }
+  }
+}

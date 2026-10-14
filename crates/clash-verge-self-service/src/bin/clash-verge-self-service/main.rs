@@ -1,0 +1,100 @@
+mod install;
+mod log_config;
+mod uninstall;
+
+use std::path::PathBuf;
+
+use clap::{Parser, Subcommand};
+use log_config::LogConfig;
+#[cfg(windows)]
+use once_cell::sync::OnceCell;
+#[cfg(windows)]
+use windows_service::{define_windows_service, service_dispatcher};
+
+#[derive(Parser)]
+#[command(version, about = "install, uninstall or run ClashMorden Service", long_about = None)]
+struct Cli {
+    #[arg(short, long, help = "Run the IPC server with server-id as the socket path")]
+    server_id: Option<String>,
+
+    #[command(subcommand)]
+    command: Option<Commands>,
+}
+
+#[derive(Subcommand)]
+enum Commands {
+    #[command(about = "Install ClashMorden Service")]
+    Install {
+        #[arg(short, long, help = "Log directory")]
+        log_dir: Option<PathBuf>,
+
+        #[arg(short, long, help = "The socket path of the IPC server")]
+        server_id: Option<String>,
+    },
+    #[command(about = "Uninstall ClashMorden Service")]
+    Uninstall {
+        #[arg(short, long, help = "Log directory")]
+        log_dir: Option<PathBuf>,
+    },
+}
+
+/// used to store the server_id resolved by the clap
+#[cfg(windows)]
+static SERVER_ID: OnceCell<Option<String>> = OnceCell::new();
+
+#[cfg(windows)]
+define_windows_service!(ffi_service_main, my_service_main);
+
+#[cfg(windows)]
+pub fn my_service_main(_arguments: Vec<std::ffi::OsString>) {
+    // this arguments is not same as launch arguments
+    if let Ok(rt) = tokio::runtime::Runtime::new() {
+        let server_id = SERVER_ID.get().and_then(|id| id.clone()).unwrap_or_else(|| {
+            log::error!("failed to get server id");
+            clash_verge_self_service::DEFAULT_SERVER_ID.to_string()
+        });
+        let psk =
+            option_env!("CLASH_VERGE_SELF_SERVICE_PSK").map_or(clash_verge_self_service::DEFAULT_PSK, |v| v.as_bytes());
+        rt.block_on(async move {
+            let _ = clash_verge_self_service::Server::run(server_id, Some(psk)).await;
+        });
+    }
+}
+
+fn main() -> clash_verge_self_service::Result<()> {
+    let cli = Cli::parse();
+    match cli.command {
+        Some(Commands::Install { log_dir, server_id }) => {
+            LogConfig::global().lock().init(log_dir)?;
+            install::process(server_id)?;
+        }
+        Some(Commands::Uninstall { log_dir }) => {
+            LogConfig::global().lock().init(log_dir)?;
+            uninstall::process()?;
+        }
+        None => {
+            LogConfig::global().lock().init(None)?;
+            let server_id = cli.server_id;
+            log::info!("Server ID: {:?}", server_id);
+            #[cfg(unix)]
+            {
+                let rt = tokio::runtime::Runtime::new()?;
+                let server_id = server_id.unwrap_or(clash_verge_self_service::DEFAULT_SERVER_ID.to_string());
+                let psk = option_env!("CLASH_VERGE_SELF_SERVICE_PSK")
+                    .map_or(clash_verge_self_service::DEFAULT_PSK, |v| v.as_bytes());
+                rt.block_on(async move {
+                    let _ = clash_verge_self_service::Server::run(server_id, Some(psk)).await;
+                });
+            }
+            #[cfg(windows)]
+            {
+                SERVER_ID
+                    .set(server_id)
+                    .map_err(|_| clash_verge_self_service::ServiceError::General("failed to set server id".into()))?;
+                service_dispatcher::start(clash_verge_self_service::SERVICE_NAME, ffi_service_main)?;
+            }
+        }
+    }
+
+    Ok(())
+}

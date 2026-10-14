@@ -1,0 +1,163 @@
+name: Test Bundle
+
+on:
+  workflow_dispatch:
+    inputs:
+      windows:
+        description: Build for Windows (x86_64)
+        type: boolean
+        default: true
+        required: false
+      macos:
+        description: Build for macOS (aarch64)
+        type: boolean
+        default: true
+        required: false
+      ubuntu:
+        description: Build for Ubuntu-22.04 (x86_64)
+        type: boolean
+        default: true
+        required: false
+
+concurrency:
+  group: test-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions: write-all
+env:
+  CARGO_INCREMENTAL: 0
+  RUST_BACKTRACE: short
+
+jobs:
+  prepare-matrix:
+    name: Prepare Matrix
+    runs-on: ubuntu-22.04
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Set Matrix
+        id: set-matrix
+        run: |
+          ENTRIES=""
+          if [ "${{ inputs.windows }}" == "true" ]; then
+            ENTRIES="${ENTRIES:+$ENTRIES,}"'{"os":"windows-latest","target":"x86_64-pc-windows-msvc"}'
+          fi
+          if [ "${{ inputs.macos }}" == "true" ]; then
+            ENTRIES="${ENTRIES:+$ENTRIES,}"'{"os":"macos-latest","target":"aarch64-apple-darwin"}'
+          fi
+          if [ "${{ inputs.ubuntu }}" == "true" ]; then
+            ENTRIES="${ENTRIES:+$ENTRIES,}"'{"os":"ubuntu-22.04","target":"x86_64-unknown-linux-gnu"}'
+          fi
+          echo "matrix={\"include\":[$ENTRIES]}" >> "$GITHUB_OUTPUT"
+          echo "Generated matrix: $ENTRIES"
+
+  build:
+    needs: prepare-matrix
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.prepare-matrix.outputs.matrix) }}
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Install Rust Stable
+        uses: dtolnay/rust-toolchain@89b12181fb390509a0842a86cc55eeb8eb928c1d # stable
+
+      - name: Add Rust Target
+        run: rustup target add ${{ matrix.target }}
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2
+
+      - name: Install Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: "24"
+
+      - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6
+        name: Install pnpm
+        with:
+          run_install: false
+
+      - name: Configure Fast APT Mirror
+        if: matrix.os == 'ubuntu-22.04' && inputs.ubuntu
+        uses: vegardit/fast-apt-mirror.sh@v1
+        with: # the following parameters are listed with their action default values and are optional
+          healthchecks: 20 # Number of mirrors from the mirrors list to check for availability and up-to-dateness
+          speedtests: 10 # Maximum number of healthy mirrors to test for speed
+          parallel: 2 # Number of parallel speed tests
+          sample-size: 1024 # Number of kilobytes to download during the speed from each mirror
+          sample-time: 3 # Maximum number of seconds within the sample download from a mirror must finish
+          country: "" # The country code for selecting Ubuntu mirrors. If not set, defaults to http://mirrors.ubuntu.com/mirrors.txt
+          exclude-current: false # If set to "true", don't include the current APT mirror in the speed tests
+          configure-mirror: auto # Whether to configure the APT mirror: auto, true, or false
+
+      - name: Install Packages (Linux)
+        if: matrix.os == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq libgtk-3-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
+      - name: Get Version (Linux)
+        if: matrix.os == 'ubuntu-22.04'
+        id: get_version
+        run: |
+          echo "VERSION=$(cat package.json | jq '.version' | tr -d '"')" >> "$GITHUB_OUTPUT"
+
+      - name: Tauri build
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          CLASH_VERGE_SELF_SERVICE_PSK: ${{secrets.CLASH_VERGE_SELF_SERVICE_PSK}}
+        run: |
+          pnpm i
+          pnpm check ${{ matrix.target }} --alpha --no-confirm
+          # 测试渠道不签名 updater 产物：新仓库暂无 TAURI_SIGNING_PRIVATE_KEY，
+          # 不关闭会导致构建 exit 1 并跳过 artifact 上传
+          pnpm build --target ${{ matrix.target }} --config '{"bundle":{"createUpdaterArtifacts":false}}'
+
+      - name: Update Checksums (Arch Linux PKG)
+        if: matrix.os == 'ubuntu-22.04'
+        run: |
+          echo "version: ${{ steps.get_version.outputs.VERSION }}"
+          cp target/${{ matrix.target }}/release/bundle/deb/clashmorden_${{ steps.get_version.outputs.VERSION }}_amd64.deb archbuild/common/amd64.deb
+
+          # 直接在统一模板中就地注入 test 渠道字段
+          sed -i "s/^pkgname=.*/pkgname=clashmorden-alpha-bin/" archbuild/common/PKGBUILD
+          sed -i 's|source_x86_64=.*|source_x86_64=("amd64.deb")|' archbuild/common/PKGBUILD
+          sed -i "s/sha256sums_x86_64=.*/sha256sums_x86_64=(\"$(sha256sum archbuild/common/amd64.deb | awk '{print $1}')\")/" archbuild/common/PKGBUILD
+
+      - name: Makepkg Build and Check (Arch Linux PKG)
+        if: matrix.os == 'ubuntu-22.04'
+        id: makepkg
+        uses: CachyOS/pkgbuild-action@99a0608d129dae363a6174971400e018dd0f4577 # master
+        with:
+          pkgdir: archbuild/common
+
+      - name: Upload artifact
+        if: matrix.os == 'windows-latest'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: windows
+          path: |
+            target/${{ matrix.target }}/release/bundle/**/*.exe
+
+      - name: Upload artifact
+        if: matrix.os == 'macos-latest'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: macos
+          path: |
+            target/${{ matrix.target }}/release/bundle/**/*.dmg
+
+      - name: Upload artifact
+        if: matrix.os == 'ubuntu-22.04'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: linux
+          path: |
+            target/${{ matrix.target }}/release/bundle/**/*.deb
+            ${{ steps.makepkg.outputs.pkgfile0 }}

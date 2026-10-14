@@ -1,0 +1,10 @@
+packages:
+  - "crates/*"
+allowBuilds:
+  "@parcel/watcher": true
+  core-js: true
+  esbuild: true
+  meta-json-schema: false
+patchedDependencies:
+  vite-plugin-monaco-editor@1.1.0: patches/vite-plugin-monaco-editor@1.1.0.patch
+storeDir: .pnpm-store

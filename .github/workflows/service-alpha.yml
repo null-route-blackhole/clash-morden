@@ -1,0 +1,94 @@
+name: Service Alpha Build
+
+on:
+  push:
+    branches:
+      - dev
+    paths:
+      - "crates/clash-verge-self-service/**"
+      - "crates/process_supervisor/**"
+      - "crates/clash-verge-self-utils/**"
+  workflow_dispatch:
+
+concurrency:
+  group: service-alpha-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions: write-all
+env:
+  CARGO_INCREMENTAL: 0
+  RUST_BACKTRACE: short
+
+jobs:
+  build-service:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+          - os: windows-latest
+            target: i686-pc-windows-msvc
+          - os: windows-latest
+            target: aarch64-pc-windows-msvc
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+          - os: ubuntu-latest
+            target: i686-unknown-linux-gnu
+          - os: ubuntu-latest
+            target: aarch64-unknown-linux-gnu
+          - os: ubuntu-latest
+            target: armv7-unknown-linux-gnueabihf
+          - os: macos-latest
+            target: aarch64-apple-darwin
+          - os: macos-latest
+            target: x86_64-apple-darwin
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Install Rust
+        if: matrix.os != 'ubuntu-latest'
+        uses: dtolnay/rust-toolchain@89b12181fb390509a0842a86cc55eeb8eb928c1d # stable
+
+      - name: Add Rust Target
+        if: matrix.os != 'ubuntu-latest'
+        run: rustup target add ${{ matrix.target }}
+
+      - name: Rust Cache
+        if: matrix.os != 'ubuntu-latest'
+        uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2
+
+      - name: Build (Windows / MacOS)
+        if: matrix.os != 'ubuntu-latest'
+        env:
+          CLASH_VERGE_SELF_SERVICE_PSK: ${{secrets.CLASH_VERGE_SELF_SERVICE_PSK}}
+        run: cargo build --package clash-verge-self-service --release --target ${{ matrix.target }}
+
+      - name: Build (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        uses: ./.github/build-service-for-linux
+        env:
+          CLASH_VERGE_SELF_SERVICE_PSK: ${{secrets.CLASH_VERGE_SELF_SERVICE_PSK}}
+        with:
+          target: ${{ matrix.target }}
+
+      - name: Rename Clash Verge Service
+        shell: bash
+        run: |
+          EXT=${{ matrix.os == 'windows-latest' && '.exe' || '' }}
+          cp "target/${{ matrix.target }}/release/clash-verge-self-service${EXT}" \
+            "./clash-verge-self-service-${{ matrix.target }}${EXT}"
+
+      - name: Create Pre-Release
+        uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3
+        with:
+          name: ClashMorden Service Alpha
+          tag_name: service-alpha
+          prerelease: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          files: |
+            ./clash-verge-self-service-${{ matrix.target }}
+            ./clash-verge-self-service-${{ matrix.target }}.exe

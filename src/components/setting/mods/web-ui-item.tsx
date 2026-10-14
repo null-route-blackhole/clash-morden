@@ -1,0 +1,154 @@
+import CheckRounded from "@mui/icons-material/CheckRounded";
+import CloseRounded from "@mui/icons-material/CloseRounded";
+import DeleteRounded from "@mui/icons-material/DeleteRounded";
+import EditRounded from "@mui/icons-material/EditRounded";
+import OpenInNewRounded from "@mui/icons-material/OpenInNewRounded";
+import {
+  Divider,
+  IconButton,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
+
+interface Props {
+  value?: string;
+  onlyEdit?: boolean;
+  onChange: (value?: string) => void;
+  onOpenUrl?: (value?: string) => void;
+  onDelete?: () => void;
+  onCancel?: () => void;
+}
+
+export const WebUIItem = (props: Props) => {
+  const {
+    value,
+    onlyEdit = false,
+    onChange,
+    onDelete,
+    onOpenUrl,
+    onCancel,
+  } = props;
+
+  const [editing, setEditing] = useState(false);
+  const [editValue, setEditValue] = useState(value);
+  const { t } = useTranslation();
+
+  if (editing || onlyEdit) {
+    return (
+      <>
+        <Stack
+          spacing={0.75}
+          direction="row"
+          sx={{
+            mt: 1,
+            mb: 1,
+            alignItems: "center",
+          }}>
+          <TextField
+            fullWidth
+            size="small"
+            value={editValue}
+            onChange={(e) => setEditValue(e.target.value)}
+            placeholder={t("pages.settings.clash.webUi.supportPlaceholders")}
+            autoComplete="off"
+          />
+          <IconButton
+            size="small"
+            title={t("common.actions.save")}
+            color="inherit"
+            onClick={() => {
+              onChange(editValue);
+              setEditing(false);
+            }}>
+            <CheckRounded fontSize="inherit" />
+          </IconButton>
+          <IconButton
+            size="small"
+            title={t("common.actions.cancel")}
+            color="inherit"
+            onClick={() => {
+              onCancel?.();
+              setEditing(false);
+            }}>
+            <CloseRounded fontSize="inherit" />
+          </IconButton>
+        </Stack>
+        <Divider />
+      </>
+    );
+  }
+
+  const escapeHtml = (input: string) =>
+    input
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#39;");
+
+  const html = escapeHtml(value ?? "")
+    .replace("%host", "<span>%host</span>")
+    .replace("%port", "<span>%port</span>")
+    .replace("%secret", "<span>%secret</span>");
+
+  return (
+    <>
+      <Stack
+        spacing={0.75}
+        direction="row"
+        sx={{
+          alignItems: "center",
+          mt: 1,
+          mb: 1,
+        }}>
+        <Typography
+          component="div"
+          title={value}
+          color={value ? "text.primary" : "text.secondary"}
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: value 已先经 escapeHtml 转义，仅用于高亮 %host/%port/%secret 占位符
+          dangerouslySetInnerHTML={{ __html: html || "NULL" }}
+          sx={[
+            {
+              width: "100%",
+            },
+            ({ palette }) => ({
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              "> span": {
+                color: palette.primary.main,
+              },
+            }),
+          ]}
+        />
+        <IconButton
+          size="small"
+          title={t("common.actions.openUrl")}
+          color="inherit"
+          onClick={() => onOpenUrl?.(value)}>
+          <OpenInNewRounded fontSize="inherit" />
+        </IconButton>
+        <IconButton
+          size="small"
+          title={t("common.actions.edit")}
+          color="inherit"
+          onClick={() => {
+            setEditing(true);
+            setEditValue(value);
+          }}>
+          <EditRounded fontSize="inherit" />
+        </IconButton>
+        <IconButton
+          size="small"
+          title={t("common.actions.delete")}
+          color="inherit"
+          onClick={onDelete}>
+          <DeleteRounded fontSize="inherit" />
+        </IconButton>
+      </Stack>
+      <Divider />
+    </>
+  );
+};

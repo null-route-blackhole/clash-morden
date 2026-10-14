@@ -1,0 +1,80 @@
+tray:
+  dashboard: Dashboard
+  mode:
+    rule: Rule Mode
+    global: Global Mode
+    direct: Direct Mode
+  proxy:
+    system: System Proxy
+    tun: Tun Mode
+  service: Service Mode
+  copy:
+    env: Copy Env
+  open:
+    dir: Open Dir
+    app:
+      dir: App Dir
+    core:
+      dir: Core Dir
+    log:
+      dir: Log Dir
+    devtools: Open DevTools
+  more: More
+  start:
+    core: Start Core
+  stop:
+    core: Stop Core
+  restart:
+    clash: Restart Clash
+    app: Restart App
+  quit: Quit
+  current:
+    profile: Current Profile
+  profiles:
+    switch:
+      title: Switch Profile
+      success: Switch profile successfully
+      failed: Switch profile failed
+
+notice:
+  disable:
+    failed: Disabled Failed
+  enable:
+    failed: Enabled Failed
+  install:
+    failed: Install Failed
+  service:
+    install:
+      run:
+        failed: Install successfully, but ClashMorden Service run failed
+        success: ClashMorden Service install and run successfully
+  import:
+    success: Import profile successfully
+    failed: Import profile failed
+
+dialog:
+  install:
+    service:
+      ask: "ClashMorden Service not installed.\nDo you want to install and run service right now?"
+  panic:
+    title: ClashMorden Crash
+    backtrace: "stack backtrace:\n%{backtrace}"
+    displayBacktraceNote: "Note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace"
+    content: "location: %{location}:\n\n%{payload}\n\n%{limit_backtrace}...\n\nFor more panic information, check the log files:\n  App log: %{app_log_file}\n  Clash log: %{clash_log_file}"
+
+error:
+  tun:
+    busy: Tun Device Or Resource Busy, restart core might solve it
+    needPermissions: Please grant core permissions before turning on Tun mode, or install and enable service mode
+  config:
+    parseFailed: Failed to parse config to yaml file
+    convertFailed: Failed to convert config to yaml
+  runtime:
+    config:
+      getFailed: Failed to get runtime config
+  clash:
+    restartFailed: Clash Core Restart Failed
+  sysproxy:
+    updateFailed: Failed to update system proxy
+    pac:
+      updateFailed: Failed to update PAC proxy

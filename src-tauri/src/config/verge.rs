@@ -1,0 +1,478 @@
+use anyhow::Result;
+use serde::{Deserialize, Serialize};
+use tracing::level_filters::LevelFilter;
+
+use crate::{
+    config::DEFAULT_PAC,
+    core::hotkey::HotkeyAction,
+    utils::{dirs, help},
+};
+
+fn default_app_hotkeys() -> Vec<String> {
+    #[cfg(target_os = "macos")]
+    {
+        vec![HotkeyAction::ExitApp.to_config_entry("CMD+Q")]
+    }
+    #[cfg(not(target_os = "macos"))]
+    {
+        vec![HotkeyAction::CloseDashboard.to_config_entry("ESCAPE")]
+    }
+}
+
+/// ### `verge.yaml` schema
+#[derive(Default, Debug, Clone, Deserialize, Serialize)]
+pub struct IVerge {
+    /// app log level
+    /// silent | error | warn | info | debug | trace
+    pub app_log_level: Option<String>,
+
+    // i18n (now supported): zh_CN | en | ru | fa
+    pub language: Option<String>,
+
+    /// `light` or `dark` or `system`
+    pub theme_mode: Option<String>,
+
+    /// tray click event
+    pub tray_event: Option<String>,
+
+    /// copy env type
+    pub env_type: Option<String>,
+
+    /// start page
+    pub start_page: Option<String>,
+    /// startup script path
+    pub startup_script: Option<String>,
+
+    /// enable traffic graph default is true
+    pub traffic_graph: Option<bool>,
+
+    /// show memory info (only for Mihomo)
+    pub enable_memory_usage: Option<bool>,
+
+    /// enable group icon
+    pub enable_group_icon: Option<bool>,
+
+    /// enable proxy group jump entry
+    pub enable_group_jump: Option<bool>,
+
+    /// common tray icon
+    pub common_tray_icon: Option<bool>,
+
+    /// tray icon
+    #[cfg(target_os = "macos")]
+    pub tray_icon: Option<String>,
+
+    /// menu icon
+    pub menu_icon: Option<String>,
+
+    /// sysproxy tray icon
+    pub sysproxy_tray_icon: Option<bool>,
+
+    /// tun tray icon
+    pub tun_tray_icon: Option<bool>,
+
+    /// windows service mode
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub enable_service_mode: Option<bool>,
+
+    /// can the app auto startup
+    pub enable_auto_launch: Option<bool>,
+
+    /// 是否启用系统标题栏
+    #[serde(alias = "enable_system_title")]
+    pub enable_system_title_bar: Option<bool>,
+
+    /// 是否保持UI界面活动
+    pub enable_keep_ui_active: Option<bool>,
+
+    /// not show the window on launch
+    ///
+    /// TODO: __即将弃用__
+    pub enable_silent_start: Option<bool>,
+
+    pub silent_start_mode: Option<SilentStartMode>,
+
+    /// set system proxy
+    pub enable_system_proxy: Option<bool>,
+
+    /// enable proxy guard
+    pub enable_proxy_guard: Option<bool>,
+
+    /// set system proxy bypass
+    ///
+    /// TODO: __即将弃用__
+    pub system_proxy_bypass: Option<String>,
+
+    /// system proxy bypass for windows
+    pub windows_bypass: Option<String>,
+    /// system proxy bypass for macos
+    pub macos_bypass: Option<String>,
+    /// system proxy bypass for linux
+    pub linux_bypass: Option<String>,
+
+    /// proxy guard duration
+    pub proxy_guard_duration: Option<u64>,
+
+    /// use pac mode
+    pub proxy_auto_config: Option<bool>,
+
+    /// pac script content
+    pub pac_file_content: Option<String>,
+
+    /// light theme setting
+    pub light_theme_setting: Option<IVergeTheme>,
+
+    /// dark theme setting
+    pub dark_theme_setting: Option<IVergeTheme>,
+
+    /// web ui list
+    pub web_ui_list: Option<Vec<String>>,
+
+    /// clash core path
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub clash_core: Option<String>,
+
+    /// hotkey map
+    /// format: {func},{key}
+    pub hotkeys: Option<Vec<String>>,
+
+    /// app hotkey map
+    /// format: {func},{key}
+    pub app_hotkeys: Option<Vec<String>>,
+
+    /// 首页卡片显示开关（纯数据字段）
+    pub home_cards: Option<serde_json::Value>,
+
+    /// 首页卡片排序（key 数组，纯数据字段）
+    pub home_cards_order: Option<Vec<String>>,
+
+    /// 切换代理时自动关闭连接
+    pub auto_close_connection: Option<bool>,
+
+    /// 是否自动检查更新
+    pub auto_check_update: Option<bool>,
+
+    /// 更新渠道
+    /// stable | preview
+    pub update_channel: Option<String>,
+
+    /// 默认的延迟测试连接
+    pub default_latency_test: Option<String>,
+
+    /// 默认的延迟测试超时时间
+    pub default_latency_timeout: Option<i32>,
+
+    /// proxy 页面布局 列数
+    pub proxy_layout_column: Option<i32>,
+
+    /// 测试网站列表
+    pub test_list: Option<Vec<IVergeTestItem>>,
+
+    /// 日志清理, 默认 7 天
+    /// 0: 不清理; 1: 7天; 2: 30天; 3: 90天
+    pub auto_log_clean: Option<i32>,
+
+    /// 滚动日志单文件大小上限 (MB), 默认 10
+    pub log_roll_size_mb: Option<u64>,
+    /// 滚动日志最大保留份数, 默认 10
+    pub log_max_keep_files: Option<u64>,
+
+    /// window size and position
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub window_size_position: Option<Vec<f64>>,
+
+    /// window size and position
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub window_is_maximized: Option<bool>,
+
+    /// 是否启用随机端口
+    pub enable_random_port: Option<bool>,
+
+    /// webdav url
+    pub webdav_url: Option<String>,
+    /// webdav username
+    pub webdav_username: Option<String>,
+    /// webdav password
+    pub webdav_password: Option<String>,
+    /// local backup dir
+    pub local_backup_dir: Option<String>,
+
+    /// enable tray
+    pub enable_tray: Option<bool>,
+
+    /// keep in dock
+    #[serde(alias = "show_in_dock")]
+    pub keep_in_dock: Option<bool>,
+
+    /// enable external controller, such as 127.0.0.1:8080
+    pub enable_external_controller: Option<bool>,
+}
+
+#[derive(Default, Debug, Clone, Deserialize, Serialize)]
+#[serde(rename_all = "lowercase")]
+pub enum SilentStartMode {
+    Bootup,
+    Global,
+    #[default]
+    Off,
+}
+
+#[derive(Default, Debug, Clone, Deserialize, Serialize)]
+pub struct IVergeTestItem {
+    pub uid: Option<String>,
+    pub name: Option<String>,
+    pub icon: Option<String>,
+    pub url: Option<String>,
+}
+
+#[derive(Default, Debug, Clone, Deserialize, Serialize)]
+pub struct IVergeTheme {
+    pub primary_color: Option<String>,
+    pub secondary_color: Option<String>,
+    pub primary_text: Option<String>,
+    pub secondary_text: Option<String>,
+
+    pub info_color: Option<String>,
+    pub error_color: Option<String>,
+    pub warning_color: Option<String>,
+    pub success_color: Option<String>,
+
+    pub background_color: Option<String>,
+    pub paper_background_color: Option<String>,
+
+    pub font_family: Option<String>,
+    pub css_injection: Option<String>,
+}
+
+impl IVerge {
+    pub fn new() -> Self {
+        match dirs::verge_path().and_then(|path| help::read_yaml::<IVerge>(&path)) {
+            Ok(mut config) => {
+                config.migrate();
+                config
+            }
+            Err(err) => {
+                tracing::error!("{err}");
+                Self::template()
+            }
+        }
+    }
+
+    fn migrate(&mut self) {
+        if let Some(bypass) = self.system_proxy_bypass.clone() {
+            // 对旧字段的兼容处理
+            // 将 system_proxy_bypass 设置到对应的平台，后续将移除 system_proxy_bypass
+            if bypass.contains(";") {
+                #[cfg(target_os = "windows")]
+                {
+                    if self.windows_bypass.is_none() {
+                        self.windows_bypass = Some(bypass);
+                    }
+                }
+            } else if bypass.contains(",") {
+                #[cfg(target_os = "macos")]
+                {
+                    if self.macos_bypass.is_none() {
+                        self.macos_bypass = Some(bypass);
+                    }
+                }
+                #[cfg(target_os = "linux")]
+                {
+                    if self.linux_bypass.is_none() {
+                        self.linux_bypass = Some(bypass);
+                    }
+                }
+            }
+        }
+
+        if let Some(enable_silent_start) = self.enable_silent_start
+            && self.silent_start_mode.is_none()
+        {
+            if enable_silent_start {
+                self.silent_start_mode = Some(SilentStartMode::Global);
+            } else {
+                self.silent_start_mode = Some(SilentStartMode::Off);
+            }
+        }
+
+        if let Some(clash_core) = self.clash_core.as_ref()
+            && clash_core.contains("verge-mihomo")
+        {
+            let new_clash_core = clash_core.replace("verge-mihomo", "self-mihomo");
+            self.clash_core = Some(new_clash_core)
+        }
+
+        #[cfg(target_os = "macos")]
+        if let Some(enable_system_title_bar) = self.enable_system_title_bar
+            && !enable_system_title_bar
+        {
+            self.enable_system_title_bar = Some(true)
+        }
+
+        if let Some(language) = self.language.as_ref()
+            && language == "zh"
+        {
+            self.language = Some("zh_CN".into());
+        }
+
+        if self.app_hotkeys.is_none() {
+            self.app_hotkeys = Some(default_app_hotkeys());
+        }
+    }
+
+    pub fn template() -> Self {
+        Self {
+            clash_core: Some("self-mihomo".into()),
+            language: Some("zh_CN".into()),
+            theme_mode: Some("system".into()),
+            #[cfg(not(target_os = "windows"))]
+            env_type: Some("bash".into()),
+            #[cfg(target_os = "windows")]
+            env_type: Some("powershell".into()),
+            start_page: Some("/".into()),
+            traffic_graph: Some(true),
+            enable_memory_usage: Some(true),
+            enable_group_icon: Some(true),
+            enable_group_jump: Some(true),
+            #[cfg(target_os = "macos")]
+            tray_icon: Some("monochrome".into()),
+            menu_icon: Some("monochrome".into()),
+            common_tray_icon: Some(false),
+            sysproxy_tray_icon: Some(false),
+            tun_tray_icon: Some(false),
+            enable_auto_launch: Some(false),
+            enable_silent_start: Some(false),
+            silent_start_mode: Some(SilentStartMode::Off),
+            enable_system_title_bar: Some(false),
+            enable_keep_ui_active: Some(false),
+            enable_system_proxy: Some(false),
+            proxy_auto_config: Some(false),
+            pac_file_content: Some(DEFAULT_PAC.into()),
+            enable_random_port: Some(false),
+            enable_proxy_guard: Some(false),
+            proxy_guard_duration: Some(30),
+            auto_close_connection: Some(true),
+            auto_check_update: Some(true),
+            auto_log_clean: Some(1),
+            log_roll_size_mb: Some(10),
+            log_max_keep_files: Some(10),
+            enable_tray: Some(true),
+            keep_in_dock: Some(true),
+            enable_external_controller: Some(false),
+            app_hotkeys: Some(default_app_hotkeys()),
+            home_cards: None,
+            home_cards_order: None,
+            ..Self::default()
+        }
+    }
+
+    /// Save IVerge App Config
+    pub fn save_file(&self) -> Result<()> {
+        help::save_yaml(&dirs::verge_path()?, &self, Some("# ClashMorden Config"))
+    }
+
+    /// patch verge config
+    /// only save to file
+    pub fn patch_config(&mut self, patch: IVerge) {
+        macro_rules! patch {
+            ($key: tt) => {
+                if patch.$key.is_some() {
+                    self.$key = patch.$key;
+                }
+            };
+        }
+
+        patch!(app_log_level);
+        patch!(language);
+        patch!(theme_mode);
+        patch!(tray_event);
+        patch!(env_type);
+        patch!(start_page);
+        patch!(startup_script);
+        patch!(traffic_graph);
+        patch!(enable_memory_usage);
+        patch!(enable_group_icon);
+        patch!(enable_group_jump);
+        #[cfg(target_os = "macos")]
+        patch!(tray_icon);
+        patch!(menu_icon);
+        patch!(common_tray_icon);
+        patch!(sysproxy_tray_icon);
+        patch!(tun_tray_icon);
+
+        patch!(enable_service_mode);
+        patch!(enable_auto_launch);
+        patch!(enable_silent_start);
+        patch!(silent_start_mode);
+        patch!(enable_system_title_bar);
+        patch!(enable_keep_ui_active);
+        patch!(enable_random_port);
+        patch!(enable_system_proxy);
+        patch!(enable_proxy_guard);
+        // bypass
+        patch!(system_proxy_bypass);
+        patch!(windows_bypass);
+        patch!(macos_bypass);
+        patch!(linux_bypass);
+
+        patch!(proxy_guard_duration);
+        patch!(proxy_auto_config);
+        patch!(pac_file_content);
+
+        patch!(light_theme_setting);
+        patch!(dark_theme_setting);
+        patch!(web_ui_list);
+        patch!(clash_core);
+        patch!(hotkeys);
+        patch!(app_hotkeys);
+        patch!(home_cards);
+        patch!(home_cards_order);
+
+        patch!(auto_close_connection);
+        patch!(auto_check_update);
+        patch!(update_channel);
+        patch!(default_latency_test);
+        patch!(default_latency_timeout);
+        patch!(proxy_layout_column);
+        patch!(test_list);
+        patch!(auto_log_clean);
+        patch!(log_roll_size_mb);
+        patch!(log_max_keep_files);
+        patch!(window_size_position);
+        patch!(window_is_maximized);
+        patch!(webdav_url);
+        patch!(webdav_username);
+        patch!(webdav_password);
+        patch!(local_backup_dir);
+        patch!(enable_tray);
+        patch!(keep_in_dock);
+        patch!(enable_external_controller);
+    }
+
+    // 获取日志等级
+    pub fn get_log_level(&self) -> LevelFilter {
+        if let Some(level) = self.app_log_level.as_ref() {
+            match level.to_lowercase().as_str() {
+                "silent" => LevelFilter::OFF,
+                "error" => LevelFilter::ERROR,
+                "warn" => LevelFilter::WARN,
+                "info" => LevelFilter::INFO,
+                "debug" => LevelFilter::DEBUG,
+                "trace" => LevelFilter::TRACE,
+                _ => LevelFilter::INFO,
+            }
+        } else {
+            LevelFilter::INFO
+        }
+    }
+
+    /// 滚动日志单文件大小上限 (MB), 默认 10
+    pub fn get_log_roll_size_mb(&self) -> u64 {
+        self.log_roll_size_mb.map_or(10, |v| v.max(1))
+    }
+
+    /// 滚动日志最大保留份数, 默认 10
+    pub fn get_log_max_keep_files(&self) -> u64 {
+        self.log_max_keep_files.map_or(10, |v| v.max(1))
+    }
+}

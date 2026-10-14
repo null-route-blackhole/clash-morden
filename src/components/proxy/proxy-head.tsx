@@ -1,0 +1,203 @@
+import AccessTimeRounded from "@mui/icons-material/AccessTimeRounded";
+import FilterAltOffRounded from "@mui/icons-material/FilterAltOffRounded";
+import FilterAltRounded from "@mui/icons-material/FilterAltRounded";
+import MyLocationRounded from "@mui/icons-material/MyLocationRounded";
+import NetworkCheckRounded from "@mui/icons-material/NetworkCheckRounded";
+import SortByAlphaRounded from "@mui/icons-material/SortByAlphaRounded";
+import SortRounded from "@mui/icons-material/SortRounded";
+import VisibilityOffRounded from "@mui/icons-material/VisibilityOffRounded";
+import VisibilityRounded from "@mui/icons-material/VisibilityRounded";
+import WifiTetheringOffRounded from "@mui/icons-material/WifiTetheringOffRounded";
+import WifiTetheringRounded from "@mui/icons-material/WifiTetheringRounded";
+import { Box, IconButton, type SxProps, TextField } from "@mui/material";
+import debounce from "lodash-es/debounce";
+import { memo, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
+
+import delayManager from "@/services/delay";
+import { useProfilesStore, useVergeStore } from "@/stores";
+import {
+  createScopedHeadStateActions,
+  DEFAULT_STATE,
+  useProxyHeadStateStore,
+} from "@/stores/proxyHeadStateStore";
+
+import type { ProxySortType } from "./use-filter-sort";
+
+interface Props {
+  sx?: SxProps;
+  groupName: string;
+  onLocation: () => void;
+  onCheckDelay: () => void;
+}
+
+export const ProxyHead = memo(function ProxyHead(props: Props) {
+  const { sx = {}, groupName } = props;
+  const currentProfileUid = useProfilesStore(
+    (s) => s.currentProfile?.uid ?? "",
+  );
+  const headState = useProxyHeadStateStore((state) =>
+    currentProfileUid
+      ? (state.headStates[currentProfileUid]?.[groupName] ?? DEFAULT_STATE)
+      : DEFAULT_STATE,
+  );
+  const headStateActions = useMemo(
+    () =>
+      createScopedHeadStateActions({ current: currentProfileUid, groupName }),
+    [currentProfileUid, groupName],
+  );
+
+  const { showType, sortType, filterText, textState, testUrl } = headState;
+  const [filterTextInp, setFilterTextInp] = useState(filterText);
+
+  const { t } = useTranslation();
+  const [autoFocus, setAutoFocus] = useState(false);
+
+  useEffect(() => {
+    // fix the focus conflict
+    const timer = setTimeout(() => setAutoFocus(true), 100);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const defaultLatencyTest = useVergeStore((s) => s.verge.default_latency_test);
+
+  useEffect(() => {
+    delayManager.setUrl(groupName, testUrl || defaultLatencyTest);
+  }, [groupName, testUrl, defaultLatencyTest]);
+
+  const filterChange = useMemo(
+    () =>
+      debounce((text: string) => {
+        headStateActions.setFilterText(text);
+      }, 500),
+    [headStateActions],
+  );
+
+  useEffect(() => {
+    return () => {
+      filterChange.cancel();
+    };
+  }, [filterChange]);
+
+  return (
+    <Box className="flex items-center gap-1" style={sx as React.CSSProperties}>
+      <IconButton
+        size="small"
+        color="inherit"
+        title={t("common.fields.location")}
+        onClick={props.onLocation}>
+        <MyLocationRounded />
+      </IconButton>
+
+      <IconButton
+        size="small"
+        color="inherit"
+        title={t("pages.proxies.actions.delayCheck")}
+        onClick={() => {
+          // Remind the user that it is custom test url
+          if (testUrl?.trim() && textState !== "filter") {
+            headStateActions.setTextState("url");
+          }
+          props.onCheckDelay();
+        }}>
+        <NetworkCheckRounded />
+      </IconButton>
+
+      <IconButton
+        size="small"
+        color="inherit"
+        title={
+          [
+            t("pages.proxies.sort.default"),
+            t("pages.proxies.sort.delay"),
+            t("pages.proxies.sort.name"),
+          ][sortType]
+        }
+        onClick={() =>
+          headStateActions.setSortType(((sortType + 1) % 3) as ProxySortType)
+        }>
+        {sortType !== 1 && sortType !== 2 && <SortRounded />}
+        {sortType === 1 && <AccessTimeRounded />}
+        {sortType === 2 && <SortByAlphaRounded />}
+      </IconButton>
+
+      <IconButton
+        size="small"
+        color="inherit"
+        title={t("pages.proxies.actions.delayCheckUrl")}
+        onClick={() =>
+          headStateActions.setTextState(textState === "url" ? null : "url")
+        }>
+        {textState === "url" ? (
+          <WifiTetheringRounded />
+        ) : (
+          <WifiTetheringOffRounded />
+        )}
+      </IconButton>
+
+      <IconButton
+        size="small"
+        color="inherit"
+        title={
+          showType
+            ? t("pages.proxies.view.basic")
+            : t("pages.proxies.view.detail")
+        }
+        onClick={() => headStateActions.setShowType(!showType)}>
+        {showType ? <VisibilityRounded /> : <VisibilityOffRounded />}
+      </IconButton>
+
+      <IconButton
+        size="small"
+        color="inherit"
+        title={t("common.search.filter")}
+        onClick={() => {
+          setFilterTextInp("");
+          headStateActions.setTextState(
+            textState === "filter" ? null : "filter",
+          );
+          headStateActions.setFilterText("");
+        }}>
+        {textState === "filter" ? (
+          <FilterAltRounded />
+        ) : (
+          <FilterAltOffRounded />
+        )}
+      </IconButton>
+
+      {textState === "filter" && (
+        <TextField
+          autoFocus={autoFocus}
+          hiddenLabel
+          value={filterTextInp}
+          size="small"
+          variant="outlined"
+          placeholder={t("common.search.filterConditions")}
+          onChange={(e) => {
+            const text = e.target.value;
+            setFilterTextInp(text);
+            filterChange(text);
+          }}
+          className="ml-1 flex-1"
+          slotProps={{ input: { className: "py-[2.6px] px-1" } }}
+        />
+      )}
+
+      {textState === "url" && (
+        <TextField
+          autoFocus={autoFocus}
+          hiddenLabel
+          autoSave="off"
+          autoComplete="off"
+          value={testUrl}
+          size="small"
+          variant="outlined"
+          placeholder={t("pages.proxies.actions.delayCheckUrl")}
+          onChange={(e) => headStateActions.setTestUrl(e.target.value)}
+          className="ml-1 flex-1"
+          slotProps={{ input: { className: "py-[2.6px] px-1" } }}
+        />
+      )}
+    </Box>
+  );
+});

@@ -1,0 +1,24 @@
+## Maintainer: Anonymous
+
+pkgname=clash-verge-self-alpha-bin
+_pkgname=clash-verge-self
+pkgver=2.3.2
+_pkgver=2.3.2
+pkgrel=1
+pkgdesc="Continuation of Clash Verge | A Mihomo GUI based on Tauri"
+arch=('x86_64')
+url="https://example.com/project"
+license=('GPL3')
+depends=('cairo' 'desktop-file-utils' 'gdk-pixbuf2' 'glib2' 'gtk3' 'hicolor-icon-theme' 'libsoup3' 'pango' 'webkit2gtk-4.1' 'libkeybinder3')
+options=('!strip' '!emptydirs')
+conflicts=("$_pkgname" "$_pkgname-alpha" "$_pkgname-alpha-bin" "$_pkgname-git" "clash-meta")
+install=clash-verge-self.install
+
+source_x86_64=("clash-verge-self_${_pkgver}_amd64.deb")
+
+sha256sums_x86_64=("2602a93bcde7134c2c6e368f3f74bec157b01966e54ca0a0f3e909b85eaabdd6")
+
+package() {
+	# Extract package data
+	tar -xz -f data.tar.gz -C "${pkgdir}"
+}

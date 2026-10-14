@@ -1,0 +1,129 @@
+#[cfg(target_os = "macos")]
+use clash_verge_self_service::MACOS_HELPER_ID;
+use clash_verge_self_service::{Result, ServiceError};
+
+#[cfg(not(any(windows, target_os = "linux", target_os = "macos")))]
+pub fn process() -> Result<()> {
+    log::error!("Unsupported platform");
+    return Err(ServiceError::General(
+        "This program is not intended to run on this platform.".into(),
+    ));
+}
+
+#[cfg(target_os = "macos")]
+pub fn process() -> Result<()> {
+    use std::{fs::remove_file, path::Path};
+
+    log::debug!("Start uninstall ClashMorden Service");
+
+    let plist_file = format!("/Library/LaunchDaemons/{MACOS_HELPER_ID}.plist");
+
+    // Remove the service from the modern launchd system domain. It is fine if
+    // the plist was not registered yet.
+    log::debug!("Unloading service");
+    std::process::Command::new("launchctl")
+        .arg("bootout")
+        .arg("system")
+        .arg(&plist_file)
+        .output()
+        .map_err(|e| ServiceError::General(format!("Failed to unload service: {e}")))?;
+
+    // Remove the service file.
+    let service_file = format!("/Library/PrivilegedHelperTools/{MACOS_HELPER_ID}");
+    log::debug!("Removing service file [{service_file}]");
+    let service_file = Path::new(&service_file);
+    if service_file.exists() {
+        remove_file(service_file)?;
+    }
+
+    // Remove the plist file.
+    log::debug!("Removing plist file [{}]", plist_file);
+    let plist_file = Path::new(&plist_file);
+    if plist_file.exists() {
+        remove_file(plist_file)?;
+    }
+
+    log::debug!("Service uninstalled successfully.");
+    Ok(())
+}
+
+#[cfg(target_os = "linux")]
+pub fn process() -> Result<()> {
+    use std::{fs::remove_file, path::Path};
+
+    use clash_verge_self_service::SERVICE_NAME;
+
+    log::debug!("Start uninstall ClashMorden Service");
+
+    // Disable the service
+    log::debug!("Disabling [{SERVICE_NAME}] service");
+    std::process::Command::new("systemctl")
+        .arg("disable")
+        .arg(SERVICE_NAME)
+        .arg("--now")
+        .output()
+        .map_err(|e| ServiceError::General(format!("Failed to disable service: {e}")))?;
+
+    // Remove the unit file.
+    let unit_file = format!("/etc/systemd/system/{SERVICE_NAME}.service");
+    log::debug!("Removing unit service file [{unit_file}].");
+    let unit_file = Path::new(&unit_file);
+    if unit_file.exists() {
+        log::debug!("Service file exists, removing it");
+        remove_file(unit_file).map_err(|e| ServiceError::General(format!("Failed to remove unit file: {e}")))?;
+    }
+    log::debug!("Service file removed");
+
+    log::debug!("Reloading systemd daemon");
+    std::process::Command::new("systemctl")
+        .arg("daemon-reload")
+        .output()
+        .map_err(|e| ServiceError::General(format!("Failed to reload systemd daemon: {e}")))?;
+
+    log::debug!("Service uninstalled successfully.");
+    Ok(())
+}
+
+/// stop and uninstall the service
+#[cfg(windows)]
+pub fn process() -> Result<()> {
+    use std::{thread, time::Duration};
+
+    use clash_verge_self_service::SERVICE_NAME;
+    use windows_service::{
+        service::{ServiceAccess, ServiceState},
+        service_manager::{ServiceManager, ServiceManagerAccess},
+    };
+
+    log::debug!("Start uninstall ClashMorden Service.");
+
+    log::debug!("Connecting to service manager.");
+    let manager_access = ServiceManagerAccess::CONNECT;
+    let service_manager = ServiceManager::local_computer(None::<&str>, manager_access)
+        .map_err(|e| ServiceError::General(e.to_string()))?;
+
+    log::debug!("Opening existing service.");
+    let service_access = ServiceAccess::QUERY_STATUS | ServiceAccess::STOP | ServiceAccess::DELETE;
+    let service = service_manager
+        .open_service(SERVICE_NAME, service_access)
+        .map_err(|e| ServiceError::General(e.to_string()))?;
+
+    log::debug!("Checking service status.");
+    let service_status = service
+        .query_status()
+        .map_err(|e| ServiceError::General(e.to_string()))?;
+    if service_status.current_state != ServiceState::Stopped {
+        log::debug!("Service status is not stopped, stopping it first.");
+        if let Err(err) = service.stop() {
+            log::error!("Failed to stop service: {err}");
+        }
+        // Wait for service to stop
+        thread::sleep(Duration::from_secs(1));
+    }
+
+    log::debug!("Deleting service");
+    service.delete().map_err(|e| ServiceError::General(e.to_string()))?;
+
+    log::debug!("Service uninstalled successfully.");
+    Ok(())
+}

@@ -1,0 +1,17 @@
+[files]
+extend-exclude = [
+  "src/assets/*",
+  "crates/tauri-plugin-mihomo/permissions/*",
+  "crates/tauri-plugin-mihomo/examples/*",
+]
+
+[type.svg]
+extend-glob = ["*.svg"]
+check-file = false
+
+[default]
+extend-ignore-re = [
+  "certifactes", # crates/mihomo-config/src/config/raw_config.rs - L654
+  "StrCpy", # tauri windows bundle template file and hooks (src-tauri/template)
+  "GostRelay" # crates/tauri-plugin-mihomo/src/models.rs - L538
+]
