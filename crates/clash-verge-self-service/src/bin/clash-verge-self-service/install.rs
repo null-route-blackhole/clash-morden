@@ -158,7 +158,9 @@ pub fn process(server_id: Option<String>) -> Result<()> {
 
     log::debug!("Start install ClashMorden Service.");
 
-    let service_binary_path = std::env::current_exe().unwrap().with_file_name(SERVICE_EXECUTABLE);
+    let service_binary_path = std::env::current_exe()
+        .unwrap()
+        .with_file_name(clash_verge_self_service::SERVICE_EXECUTABLE);
     if !service_binary_path.exists() {
         log::error!("The clash-verge-self-service binary not found.");
         std::process::exit(2);
@@ -271,7 +273,9 @@ pub fn process(server_id: Option<String>) -> Result<()> {
         }
     }
 
-    let service_binary_path = std::env::current_exe().unwrap().with_file_name(SERVICE_EXECUTABLE);
+    let service_binary_path = std::env::current_exe()
+        .unwrap()
+        .with_file_name(clash_verge_self_service::SERVICE_EXECUTABLE);
 
     if !service_binary_path.exists() {
         log::error!("clash-verge-self-service.exe not found");
