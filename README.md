@@ -10,7 +10,7 @@
 
 ClashMorden is a community-developed interface based on Clash Verge Rev. It keeps the familiar proxy-client workflows and adds a redesigned overview, richer connection insights, and a refreshed visual theme.
 
-> **Frontend interface only.** Release packages do not bundle or distribute Mihomo or any other proxy core. Users must provide a compatible core separately. ClashMorden does not provide proxy nodes or network services.
+> **Frontend interface only.** Release packages do not bundle or distribute Mihomo or any other proxy core. Users must provide a compatible core separately. ClashMorden does not provide proxy nodes or network services. This project will be no more updates.
 
 ## What is new
 
