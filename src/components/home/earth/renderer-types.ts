@@ -27,7 +27,6 @@ export interface EarthRenderer {
   setProjection: (projection: EarthProjection) => void;
   setVisualMode: (mode: EarthVisualMode) => void;
   setColorScheme: (scheme: EarthColorScheme) => void;
-  setZoomLocked: (locked: boolean) => void;
   dispose: () => void;
 }
 

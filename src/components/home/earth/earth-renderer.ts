@@ -2,8 +2,6 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { CSS2DRenderer } from "three/addons/renderers/CSS2DRenderer.js";
 import * as THREE from "three/webgpu";
 
-import { OS } from "@/utils/get-system";
-
 import { createCityLabelLayer } from "./city-label-layer";
 import { getRealtimeSunDirection, toEarthVector } from "./earth-math";
 import { createEndpointLayer } from "./endpoint-layer";
@@ -67,41 +65,13 @@ export const createEarthRenderer = async (
   const camera = new THREE.PerspectiveCamera(28, 1, 0.1, 100);
   camera.position.set(3.7, 1.55, 3.2);
 
-  // WebGL path is more reliable across Tauri WebViews; the WebGPU renderer
-  // remains available as a fallback for environments that support it fully.
-  const createRenderer = async (forceWebGL: boolean) => {
-    // Windows WebView2 and Linux WebKitGTK pay a much higher cost for a
-    // high-DPI antialiased canvas. Keep the globe responsive there while
-    // retaining the sharper presentation on macOS.
-    const isMacOS = OS === "macos";
-    const nextRenderer = new THREE.WebGPURenderer({
-      alpha: true,
-      antialias: isMacOS,
-      forceWebGL,
-    });
-    nextRenderer.setPixelRatio(
-      Math.min(window.devicePixelRatio, isMacOS ? 2 : 1),
-    );
-    nextRenderer.toneMapping = THREE.ACESFilmicToneMapping;
-    nextRenderer.toneMappingExposure = 1.05;
-    nextRenderer.domElement.className =
-      "h-full w-full cursor-grab active:cursor-grabbing";
-    nextRenderer.domElement.style.display = "block";
-    await nextRenderer.init();
-    return nextRenderer;
-  };
-
-  let renderer: THREE.WebGPURenderer;
-  try {
-    renderer = await createRenderer(true);
-  } catch (error) {
-    console.warn("[earth] WebGL init failed, falling back to WebGPU:", error);
-    try {
-      renderer = await createRenderer(false);
-    } catch {
-      renderer = await createRenderer(true);
-    }
-  }
+  const renderer = new THREE.WebGPURenderer({ alpha: true, antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.05;
+  renderer.domElement.className =
+    "h-full w-full cursor-grab active:cursor-grabbing";
+  renderer.domElement.style.display = "block";
 
   try {
     container.appendChild(renderer.domElement);
@@ -113,6 +83,7 @@ export const createEarthRenderer = async (
         renderer.domElement.remove();
       }
     });
+    await renderer.init();
 
     const labelRenderer = new CSS2DRenderer();
     labelRenderer.sortObjects = false;
@@ -174,15 +145,6 @@ export const createEarthRenderer = async (
     });
     registerCleanup(() => globeLayer.dispose());
 
-    const cityLabelLayer = createCityLabelLayer({
-      parent: overlayGroup,
-      camera,
-      controls,
-      labelRenderer,
-      view,
-    });
-    registerCleanup(() => cityLabelLayer.dispose());
-
     const routeLayer = createRouteLayer({
       parent: overlayGroup,
       view,
@@ -200,6 +162,15 @@ export const createEarthRenderer = async (
     });
     registerCleanup(() => endpointLayer.dispose());
 
+    const cityLabelLayer = createCityLabelLayer({
+      parent: overlayGroup,
+      camera,
+      controls,
+      labelRenderer,
+      view,
+    });
+    registerCleanup(() => cityLabelLayer.dispose());
+
     const mapDistance = () => {
       const halfFov = THREE.MathUtils.degToRad(camera.fov) / 2;
       const fitHeight = PLANE_HALF_HEIGHT / Math.tan(halfFov);
@@ -215,11 +186,10 @@ export const createEarthRenderer = async (
         const distance = mapDistance();
 
         controls.enableRotate = false;
-        // 单一地图 + 弧线居中，禁用平移（无需滚动）
-        controls.enablePan = false;
-        controls.screenSpacePanning = false;
-        controls.mouseButtons.LEFT = null;
-        controls.touches.ONE = null;
+        controls.enablePan = true;
+        controls.screenSpacePanning = true;
+        controls.mouseButtons.LEFT = THREE.MOUSE.PAN;
+        controls.touches.ONE = THREE.TOUCH.PAN;
         controls.touches.TWO = THREE.TOUCH.DOLLY_PAN;
         controls.minDistance = distance * 0.35;
         controls.maxDistance = distance * 1.15;
@@ -313,8 +283,6 @@ export const createEarthRenderer = async (
       if (progress >= 1) finishMorph();
     };
 
-    let lastRenderAt = 0;
-
     const animate = () => {
       if (disposed) return;
 
@@ -332,11 +300,8 @@ export const createEarthRenderer = async (
       endpointLayer.update(delta);
       if (visualMode === "space" && morph === 0) globeLayer.syncSunLight();
       routeLayer.update(elapsed);
-      const now = performance.now();
-      if (morphing || now - lastRenderAt >= 33) {
-        lastRenderAt = now;
-        render();
-      }
+
+      render();
     };
 
     const updateSunForTime = () => {
@@ -563,17 +528,13 @@ export const createEarthRenderer = async (
         routeLayer.setColorScheme(scheme);
         if (visualMode === "flat" || projection === "2d") render();
       },
-      setZoomLocked(locked) {
-        if (disposed) return;
-        controls.enableZoom = !locked;
-      },
       dispose: disposeResources,
     };
   } catch (error) {
     try {
       disposeResources();
     } catch {
-      // 清理失败不掩盖原始错误
+      // Preserve the original initialization error.
     }
     throw error;
   }

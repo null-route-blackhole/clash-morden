@@ -570,7 +570,6 @@ export const EarthGlobeCard = () => {
       }
 
       rendererRef.current = createdRenderer;
-      createdRenderer.setZoomLocked(zoomLockedRef.current);
       createdRenderer.setAutoRotation(!rotationPaused);
       createdRenderer.setCityLabelsVisible(showCityLabels);
       scheduleRouteRefresh();
@@ -851,7 +850,6 @@ export const EarthGlobeCard = () => {
               onClick={() => {
                 const next = !zoomLocked;
                 setZoomLocked(next);
-                rendererRef.current?.setZoomLocked(next);
               }}>
               {zoomLocked ? (
                 <LockRoundedIcon fontSize="small" />

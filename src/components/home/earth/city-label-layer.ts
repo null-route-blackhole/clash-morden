@@ -8,23 +8,9 @@ import * as THREE from "three/webgpu";
 import type { EarthView } from "./projection";
 import type { EarthRenderEndpoint } from "./renderer-types";
 
-// daisyUI 样式改为 fork 的 MUI CSS 变量内联样式（明暗主题自适应）
-const applyCityLabelStyle = (element: HTMLDivElement) => {
-  element.style.cssText = [
-    "pointer-events:none",
-    "white-space:nowrap",
-    "border-radius:6px",
-    "background:color-mix(in srgb, var(--mui-palette-background-paper, #fff) 80%, transparent)",
-    "padding:2px 6px",
-    "font-size:10px",
-    "font-weight:600",
-    "line-height:1.2",
-    "color:var(--mui-palette-text-primary, #333)",
-    "box-shadow:0 1px 3px rgba(0,0,0,0.15)",
-    "backdrop-filter:blur(4px)",
-  ].join(";");
-};
-const CITY_LABEL_COLLISION_GAP = 8;
+const CITY_LABEL_CLASS_NAME =
+  "pointer-events-none whitespace-nowrap rounded-md bg-base-100/80 px-1.5 py-1 text-[10px] font-semibold leading-none text-base-content shadow-sm backdrop-blur-sm";
+const CITY_LABEL_COLLISION_GAP = 4;
 const CITY_LABEL_MIN_BUDGET = 3;
 const CITY_LABEL_MAX_BUDGET = 64;
 const CITY_LABEL_AREA_PER_ITEM = 5_500;
@@ -73,13 +59,12 @@ export const createCityLabelLayer = (
   const labelToCamera = new THREE.Vector3();
   const projectedLabelPosition = new THREE.Vector3();
 
-  const measurement = document.createElement("canvas").getContext("2d");
-  const fallbackLabelWidth = (text: string, element: HTMLElement) => {
-    if (!measurement) return 12 + Array.from(text).length * 11;
-    const style = getComputedStyle(element);
-    measurement.font = `600 10px ${style.fontFamily}`;
-    return Math.ceil(measurement.measureText(text).width) + 14;
-  };
+  const fallbackLabelWidth = (text: string) =>
+    12 +
+    Array.from(text).reduce(
+      (width, character) => width + (character.codePointAt(0)! > 0xff ? 10 : 6),
+      0,
+    );
 
   const labelsOverlap = (left: ProjectedCityLabel, right: ProjectedCityLabel) =>
     left.left < right.right + CITY_LABEL_COLLISION_GAP &&
@@ -100,7 +85,7 @@ export const createCityLabelLayer = (
 
       if (!label) {
         const element = document.createElement("div");
-        applyCityLabelStyle(element);
+        element.className = CITY_LABEL_CLASS_NAME;
         label = new CSS2DObject(element);
         label.center.set(0.5, 1.5);
         label.renderOrder = 7;
@@ -162,10 +147,8 @@ export const createCityLabelLayer = (
       const x = (projectedLabelPosition.x * 0.5 + 0.5) * width;
       const y = (-projectedLabelPosition.y * 0.5 + 0.5) * height;
       const elementBounds = label.element.getBoundingClientRect();
-      const labelWidth = Math.max(
-        elementBounds.width,
-        fallbackLabelWidth(endpoint.city, label.element),
-      );
+      const labelWidth =
+        elementBounds.width || fallbackLabelWidth(endpoint.city);
       const labelHeight = elementBounds.height || CITY_LABEL_FALLBACK_HEIGHT;
 
       candidates.push({
@@ -207,13 +190,6 @@ export const createCityLabelLayer = (
 
     for (const candidate of candidates) {
       if (accepted.length >= labelBudget) break;
-      if (
-        candidate.left < 0 ||
-        candidate.right > width ||
-        candidate.top < 0 ||
-        candidate.bottom > height
-      )
-        continue;
       if (
         accepted.some((visibleLabel) => labelsOverlap(candidate, visibleLabel))
       )

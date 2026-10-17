@@ -265,8 +265,7 @@ export const createGlobeLayer = async (
       : THREE.ACESFilmicToneMapping;
     globe.material = flat ? flatGlobeMaterial : globeMaterial;
     globe.visible = !flattened;
-    // 2D 平面由 border-map-layer 的彩色地图接管，旧贴图平面不再显示
-    map.visible = false;
+    map.visible = flattened;
     sun.visible = !flat;
     atmosphere.visible = !flat;
   };
