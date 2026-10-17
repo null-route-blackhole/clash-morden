@@ -117,7 +117,7 @@ export const EarthGlobeCard = () => {
 
   const [mapStyle, setMapStyle] = useState<MapStyle>(() => {
     const saved = localStorage.getItem("earth-map-style");
-    return MAP_STYLES.find((style) => style.id === saved)?.id ?? "positron";
+    return MAP_STYLES.find((style) => style.id === saved)?.id ?? "zashboard";
   });
   const [projection, setProjection] = useState<EarthProjection>("3d");
   const previousProjectionRef = useRef(projection);

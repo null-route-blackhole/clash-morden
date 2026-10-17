@@ -220,7 +220,7 @@ export const LeafletMapOverlay = ({
   colorScheme,
   showCityLabels = true,
   zoomLocked = true,
-  mapStyle = "liberty",
+  mapStyle = "zashboard",
   onEndpointHover,
 }: Props) => {
   const hoverRef = useRef(onEndpointHover);
@@ -240,7 +240,7 @@ export const LeafletMapOverlay = ({
     const map = new maplibregl.Map({
       container,
       style: mapStyleUrl(appliedStyle.current),
-      pitch: appliedStyle.current === "liberty-3d" ? 60 : 0,
+      pitch: 0,
       center: [180, 20],
       zoom: 1.35,
       minZoom: 1,
@@ -422,8 +422,8 @@ export const LeafletMapOverlay = ({
     if (!map || appliedStyle.current === mapStyle) return;
     const oldUrl = mapStyleUrl(appliedStyle.current);
     appliedStyle.current = mapStyle;
-    map.setPitch(mapStyle === "liberty-3d" ? 60 : 0);
-    if (mapStyle !== "liberty-3d") map.setBearing(0);
+    map.setPitch(0);
+    map.setBearing(0);
     if (oldUrl !== mapStyleUrl(mapStyle)) {
       setMapReady(false);
       map.setStyle(mapStyleUrl(mapStyle));
