@@ -1053,7 +1053,7 @@ dependencies = [
 
 [[package]]
 name = "clashmorden"
-version = "1.2.24"
+version = "1.2.25"
 dependencies = [
  "anyhow",
  "auto-launch",

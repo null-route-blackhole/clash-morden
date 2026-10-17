@@ -161,11 +161,7 @@ export const createEarthRenderer = async (
     const cameraTo = new THREE.Vector3();
     const targetFrom = new THREE.Vector3();
     const orbitCameraPosition = camera.position.clone();
-    // Timer replaces the deprecated THREE.Clock and avoids large deltas after
-    // the WebView is backgrounded on Windows.
-    const clock = new THREE.Timer();
-    clock.connect(document);
-    registerCleanup(() => clock.disconnect());
+    const clock = new THREE.Clock();
     const sunDirection = getRealtimeSunDirection();
 
     const globeLayer = await createGlobeLayer({
@@ -322,7 +318,6 @@ export const createEarthRenderer = async (
     const animate = () => {
       if (disposed) return;
 
-      clock.update();
       const elapsed = clock.getDelta();
       const delta = Math.min(0.05, elapsed);
 
@@ -354,6 +349,7 @@ export const createEarthRenderer = async (
       if (disposed) return;
 
       renderer.setAnimationLoop(null);
+      clock.stop();
 
       if (morphing && (reducedMotion || !visible || !intersecting))
         finishMorph();
@@ -367,6 +363,7 @@ export const createEarthRenderer = async (
         render();
       } else {
         controls.enableDamping = true;
+        clock.start();
         renderer.setAnimationLoop(animate);
       }
     };
