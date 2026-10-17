@@ -127,7 +127,10 @@ const resolveOrigin = (
     latitude = local.latitude;
     longitude = local.longitude;
   } else {
-    return null;
+    // Keep the route visible even when the public-IP provider returns no
+    // coordinates. The exact origin can be filled on a later refresh.
+    latitude = 0;
+    longitude = 0;
   }
 
   return {
