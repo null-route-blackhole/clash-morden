@@ -24,6 +24,7 @@ const DATABASE_TTL = 30 * 24 * 60 * 60 * 1000;
 const STORAGE_HEADROOM = 16 * 1024 * 1024;
 const LOOKUP_CONCURRENCY = 16;
 const CITY_CHUNK_CACHE_MAX = 8;
+const LOCATION_CACHE_MAX = 2048;
 
 class WorkerError extends Error {
   constructor(readonly code: GeoDatabaseError) {
@@ -36,6 +37,18 @@ let readerGeneration: string | null = null;
 let reloadReaderPromise: Promise<AsyncMMDBReader<CityResponse> | null> | null =
   null;
 let downloadController: AbortController | null = null;
+const locationCache = new Map<string, EarthLocation | null>();
+const locationPending = new Map<string, Promise<EarthLocation | null>>();
+
+const cacheLocation = (key: string, value: EarthLocation | null) => {
+  locationCache.delete(key);
+  locationCache.set(key, value);
+  while (locationCache.size > LOCATION_CACHE_MAX) {
+    const oldest = locationCache.keys().next().value;
+    if (oldest === undefined) break;
+    locationCache.delete(oldest);
+  }
+};
 
 const post = (message: GeoWorkerResponse) => self.postMessage(message);
 
@@ -57,6 +70,7 @@ const installReader = (
 ) => {
   reader = nextReader;
   readerGeneration = manifest.generation;
+  locationCache.clear();
 };
 
 const init = async () => {
@@ -283,42 +297,52 @@ const locate = async (
   ip: string,
   locale: string,
 ): Promise<EarthLocation | null> => {
-  const lookupReader = reader;
-  const lookupGeneration = readerGeneration;
-
-  if (!lookupReader) return null;
-
-  let match: CityResponse | null;
-
-  try {
-    match = await lookupReader.get(ip);
-  } catch {
-    const replacement = await reloadReaderAfterFailure(
-      lookupReader,
-      lookupGeneration,
-    );
-
-    if (!replacement) return null;
-
-    try {
-      match = await replacement.get(ip);
-    } catch {
-      return null;
-    }
+  const cacheKey = `${locale}\u0000${ip}`;
+  if (locationCache.has(cacheKey)) {
+    const cached = locationCache.get(cacheKey) ?? null;
+    cacheLocation(cacheKey, cached);
+    return cached;
   }
-
-  const latitude = match?.location?.latitude;
-  const longitude = match?.location?.longitude;
-
-  return latitude == null || longitude == null
-    ? null
-    : {
-        ip,
-        latitude,
-        longitude,
-        city: cityDisplayName(localizedName(match?.city?.names, locale)),
-        country: localizedName(match?.country?.names, locale),
-      };
+  const pending = locationPending.get(cacheKey);
+  if (pending) return pending;
+  const request = (async () => {
+    const lookupReader = reader;
+    if (!lookupReader) return null;
+    let match: CityResponse | null;
+    try {
+      match = await lookupReader.get(ip);
+    } catch {
+      const replacement = await reloadReaderAfterFailure(
+        lookupReader,
+        readerGeneration,
+      );
+      if (!replacement) return null;
+      try {
+        match = await replacement.get(ip);
+      } catch {
+        return null;
+      }
+    }
+    const latitude = match?.location?.latitude;
+    const longitude = match?.location?.longitude;
+    return latitude == null || longitude == null
+      ? null
+      : {
+          ip,
+          latitude,
+          longitude,
+          city: cityDisplayName(localizedName(match?.city?.names, locale)),
+          country: localizedName(match?.country?.names, locale),
+        };
+  })();
+  locationPending.set(cacheKey, request);
+  try {
+    const result = await request;
+    cacheLocation(cacheKey, result);
+    return result;
+  } finally {
+    locationPending.delete(cacheKey);
+  }
 };
 
 const lookup = async (id: number, ips: string[], locale: string) => {
