@@ -400,6 +400,9 @@ export const EarthGlobeCard = () => {
         }
       } finally {
         setRoutesLoading(false);
+        // An async refresh may be abandoned after the page is unmounted.
+        // Release the guard here because an early return skips the loop tail.
+        if (disposedRef.current) refreshRunningRef.current = false;
       }
     } while (refreshQueuedRef.current && !disposedRef.current);
 
