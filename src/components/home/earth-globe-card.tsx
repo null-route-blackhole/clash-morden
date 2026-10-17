@@ -123,9 +123,6 @@ export const EarthGlobeCard = () => {
     return MAP_STYLES.find((style) => style.id === saved)?.id ?? "positron";
   });
   const [projection, setProjection] = useState<EarthProjection>("3d");
-  const [autoRefresh, setAutoRefresh] = useState(
-    () => localStorage.getItem("earth-auto-refresh") !== "false",
-  );
   const previousProjectionRef = useRef(projection);
   const [visualMode, setVisualMode] = useState<EarthVisualMode>("space");
   const [rotationPaused, setRotationPaused] = useState(false);
@@ -264,7 +261,6 @@ export const EarthGlobeCard = () => {
   );
 
   const refreshRoutes = useCallback(async () => {
-    if (!autoRefresh) return;
     if (refreshRunningRef.current) {
       refreshQueuedRef.current = true;
       return;
@@ -322,13 +318,11 @@ export const EarthGlobeCard = () => {
             };
           }),
         );
-        if (disposedRef.current) return;
         const codes = await lookupCountryCodes([
           ...new Set(
             resolved.map((item) => item.metadata.destinationIP).filter(Boolean),
           ),
         ]);
-        if (disposedRef.current) return;
         const located = resolved.map((connection) => ({
           ...connection,
           metadata: {
@@ -370,8 +364,6 @@ export const EarthGlobeCard = () => {
           );
         }
 
-        if (disposedRef.current) return;
-
         if (
           !disposedRef.current &&
           routeOriginRequestID === originRequestIDRef.current &&
@@ -404,29 +396,19 @@ export const EarthGlobeCard = () => {
         }
       } finally {
         setRoutesLoading(false);
-        // An async refresh may be abandoned after the page is unmounted.
-        // Release the guard here because an early return skips the loop tail.
-        if (disposedRef.current) refreshRunningRef.current = false;
       }
     } while (refreshQueuedRef.current && !disposedRef.current);
 
     refreshRunningRef.current = false;
-  }, [
-    autoRefresh,
-    connections,
-    i18n.language,
-    lookupLocations,
-    preferredOrigin,
-  ]);
+  }, [connections, i18n.language, lookupLocations, preferredOrigin]);
 
   const scheduleRouteRefresh = useCallback(() => {
-    if (!autoRefresh) return;
     if (refreshTimerRef.current) clearTimeout(refreshTimerRef.current);
     refreshTimerRef.current = setTimeout(() => {
       refreshTimerRef.current = null;
       void refreshRoutes();
     }, ROUTE_REFRESH_DEBOUNCE);
-  }, [autoRefresh, refreshRoutes]);
+  }, [refreshRoutes]);
 
   const loadOrigin = useCallback(
     async (force = false) => {
@@ -576,7 +558,7 @@ export const EarthGlobeCard = () => {
       if (!canvasRef.current || disposedRef.current) return;
       const createdRenderer = await createEarthRenderer(canvasRef.current, {
         reducedMotion,
-        projection,
+        projection: "3d",
         visualMode,
         colorScheme,
         onEndpointHover: (info, x, y) => {
@@ -594,10 +576,6 @@ export const EarthGlobeCard = () => {
       createdRenderer.setZoomLocked(zoomLockedRef.current);
       createdRenderer.setAutoRotation(!rotationPaused);
       createdRenderer.setCityLabelsVisible(showCityLabels);
-      // Route calculation can finish while the renderer is still loading.
-      // Replay the latest snapshot so initialization never loses the links.
-      if (mapData.origin) createdRenderer.setInitialLocation(mapData.origin);
-      createdRenderer.setRoutes(mapData.routes);
       scheduleRouteRefresh();
     } catch (error) {
       console.error("[earth] renderer init failed:", error);
@@ -617,16 +595,10 @@ export const EarthGlobeCard = () => {
     scheduleRouteRefresh,
     t,
     visualMode,
-    mapData,
   ]);
 
   // 延迟初始化（400ms + idle），StrictMode 幂等
   useEffect(() => {
-    // React StrictMode may run the effect cleanup and setup again on the same
-    // mounted instance. Mark the new setup as live; cleanup itself still
-    // leaves this flag set so in-flight async initialization cannot resurrect
-    // an unmounted renderer.
-    disposedRef.current = false;
     initTimerRef.current = setTimeout(() => {
       initTimerRef.current = null;
 
@@ -674,13 +646,12 @@ export const EarthGlobeCard = () => {
       return;
     }
     if (!rendererRef.current && !disposedRef.current) void initialize();
-  }, [initialize, projection]);
+  }, [projection]);
 
   // 数据/设置变更 → renderer
   useEffect(() => {
-    if (!autoRefresh) return;
     scheduleRouteRefresh();
-  }, [autoRefresh, connections, scheduleRouteRefresh]);
+  }, [connections, scheduleRouteRefresh]);
 
   useEffect(() => {
     rendererRef.current?.setReducedMotion(reducedMotion);
@@ -844,29 +815,6 @@ export const EarthGlobeCard = () => {
             value={projection}
             onChange={(value) => setProjection(value as EarthProjection)}
           />
-          <Tooltip title={autoRefresh ? "暂停链路刷新" : "恢复链路刷新"}>
-            <span>
-              <OverviewIcon
-                label="链路自动刷新"
-                active={autoRefresh}
-                onClick={() => {
-                  const next = !autoRefresh;
-                  setAutoRefresh(next);
-                  localStorage.setItem("earth-auto-refresh", String(next));
-                  if (!next && refreshTimerRef.current) {
-                    clearTimeout(refreshTimerRef.current);
-                    refreshTimerRef.current = null;
-                  }
-                  if (next) scheduleRouteRefresh();
-                }}>
-                {autoRefresh ? (
-                  <PauseRoundedIcon fontSize="small" />
-                ) : (
-                  <PlayArrowRoundedIcon fontSize="small" />
-                )}
-              </OverviewIcon>
-            </span>
-          </Tooltip>
           <Tooltip
             title={
               showCityLabels
