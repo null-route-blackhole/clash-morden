@@ -35,8 +35,6 @@ import parseTraffic from "@/utils/parse-traffic";
 
 import { CardLegend } from "./card-legend";
 import type { EarthRenderer } from "./earth/earth-renderer";
-import { LeafletMapOverlay } from "./earth/leaflet-map";
-import { MAP_STYLES, type MapStyle } from "./earth/map-styles";
 import { ENDPOINT_PALETTE } from "./earth/palette";
 import type { EarthProjection } from "./earth/projection";
 import type { EarthVisualMode } from "./earth/renderer-types";
@@ -53,11 +51,7 @@ import type {
 } from "./earth/types";
 import { DBIP_COMPRESSED_BYTES } from "./earth/types";
 import { EnhancedCard } from "./enhanced-card";
-import {
-  OverviewIcon,
-  OverviewPick,
-  OverviewSegment,
-} from "./overview-controls";
+import { OverviewIcon, OverviewSegment } from "./overview-controls";
 
 const INIT_DELAY = 400;
 const STATUS_STORAGE_KEY = "clashmorden-geoip-status";
@@ -115,13 +109,9 @@ export const EarthGlobeCard = () => {
     }
   }, [showOrigin]);
 
-  const [mapStyle, setMapStyle] = useState<MapStyle>(() => {
-    const saved = localStorage.getItem("earth-map-style");
-    return MAP_STYLES.find((style) => style.id === saved)?.id ?? "zashboard";
-  });
   const [projection, setProjection] = useState<EarthProjection>("3d");
   const previousProjectionRef = useRef(projection);
-  const [visualMode, setVisualMode] = useState<EarthVisualMode>("space");
+  const visualMode: EarthVisualMode = "space";
   const [rotationPaused, setRotationPaused] = useState(false);
   const [showCityLabels, setShowCityLabels] = useState(true);
   const [zoomLocked, setZoomLocked] = useState(true);
@@ -648,10 +638,6 @@ export const EarthGlobeCard = () => {
   }, [reducedMotion]);
 
   useEffect(() => {
-    rendererRef.current?.setVisualMode(visualMode);
-  }, [visualMode]);
-
-  useEffect(() => {
     rendererRef.current?.setColorScheme(colorScheme);
   }, [colorScheme]);
 
@@ -691,7 +677,7 @@ export const EarthGlobeCard = () => {
     : `${receivedBytes}${receivedUnit}`;
 
   const isFlatMap = projection === "2d";
-  const flatLook = isFlatMap || visualMode === "flat";
+  const flatLook = isFlatMap;
 
   const showRetry =
     databaseStatus === "error" ||
@@ -743,38 +729,6 @@ export const EarthGlobeCard = () => {
             flexWrap: "wrap",
             gap: 0.5,
           }}>
-          {isFlatMap ? (
-            <OverviewPick
-              label={t("pages.home.components.earth.mapStyle")}
-              value={mapStyle}
-              options={MAP_STYLES.map((style) => ({
-                value: style.id,
-                label: style.label,
-              }))}
-              onChange={(value) => {
-                const next = value as MapStyle;
-                setMapStyle(next);
-                localStorage.setItem("earth-map-style", next);
-              }}
-            />
-          ) : (
-            <OverviewSegment
-              label={t("pages.home.components.earth.mapStyle")}
-              options={[
-                {
-                  value: "space",
-                  label: t("pages.home.components.earth.styleSpace"),
-                },
-                {
-                  value: "flat",
-                  label: t("pages.home.components.earth.styleFlat"),
-                },
-              ]}
-              value={visualMode}
-              onChange={(value) => setVisualMode(value as EarthVisualMode)}
-            />
-          )}
-
           {!isFlatMap && (
             <Tooltip
               title={
@@ -869,34 +823,9 @@ export const EarthGlobeCard = () => {
             position: "absolute",
             inset: 0,
             touchAction: "none",
-            display: projection === "2d" ? "none" : "block",
+            display: "block",
           }}
         />
-
-        {/* 2D 模式：OpenFreeMap Liberty 瓦片 + 弧线图层 */}
-        {projection === "2d" && (
-          <Box
-            sx={{
-              position: "absolute",
-              inset: 0,
-              zIndex: 1,
-              animation: "clashmorden-fade-in .25s ease",
-              bgcolor: "background.paper",
-            }}>
-            <LeafletMapOverlay
-              routes={mapData.routes}
-              origin={mapData.origin}
-              colorScheme={colorScheme}
-              showCityLabels={showCityLabels}
-              zoomLocked={zoomLocked}
-              mapStyle={mapStyle}
-              onEndpointHover={(info, x, y) => {
-                setHoveredEndpoint(info);
-                if (x != null && y != null) setTooltipPosition({ x, y });
-              }}
-            />
-          </Box>
-        )}
 
         {/* 状态叠加层 */}
         {databaseStatus === "checking" || databaseStatus === "loading-cache" ? (
