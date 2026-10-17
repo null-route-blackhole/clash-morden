@@ -617,6 +617,11 @@ export const EarthGlobeCard = () => {
 
   // 延迟初始化（400ms + idle），StrictMode 幂等
   useEffect(() => {
+    // React StrictMode may run the effect cleanup and setup again on the same
+    // mounted instance. Mark the new setup as live; cleanup itself still
+    // leaves this flag set so in-flight async initialization cannot resurrect
+    // an unmounted renderer.
+    disposedRef.current = false;
     initTimerRef.current = setTimeout(() => {
       initTimerRef.current = null;
 
