@@ -633,6 +633,7 @@ export const EarthGlobeCard = () => {
       workerRef.current = null;
       locationCache.current.clear();
       lookupRequests.current.clear();
+      disposedRef.current = false;
     };
   }, []);
 
