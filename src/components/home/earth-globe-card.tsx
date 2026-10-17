@@ -318,11 +318,13 @@ export const EarthGlobeCard = () => {
             };
           }),
         );
+        if (disposedRef.current) return;
         const codes = await lookupCountryCodes([
           ...new Set(
             resolved.map((item) => item.metadata.destinationIP).filter(Boolean),
           ),
         ]);
+        if (disposedRef.current) return;
         const located = resolved.map((connection) => ({
           ...connection,
           metadata: {
@@ -363,6 +365,8 @@ export const EarthGlobeCard = () => {
             preferredOrigin,
           );
         }
+
+        if (disposedRef.current) return;
 
         if (
           !disposedRef.current &&

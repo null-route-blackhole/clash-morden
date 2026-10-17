@@ -1,6 +1,6 @@
 [package]
 name = "clashmorden"
-version = "1.2.15"
+version = "1.2.16"
 description = "clash verge self"
 authors = ["Anonymous"]
 license = "GPL-3.0-only"
