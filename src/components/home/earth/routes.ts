@@ -63,7 +63,11 @@ const extractCandidates = (
 
   for (const connection of connections) {
     const destination = destinationIP(connection.metadata.destinationIP);
-    const rawHost = (connection.metadata.host || connection.metadata.sniffHost || "")
+    const rawHost = (
+      connection.metadata.host ||
+      connection.metadata.sniffHost ||
+      ""
+    )
       .trim()
       .replace(/\.$/, "");
 
@@ -72,11 +76,13 @@ const extractCandidates = (
     candidates.push({
       destinationIP: destination,
       host: rawHost.toLowerCase(),
-      countryCode: connection.metadata.destinationGeoIP?.[0]?.toUpperCase() ?? null,
+      countryCode:
+        connection.metadata.destinationGeoIP?.[0]?.toUpperCase() ?? null,
       upload: Math.max(0, connection.curUpload ?? 0),
       download: Math.max(0, connection.curDownload ?? 0),
       downloaded: Math.max(0, connection.download),
-      direct: !(connection.chains?.length) || connection.chains.includes("DIRECT"),
+      direct:
+        !connection.chains?.length || connection.chains.includes("DIRECT"),
     });
   }
 
@@ -94,9 +100,7 @@ const mergeTopHosts = (...groups: EarthHostTraffic[][]) =>
 
 const hasValidCoordinates = (
   location:
-    | Pick<EarthLocationHint, "latitude" | "longitude">
-    | EarthLocation
-    | null,
+    Pick<EarthLocationHint, "latitude" | "longitude"> | EarthLocation | null,
 ): location is (EarthLocationHint | EarthLocation) & LocatedCoordinates =>
   location !== null &&
   location.latitude !== null &&
@@ -140,7 +144,10 @@ export const buildEarthRoutes = async (
   connections: readonly IConnectionsItem[],
   originIP: string,
   locale: string,
-  lookup: (ips: string[], locale: string) => Promise<Record<string, EarthLocation | null>>,
+  lookup: (
+    ips: string[],
+    locale: string,
+  ) => Promise<Record<string, EarthLocation | null>>,
   preferredOrigin?: EarthLocationHint | null,
   centroids?: Readonly<Record<string, readonly [number, number]>>,
 ) => {
@@ -149,34 +156,58 @@ export const buildEarthRoutes = async (
   if (!normalizedOrigin) return { routes: [] as EarthRoute[], origin: null };
 
   const candidates = extractCandidates(connections).filter(
-    (candidate) => candidate.destinationIP !== null || candidate.countryCode !== null,
+    (candidate) =>
+      candidate.destinationIP !== null || candidate.countryCode !== null,
   );
 
+  // Mihomo already resolves the destination country for active connections
+  // (`metadata.destinationGeoIP`). Only ask the local city database for an IP
+  // when the kernel did not provide a usable country centroid. This avoids a
+  // city MMDB lookup for every connection on every refresh.
   const ips = new Set<string>([normalizedOrigin]);
 
   for (const candidate of candidates) {
-    if (candidate.destinationIP) ips.add(candidate.destinationIP);
+    const hasKernelCentroid =
+      candidate.countryCode != null &&
+      centroids?.[candidate.countryCode] != null;
+    if (candidate.destinationIP && !hasKernelCentroid) {
+      ips.add(candidate.destinationIP);
+    }
   }
 
   const locations = await lookup([...ips], locale);
-  const origin = resolveOrigin(normalizedOrigin, locations[normalizedOrigin], preferredOrigin);
+  const origin = resolveOrigin(
+    normalizedOrigin,
+    locations[normalizedOrigin],
+    preferredOrigin,
+  );
 
   if (!origin) return { routes: [] as EarthRoute[], origin: null };
 
   const aggregated = new Map<string, EarthRoute>();
 
   for (const candidate of candidates) {
-    const precise = candidate.destinationIP ? locations[candidate.destinationIP] : null;
-    const centroid = candidate.countryCode ? centroids?.[candidate.countryCode] : undefined;
-    const destination = precise ?? (centroid
-      ? {
-          ip: candidate.destinationIP ?? "",
-          latitude: centroid[0],
-          longitude: centroid[1],
-          city: "",
-          country: candidate.countryCode ?? "",
-        }
-      : null);
+    const centroid = candidate.countryCode
+      ? centroids?.[candidate.countryCode]
+      : undefined;
+    // Prefer the country supplied by Mihomo. The city MMDB is only a fallback
+    // for connections without kernel country metadata.
+    const precise = centroid
+      ? null
+      : candidate.destinationIP
+        ? locations[candidate.destinationIP]
+        : null;
+    const destination =
+      precise ??
+      (centroid
+        ? {
+            ip: candidate.destinationIP ?? "",
+            latitude: centroid[0],
+            longitude: centroid[1],
+            city: "",
+            country: candidate.countryCode ?? "",
+          }
+        : null);
 
     if (!destination) continue;
 
@@ -184,7 +215,9 @@ export const buildEarthRoutes = async (
       { ...origin, role: "origin" },
       { ...destination, role: "destination" },
     ];
-    const key = path.map((point) => `${point.role}:${coordinateKey(point)}`).join(">");
+    const key = path
+      .map((point) => `${point.role}:${coordinateKey(point)}`)
+      .join(">");
     const existing = aggregated.get(key);
 
     if (existing) {
@@ -194,7 +227,9 @@ export const buildEarthRoutes = async (
       existing.download += candidate.download;
       existing.topHosts = mergeTopHosts(
         existing.topHosts,
-        candidate.host ? [{ host: candidate.host, downloaded: candidate.downloaded }] : [],
+        candidate.host
+          ? [{ host: candidate.host, downloaded: candidate.downloaded }]
+          : [],
       );
     } else {
       aggregated.set(key, {
@@ -235,7 +270,8 @@ export const buildCentroidRoutes = (
   const aggregated = new Map<string, EarthRoute>();
 
   for (const connection of connections) {
-    const countryCode = connection.metadata.destinationGeoIP?.[0]?.toUpperCase();
+    const countryCode =
+      connection.metadata.destinationGeoIP?.[0]?.toUpperCase();
     const centroid = countryCode ? centroids[countryCode] : undefined;
 
     if (!centroid) continue;
@@ -248,8 +284,12 @@ export const buildCentroidRoutes = (
       country: countryCode!,
     };
     const direct =
-      !(connection.chains?.length) || connection.chains.includes("DIRECT");
-    const rawHost = (connection.metadata.host || connection.metadata.sniffHost || "")
+      !connection.chains?.length || connection.chains.includes("DIRECT");
+    const rawHost = (
+      connection.metadata.host ||
+      connection.metadata.sniffHost ||
+      ""
+    )
       .trim()
       .replace(/\.$/, "");
 
@@ -257,7 +297,9 @@ export const buildCentroidRoutes = (
       { ...origin, role: "origin" },
       { ...destination, role: "destination" },
     ];
-    const key = path.map((point) => `${point.role}:${coordinateKey(point)}`).join(">");
+    const key = path
+      .map((point) => `${point.role}:${coordinateKey(point)}`)
+      .join(">");
     const existing = aggregated.get(key);
 
     if (existing) {
@@ -268,7 +310,12 @@ export const buildCentroidRoutes = (
       existing.topHosts = mergeTopHosts(
         existing.topHosts,
         rawHost
-          ? [{ host: rawHost.toLowerCase(), downloaded: Math.max(0, connection.download) }]
+          ? [
+              {
+                host: rawHost.toLowerCase(),
+                downloaded: Math.max(0, connection.download),
+              },
+            ]
           : [],
       );
     } else {
@@ -280,7 +327,12 @@ export const buildCentroidRoutes = (
         upload: Math.max(0, connection.curUpload ?? 0),
         download: Math.max(0, connection.curDownload ?? 0),
         topHosts: rawHost
-          ? [{ host: rawHost.toLowerCase(), downloaded: Math.max(0, connection.download) }]
+          ? [
+              {
+                host: rawHost.toLowerCase(),
+                downloaded: Math.max(0, connection.download),
+              },
+            ]
           : [],
       });
     }
