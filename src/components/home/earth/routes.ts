@@ -160,19 +160,10 @@ export const buildEarthRoutes = async (
       candidate.destinationIP !== null || candidate.countryCode !== null,
   );
 
-  // Mihomo already resolves the destination country for active connections
-  // (`metadata.destinationGeoIP`). Only ask the local city database for an IP
-  // when the kernel did not provide a usable country centroid. This avoids a
-  // city MMDB lookup for every connection on every refresh.
   const ips = new Set<string>([normalizedOrigin]);
 
   for (const candidate of candidates) {
-    const hasKernelCentroid =
-      candidate.countryCode != null &&
-      centroids?.[candidate.countryCode] != null;
-    if (candidate.destinationIP && !hasKernelCentroid) {
-      ips.add(candidate.destinationIP);
-    }
+    if (candidate.destinationIP) ips.add(candidate.destinationIP);
   }
 
   const locations = await lookup([...ips], locale);
@@ -187,16 +178,12 @@ export const buildEarthRoutes = async (
   const aggregated = new Map<string, EarthRoute>();
 
   for (const candidate of candidates) {
+    const precise = candidate.destinationIP
+      ? locations[candidate.destinationIP]
+      : null;
     const centroid = candidate.countryCode
       ? centroids?.[candidate.countryCode]
       : undefined;
-    // Prefer the country supplied by Mihomo. The city MMDB is only a fallback
-    // for connections without kernel country metadata.
-    const precise = centroid
-      ? null
-      : candidate.destinationIP
-        ? locations[candidate.destinationIP]
-        : null;
     const destination =
       precise ??
       (centroid

@@ -201,19 +201,14 @@ const deleteInactiveGenerations = async (
 
   return new Promise<void>((resolve, reject) => {
     const transaction = database.transaction(CHUNK_STORE, "readwrite");
-    const store = transaction.objectStore(CHUNK_STORE);
-    const request = store.openKeyCursor(
-      IDBKeyRange.bound([key, ""], [key, "\uffff"]),
-    );
-    const keysToDelete: IDBValidKey[] = [];
+    const request = transaction
+      .objectStore(CHUNK_STORE)
+      .openKeyCursor(IDBKeyRange.bound([key, ""], [key, "\uffff"]));
 
     request.onsuccess = () => {
       const cursor = request.result;
 
-      if (!cursor) {
-        for (const primaryKey of keysToDelete) store.delete(primaryKey);
-        return;
-      }
+      if (!cursor) return;
       const chunkKey = cursor.primaryKey as [string, string, number];
 
       if (
@@ -221,14 +216,10 @@ const deleteInactiveGenerations = async (
         chunkKey[1] !== previousGeneration &&
         !stagedGenerations.has(chunkKey[1])
       ) {
-        // `openKeyCursor()` returns a key cursor. Calling cursor.delete()
-        // on it throws InvalidStateError in WebKit/Chromium. Collect keys
-        // first, then delete through the object store after iteration.
-        keysToDelete.push(cursor.primaryKey);
+        cursor.delete();
       }
       cursor.continue();
     };
-    request.onerror = () => reject(request.error);
     transaction.oncomplete = () => resolve();
     transaction.onerror = () => reject(transaction.error);
     transaction.onabort = () => reject(transaction.error);
