@@ -252,7 +252,6 @@ const Layout = () => {
             enableSystemTitleBar={enableSystemTitleBar}
             onNavigateStart={(to) => {
               if (to === pathname) return;
-              if (visitedPathsRef.current.has(to)) return;
               setPendingPath(to);
               setShowRouteLoading(true);
             }}
@@ -273,8 +272,15 @@ const Layout = () => {
 
           <Box className="relative min-h-0 flex-1 overflow-hidden py-1 pr-1">
             <Suspense fallback={<LoadingPage />}>
-              <Outlet />
-              <FrontendReadySignal />
+              {/* Unmount the previous page as soon as navigation starts. This
+                  releases page-owned timers, workers, maps and subscriptions
+                  before the next route finishes loading. */}
+              {!showRouteLoading && (
+                <>
+                  <Outlet />
+                  <FrontendReadySignal />
+                </>
+              )}
             </Suspense>
             {showRouteLoading && (
               <Box className="absolute inset-0 z-20 transition-opacity duration-150">
