@@ -148,7 +148,10 @@ export const AggregateConnectionStatsCard = () => {
   } = useConnectionData();
   const [refreshToken, setRefreshToken] = useState(0);
   useEffect(() => {
-    const timer = window.setInterval(() => setRefreshToken((value) => value + 1), REFRESH_INTERVAL);
+    const timer = window.setInterval(
+      () => setRefreshToken((value) => value + 1),
+      REFRESH_INTERVAL,
+    );
     return () => window.clearInterval(timer);
   }, []);
   const countryNames = useMemo(() => {
@@ -248,9 +251,7 @@ export const AggregateConnectionStatsCard = () => {
     }));
     const target = merge(
       sums("countries"),
-      activeSums(
-        (c) => connectionDestinationIP(c.metadata) || "Unknown",
-      ),
+      activeSums((c) => connectionDestinationIP(c.metadata) || "Unknown"),
     );
     const targetByCountry = mergeCountryTraffic(
       target,
@@ -347,7 +348,7 @@ export const AggregateConnectionStatsCard = () => {
     refreshToken,
     countryCodes,
     countryNames,
-    
+
     locale,
     rules,
     t,
@@ -361,11 +362,12 @@ export const AggregateConnectionStatsCard = () => {
       <Box
         onClick={() => setRefreshToken((value) => value + 1)}
         sx={{
+          width: "100%",
           display: "grid",
-          gridTemplateColumns: "repeat(2, minmax(300px, 1fr))",
+          gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
           gap: 1.5,
           "@container (min-width: 700px)": {
-            gridTemplateColumns: "repeat(3, minmax(205px, 1fr))",
+            gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
           },
         }}>
         {panels.map((panel) => (

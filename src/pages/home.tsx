@@ -412,8 +412,13 @@ const HomePage = () => {
                     return (
                       <Grid
                         key={key}
-                        // 保持窄窗口也使用双栏；仅在较宽的 md 断点把单卡行展开。
-                        size={{ xs: 12, sm: 6, md: row.length === 1 ? 12 : 6 }}
+                        // Full-width cards always span the complete overview row.
+                        // Smaller cards remain two-column cards when paired.
+                        size={{
+                          xs: 12,
+                          sm: row.length === 1 ? 12 : 6,
+                          md: row.length === 1 ? 12 : 6,
+                        }}
                         sx={{ display: "flex" }}>
                         <SortableItem
                           id={key}
