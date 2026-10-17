@@ -29,6 +29,7 @@ import { ConnectionStatsCard } from "@/components/home/connection-stats-card";
 import { CurrentProxyCard } from "@/components/home/current-proxy-card";
 import { EnhancedTrafficStats } from "@/components/home/enhanced-traffic-stats";
 import { HomeProfileCard } from "@/components/home/home-profile-card";
+import { OverviewMemoryBoundary } from "@/components/home/overview-memory-monitor";
 import { OverviewTopbar } from "@/components/layout/overview-topbar";
 import { useKernelAlive } from "@/hooks/use-kernel-alive";
 import { useMihomoCoresInfo } from "@/hooks/use-mihomo-cores-info";
@@ -437,7 +438,9 @@ const HomePage = () => {
                               transition: "outline-color .2s",
                             }}>
                             <Box sx={{ height: "100%" }}>
-                              {renderCardContent(key)}
+                              <OverviewMemoryBoundary name={`overview:${key}`}>
+                                {renderCardContent(key)}
+                              </OverviewMemoryBoundary>
                             </Box>
                             {editing && (
                               <Button
