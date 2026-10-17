@@ -594,6 +594,10 @@ export const EarthGlobeCard = () => {
       createdRenderer.setZoomLocked(zoomLockedRef.current);
       createdRenderer.setAutoRotation(!rotationPaused);
       createdRenderer.setCityLabelsVisible(showCityLabels);
+      // Route calculation can finish while the renderer is still loading.
+      // Replay the latest snapshot so initialization never loses the links.
+      if (mapData.origin) createdRenderer.setInitialLocation(mapData.origin);
+      createdRenderer.setRoutes(mapData.routes);
       scheduleRouteRefresh();
     } catch (error) {
       console.error("[earth] renderer init failed:", error);
@@ -613,6 +617,7 @@ export const EarthGlobeCard = () => {
     scheduleRouteRefresh,
     t,
     visualMode,
+    mapData,
   ]);
 
   // 延迟初始化（400ms + idle），StrictMode 幂等
