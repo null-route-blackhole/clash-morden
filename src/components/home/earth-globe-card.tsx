@@ -463,16 +463,9 @@ export const EarthGlobeCard = () => {
       // 保留上一次成功的路由，避免某个探测服务短暂超时时整张地图闪空。
 
       try {
-        // 不依赖单一出口探测服务：未开启 Tun 时 ip.sb/ipip 可能被代理或超时，
-        // 并发探测多个服务；实际请求路径由网络配置决定。
-        const result = await Promise.any(
-          [
-            IP_INFO_API.IPIP,
-            IP_INFO_API.IPWHOIS,
-            IP_INFO_API.IPAPI,
-            IP_INFO_API.IPSB,
-          ].map((api) => getPublicIpInfo(api)),
-        );
+        // Match Zashboard: the globe origin always uses ipip.net. Other
+        // providers remain available to the IP information cards.
+        const result = await getPublicIpInfo(IP_INFO_API.IPIP);
 
         if (!isValidIP(result.ip)) throw new Error("Invalid origin IP");
         if (requestID !== originRequestIDRef.current) return;

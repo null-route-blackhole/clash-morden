@@ -2,8 +2,8 @@
 
 pkgname=clash-verge-self-alpha-bin
 _pkgname=clash-verge-self
-pkgver=1.2.28
-_pkgver=1.2.28
+pkgver=1.2.29
+_pkgver=1.2.29
 pkgrel=1
 pkgdesc="Continuation of Clash Verge | A Mihomo GUI based on Tauri"
 arch=('x86_64')
