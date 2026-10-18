@@ -14,20 +14,11 @@ const snapshot = (): MemorySnapshot => {
   return memory ? { ...memory } : {};
 };
 
-const report = (event: string, name: string) => {
-  console.debug("[overview-memory]", event, name, {
-    active: Object.fromEntries(active),
-    memory: snapshot(),
-  });
-};
-
 export const useOverviewMemoryMonitor = (name: string) => {
   useEffect(() => {
     active.set(name, (active.get(name) ?? 0) + 1);
-    report("mount", name);
     return () => {
       active.set(name, Math.max(0, (active.get(name) ?? 1) - 1));
-      report("unmount", name);
       if (active.get(name) === 0) active.delete(name);
     };
   }, [name]);

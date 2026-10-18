@@ -111,7 +111,7 @@ export const EarthGlobeCard = () => {
 
   const [projection, setProjection] = useState<EarthProjection>("3d");
   const previousProjectionRef = useRef(projection);
-  const visualMode: EarthVisualMode = "space";
+  const [visualMode, setVisualMode] = useState<EarthVisualMode>("space");
   const [rotationPaused, setRotationPaused] = useState(false);
   const [showCityLabels, setShowCityLabels] = useState(true);
   const [zoomLocked, setZoomLocked] = useState(true);
@@ -555,6 +555,7 @@ export const EarthGlobeCard = () => {
       rendererRef.current = createdRenderer;
       createdRenderer.setAutoRotation(!rotationPaused);
       createdRenderer.setCityLabelsVisible(showCityLabels);
+      createdRenderer.setZoomLocked(zoomLockedRef.current);
       scheduleRouteRefresh();
     } catch (error) {
       console.error("[earth] renderer init failed:", error);
@@ -619,13 +620,7 @@ export const EarthGlobeCard = () => {
   useEffect(() => {
     if (previousProjectionRef.current === projection) return;
     previousProjectionRef.current = projection;
-    if (projection === "2d") {
-      rendererRef.current?.dispose();
-      rendererRef.current = null;
-      initGenerationRef.current++;
-      return;
-    }
-    if (!rendererRef.current && !disposedRef.current) void initialize();
+    rendererRef.current?.setProjection(projection);
   }, [projection]);
 
   // 数据/设置变更 → renderer
@@ -640,6 +635,14 @@ export const EarthGlobeCard = () => {
   useEffect(() => {
     rendererRef.current?.setColorScheme(colorScheme);
   }, [colorScheme]);
+
+  useEffect(() => {
+    rendererRef.current?.setZoomLocked(zoomLocked);
+  }, [zoomLocked]);
+
+  useEffect(() => {
+    rendererRef.current?.setVisualMode(visualMode);
+  }, [visualMode]);
 
   useEffect(() => {
     locationCache.current.clear();
@@ -750,6 +753,23 @@ export const EarthGlobeCard = () => {
               </span>
             </Tooltip>
           )}
+          {!isFlatMap && (
+            <OverviewSegment
+              label={t("pages.home.components.earth.mapStyle")}
+              options={[
+                {
+                  value: "space",
+                  label: t("pages.home.components.earth.styleSpace"),
+                },
+                {
+                  value: "flat",
+                  label: t("pages.home.components.earth.styleFlat"),
+                },
+              ]}
+              value={visualMode}
+              onChange={(value) => setVisualMode(value as EarthVisualMode)}
+            />
+          )}
           <OverviewSegment
             label={t("pages.home.components.earth.title")}
             options={[
@@ -797,6 +817,7 @@ export const EarthGlobeCard = () => {
               onClick={() => {
                 const next = !zoomLocked;
                 setZoomLocked(next);
+                rendererRef.current?.setZoomLocked(next);
               }}>
               {zoomLocked ? (
                 <LockRoundedIcon fontSize="small" />

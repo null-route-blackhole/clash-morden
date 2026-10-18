@@ -24,6 +24,7 @@ export interface EarthRenderer {
   setReducedMotion: (reduced: boolean) => void;
   setAutoRotation: (enabled: boolean) => void;
   setCityLabelsVisible: (visible: boolean) => void;
+  setZoomLocked: (locked: boolean) => void;
   setProjection: (projection: EarthProjection) => void;
   setVisualMode: (mode: EarthVisualMode) => void;
   setColorScheme: (scheme: EarthColorScheme) => void;

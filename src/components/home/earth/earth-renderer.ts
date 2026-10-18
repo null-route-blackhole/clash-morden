@@ -509,6 +509,10 @@ export const createEarthRenderer = async (
         cityLabelLayer.setVisible(nextVisible);
         render();
       },
+      setZoomLocked(locked) {
+        if (disposed) return;
+        controls.enableZoom = !locked;
+      },
       setProjection(next) {
         if (disposed || projection === next) return;
         startMorph(next);
